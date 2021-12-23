@@ -56,6 +56,7 @@ import {NgxSkeletonLoaderModule} from 'ngx-skeleton-loader';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import { ImpressumComponent } from './components/impressum/impressum.component';
+import { HelpComponent } from './components/help/help.component';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { SelectedItemComponent } from './components/selected-item/selected-item.component';
 @NgModule({
@@ -86,6 +87,7 @@ import { SelectedItemComponent } from './components/selected-item/selected-item.
     RoutesComponent,
     RegionComponent,
     ImpressumComponent,
+    HelpComponent,
     SelectedItemComponent,
   ],
     imports: [

@@ -77,6 +77,8 @@ export class SearchComponent implements OnInit {
   preferences = false;
   @Output() impressumVisibleEvent = new EventEmitter<boolean>();
   impressumVisible = false;
+  @Output() helpVisibleEvent = new EventEmitter<boolean>();
+  helpVisible = false;
 
   ngOnInit() {
     this.refinementStore.refinements$.subscribe(refinements => {
@@ -320,6 +322,10 @@ export class SearchComponent implements OnInit {
   toggleImpressum() {
     this.impressumVisibleEvent.emit(!this.impressumVisible);
     this.impressumVisible = !this.impressumVisible;
+  }
+  toggleHelp() {
+    this.helpVisibleEvent.emit(!this.helpVisible);
+    this.helpVisible = !this.helpVisible;
   }
   reload() {
     location.reload();

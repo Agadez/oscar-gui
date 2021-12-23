@@ -18,6 +18,7 @@ export class SideBarComponent implements OnInit {
   noResult = false;
   searchLoading = false;
   impressumVisible = false;
+  helpVisible = false;
   ngOnInit() {
 
   }
