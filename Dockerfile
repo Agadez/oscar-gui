@@ -1,14 +1,14 @@
-FROM node AS builder
-COPY . /oscar-gui
+FROM node:lts-bullseye AS builder
+RUN mkdir -p /oscar-gui/src && mkdir -p /oscar-gui/e2e
+COPY src /oscar-gui/src/
+COPY e2e /osrc-gui/e2e/
+COPY package.json ts*.json angular.json /oscar-gui/
 WORKDIR /oscar-gui
-RUN rm package-lock.json; exit 0
 RUN yarn install
+# ENV NODE_OPTIONS=--openssl-legacy-provider
 RUN $(npm bin)/ng build --prod
-RUN ls dist/oscar-gui
 
-FROM nginx:1.15.6-alpine
+FROM nginx:stable
 RUN rm -rf /usr/share/nginx/html/*
 COPY --from=builder oscar-gui/dist/oscar-gui/ /usr/share/nginx/html
-RUN ls /usr/share/nginx/html
-COPY --from=builder oscar-gui/nginx.conf /etc/nginx/nginx.conf
-RUN cat /etc/nginx/nginx.conf
+COPY nginx.conf /etc/nginx/nginx.conf
