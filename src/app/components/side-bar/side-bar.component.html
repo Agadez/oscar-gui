@@ -1,5 +1,11 @@
 <div class="side-bar" style="max-height: 100vh; overflow: auto; display: flex; flex-direction: column; position: fixed">
-    <app-search [noResult]="noResult" [loading]="searchLoading" (routesVisibleEvent)="routesVisible = $event.valueOf()" (impressumVisibleEvent)="impressumVisible = $event"></app-search>
+    <app-search
+      [noResult]="noResult"
+      [loading]="searchLoading"
+      (routesVisibleEvent)="routesVisible = $event.valueOf()"
+      (impressumVisibleEvent)="impressumVisible = $event"
+      (helpVisibleEvent)="helpVisible = $event"
+    ></app-search>
   <div style="overflow: auto; margin-top: 5px">
     <app-impressum *ngIf="impressumVisible"></app-impressum>
     <app-help *ngIf="helpVisible"></app-help>
