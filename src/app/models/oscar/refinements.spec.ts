@@ -1,7 +1,7 @@
-import { Refinements } from './refinements';
+import { ParentRefinements } from './refinements';
 
-describe('Refinements', () => {
+describe('ParentRefinements', () => {
   it('should create an instance', () => {
-    expect(new Refinements()).toBeTruthy();
+    expect(new ParentRefinements()).toBeTruthy();
   });
 });

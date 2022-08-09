@@ -1,7 +1,7 @@
-import { Routing } from './routing';
+import { RoutingPath } from './routing';
 
-describe('Routing', () => {
+describe('RoutingPath', () => {
   it('should create an instance', () => {
-    expect(new Routing()).toBeTruthy();
+    expect(new RoutingPath()).toBeTruthy();
   });
 });
