@@ -7,16 +7,17 @@
       You can then make the usual operations with these sets like intersecting them.
       There is some special syntax to define the type of match and the set operation.
       See the table below for an overview. Some examples are listed underneath it.
-      You may also make spatial queries which select all items in the vicinity of the given query rectangle.
+      <!-- You may also make spatial queries which select all items in the vicinity of the given query rectangle. -->
     </p>
     <p>
       If you click on an item in the result list, the map will zoom to it and the item will be highlighted.
       You can click on a item to scroll to its definition in the result list.
     </p>
     <p>
-      You can further improve the query by adding more statements for example by clicking on the key or values of items in the result list.
-      This will add the key or key:value to the query. Some keys are special like the wikipedia or url key.
-      Clicking on the value will take you to the respective wikipedia entry or the url defined as value.
+      You can further improve the query by adding more statements.
+       <!-- for example by clicking on the key or values of items in the result list. -->
+      <!-- This will add the key or key:value to the query. Some keys are special like the wikipedia or url key. -->
+      <!-- Clicking on the value will take you to the respective wikipedia entry or the url defined as value. -->
     </p>
   </div>
   <table class="table table-hover table-bordered table-condensed">
@@ -24,7 +25,7 @@
     <tr><th colspan="2">Examples</th></tr>
     <tr>
       <td>
-        <a href="#dummy" class="example-query-string" title="Click to use this as query">
+        <a class="example-query-string">
           @waterway:waterfall germany
         </a>
       </td>
@@ -32,7 +33,7 @@
     </tr>
     <tr>
       <td>
-        <a href="#dummy" class="example-query-string" title="Click to use this as query">"Yosemite National Park" @highway</a>
+        <a class="example-query-string">"Yosemite National Park" @highway</a>
       </td>
       <td>
         List all higways in Yosemite National Park
@@ -40,7 +41,7 @@
     </tr>
     <tr>
       <td>
-        <a href="#dummy" class="example-query-string" title="Click to use this as query">
+        <a class="example-query-string">
           @amenity:restaurant + @amenity:fast_food miami
         </a>
       </td>
@@ -50,7 +51,7 @@
     </tr>
     <tr>
       <td>
-        <a href="#dummy" class="example-query-string" title="Click to use this as query">
+        <a class="example-query-string">
           @tourism:hotel &quot;new york&quot;
         </a>
       </td>
@@ -60,7 +61,7 @@
     </tr>
     <tr>
       <td>
-        <a href="#dummy" class="example-query-string" title="Click to use this as query">
+        <a class="example-query-string">
           @amenity:restaurant (@cuisine:italian + @cuisine:french) munich
         </a>
       </td>
@@ -70,7 +71,7 @@
     </tr>
     <tr>
       <td>
-        <a href="#dummy" class="example-query-string" title="Click to use this as query">
+        <a class="example-query-string">
           @amenity:fast_food munich - (burger? ?king) - (mc? ?donald?)
         </a>
       </td>
@@ -81,8 +82,8 @@
     </tr>
     <tr>
       <td>
-        <a href="#dummy" class="example-query-string" title="Click to use this as query">
-          &percnt;1&percnt;&percnt; @amenity:school @amenity:kindergarten
+        <a class="example-query-string">
+          &#37;1&#37;&#37; @amenity:school @amenity:kindergarten
         </a>
       </td>
       <td>
@@ -91,8 +92,8 @@
     </tr>
     <tr>
       <td>
-        <a href="#dummy" class="example-query-string" title="Click to use this as query">
-          @shop:supermarket (&percnt;@amenity:atm &percnt;@amenity:pharmacy &percnt;@shop:car_repair)
+        <a class="example-query-string">
+          @shop:supermarket (&#37;@amenity:atm &#37;@amenity:pharmacy &#37;@shop:car_repair)
         </a>
       </td>
       <td>
@@ -101,7 +102,7 @@
     </tr>
     <tr>
       <td>
-        <a href="#dummy" class="example-query-string" title="Click to use this as query">
+        <a class="example-query-string">
           @tourism:hotel :north-of (eiffel tour paris @tourism:attraction)
         </a>
       </td>
@@ -111,8 +112,8 @@
     </tr>
     <tr>
       <td>
-        <a href="#dummy" class="example-query-string" title="Click to use this as query">
-          @shop:supermarket :north-of &num;Munich
+        <a class="example-query-string">
+          @shop:supermarket :north-of &#35;Munich
         </a>
       </td>
       <td>
@@ -121,7 +122,7 @@
     </tr>
     <tr>
       <td>
-        <a href="#dummy" class="example-query-string" title="Click to use this as query">
+        <a class="example-query-string">
           @tourism:hotel (&quot;Frankfurt am Main&quot; &lt;-&gt; &quot;Munich&quot;)
         </a>
       </td>
@@ -131,8 +132,8 @@
     </tr>
     <tr>
       <td>
-        <a href="#dummy" class="example-query-string" title="Click to use this as query">
-          &percnt;5&percnt;&percnt; (@waterway:river &quot;Donau&quot;) @tourism:camp_site
+        <a class="example-query-string">
+          &#37;5&#37;&#37; (@waterway:river &quot;Donau&quot;) @tourism:camp_site
         </a>
       </td>
       <td>
@@ -199,11 +200,11 @@
       <td><span>#STRING-MATCH</span></td>
       <td>Match only region with match types as specified by STRING-MATCH</td>
     </tr>
-    <tr>
+    <!-- <tr>
       <td>Spatial objects</td>
       <td><span>&amp;object-name</span></td>
-      <td>Match all items that are in the spatial object as defined in the geometry tab.</td>
-    </tr>
+      <td>Match all items that are in the spatial object as defined in the geometry tab. </td>
+    </tr> -->
     </tbody>
   </table>
   <table class="table table-hover table-bordered table-condensed">
