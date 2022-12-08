@@ -1,26 +1,26 @@
-import {Injectable, NgZone} from '@angular/core';
-import {ItemStoreService} from '../data/item-store.service';
-import {OscarMinItem} from '../../models/oscar/oscar-min-item';
-import {GeoPoint} from '../../models/geo-point';
-import {BehaviorSubject} from 'rxjs';
-import '../../../../node_modules/leaflet-webgl-heatmap/src/webgl-heatmap/webgl-heatmap';
+import { Injectable, NgZone } from "@angular/core";
+import { ItemStoreService } from "../data/item-store.service";
+import { OscarMinItem } from "../../models/oscar/oscar-min-item";
+import { GeoPoint } from "../../models/geo-point";
+import { BehaviorSubject } from "rxjs";
+import "../../../../node_modules/leaflet-webgl-heatmap/src/webgl-heatmap/webgl-heatmap";
 
-import {OscarItemsService} from '../oscar/oscar-items.service';
-import {RoutingMarker} from '../../models/routing-marker';
-import {LatLng, LatLngBounds, LayerGroup, Map as LeafletMap} from 'leaflet';
-import {Region} from '../../models/oscar/region';
-import {OscarItem} from '../../models/oscar/oscar-item';
-import {SelectedItemService} from '../ui/selected-item.service';
+import { OscarItemsService } from "../oscar/oscar-items.service";
+import { RoutingMarker } from "../../models/routing-marker";
+import { LatLng, LatLngBounds, LayerGroup, Map as LeafletMap } from "leaflet";
+import { Region } from "../../models/oscar/region";
+import { OscarItem } from "../../models/oscar/oscar-item";
+import { SelectedItemService } from "../ui/selected-item.service";
 declare var L;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class MapService {
   routingMarkers = new Map<string, L.Marker>();
   maxZoom = 20;
 
-  heatmap = new L.webGLHeatmap({size: 10, units: 'px'});
+  heatmap = new L.webGLHeatmap({ size: 10, units: "px" });
 
   searchMarkerLayer = new L.LayerGroup();
   routingMarkerLayer = new L.LayerGroup();
@@ -39,17 +39,17 @@ export class MapService {
   readonly onMapReady$ = this._mapReady.asObservable();
   _map: LeafletMap;
   route: L.Polyline = L.polyline([], {
-    color: 'red',
+    color: "red",
     weight: 3,
     opacity: 0.5,
-    smoothFactor: 1
+    smoothFactor: 1,
   });
-  constructor(private itemStore: ItemStoreService,
-              private zone: NgZone,
-              private oscarItemsService: OscarItemsService,
-              private selectedItemService: SelectedItemService) {
-
-  }
+  constructor(
+    private itemStore: ItemStoreService,
+    private zone: NgZone,
+    private oscarItemsService: OscarItemsService,
+    private selectedItemService: SelectedItemService
+  ) {}
 
   setView(lat: number, lng: number, zoom: number) {
     // @ts-ignore
@@ -83,18 +83,21 @@ export class MapService {
     this.map.addLayer(this.routingMarkerLayer);
     this.map.addLayer(this.rectLayer);
     this.map.addLayer(this.regionLayer);
-    this.map.on('zoom', (event) => {
+    this.map.on("zoom", (event) => {
       this.zoom = event.target._zoom;
       this._zoom.next(event);
     });
-    this.map.on('moveend', (event) => {
+    this.map.on("moveend", (event) => {
       this._move.next(event);
     });
-    this.map.on('click', (event => this._click.next(event)));
-    this.map.on('contextmenu', (event =>
-        {
-          this._contextMenu.next(event);
-        }));
+    this.map.on("click", (event) => this._click.next(event));
+    this.map.on("contextmenu", (event) => {
+      this._contextMenu.next(event);
+    });
+  }
+
+  drawPolygon(){
+    
   }
   drawRoute(route: GeoPoint[]) {
     this.route.setLatLngs([]);
@@ -110,23 +113,23 @@ export class MapService {
       dataPoints.push([item.lat, item.lon, intensity]);
     }
     this.clearHeatMap();
-    this.heatmap.setData( dataPoints );
+    this.heatmap.setData(dataPoints);
   }
   drawItemsMarker(items: OscarMinItem[]) {
     this.searchMarkerLayer.clearLayers();
-    this.oscarItemsService.getMultipleItems(items).subscribe(data => {
+    this.oscarItemsService.getMultipleItems(items).subscribe((data) => {
       const itemFeatures = data.features;
       // draw markers
       itemFeatures.forEach((item) => {
-        const keyValues  = [];
-        keyValues.push({k: 'osm-id', v: item.properties.osmid});
-        keyValues.push({k: 'oscar-id', v: item.properties.id});
+        const keyValues = [];
+        keyValues.push({ k: "osm-id", v: item.properties.osmid });
+        keyValues.push({ k: "oscar-id", v: item.properties.id });
         for (let i = 0; i < item.properties.k.length; i++) {
-          keyValues.push({k : item.properties.k[i], v : item.properties.v[i]});
-          if (item.properties.k[i] === 'name') {
+          keyValues.push({ k: item.properties.k[i], v: item.properties.v[i] });
+          if (item.properties.k[i] === "name") {
             const name = item.properties.v[i];
-            if (name === '') {
-              item.properties.name = 'Item without name';
+            if (name === "") {
+              item.properties.name = "Item without name";
             } else {
               item.properties.name = item.properties.v[i];
             }
@@ -137,26 +140,26 @@ export class MapService {
             <a href="https://www.openstreetmap.org/${item.properties.type}/${item.properties.osmid}" target="_blank">OSM</a>
             <ul style="list-style-type:none;">
           `;
-        keyValues.forEach(k => {
+        keyValues.forEach((k) => {
           popupText += `<li>${k.k}:${k.v}</li>`;
         });
-        popupText += '</ul></div>';
+        popupText += "</ul></div>";
 
-        if (item.geometry.type === 'LineString') {
+        if (item.geometry.type === "LineString") {
           this.drawGeoJSON(
             {
               type: item.type,
               properties: item.properties,
-              geometry:
-                {
-                  type: 'Point',
-                  coordinates: item.geometry.coordinates[0]
-                }
-                },
-            popupText);
+              geometry: {
+                type: "Point",
+                coordinates: item.geometry.coordinates[0],
+              },
+            },
+            popupText
+          );
         }
         this.drawGeoJSON(item, popupText);
-
+        console.log(L.geoJSON(item, popupText).bounds);
       });
     });
   }
@@ -168,18 +171,18 @@ export class MapService {
         const smallIcon = new L.Icon({
           iconSize: [25, 41],
           iconAnchor: [13, 41],
-          iconUrl: 'leaflet/marker-icon.png',
-          shadowUrl: 'leaflet/marker-shadow.png',
+          iconUrl: "leaflet/marker-icon.png",
+          shadowUrl: "leaflet/marker-shadow.png",
           popupAnchor: [1, -24],
         });
-        return L.marker(latlng, {icon: smallIcon});
+        return L.marker(latlng, { icon: smallIcon });
       },
-      onEachFeature: ((feature, layer) => {
-        layer.on('click', (event) => {
+      onEachFeature: (feature, layer) => {
+        layer.on("click", (event) => {
           this.selectedItemService.subject.next(item);
         });
-      }),
-      style: {color: 'blue', stroke: true, fill: false, opacity: 0.7}
+      },
+      style: { color: "blue", stroke: true, fill: false, opacity: 0.7 },
     }).addTo(this.searchMarkerLayer);
   }
   drawRegion(region: OscarItem) {
@@ -190,8 +193,6 @@ export class MapService {
 
   drawRoutingMarker(routingMarkers: RoutingMarker[]) {
     // Creates a red marker with the coffee icon
-
-
   }
   clearRegions() {
     this.regionLayer.clearLayers();
@@ -213,12 +214,23 @@ export class MapService {
   fitBounds(bounds: L.LatLngBounds) {
     console.log(bounds);
     if (bounds.getNorthEast().lat === 100000) {
-      bounds  = new LatLngBounds(new LatLng(55.203953, 4.21875), new LatLng(47.219568, 14.897462));
+      bounds = new LatLngBounds(
+        new LatLng(55.203953, 4.21875),
+        new LatLng(47.219568, 14.897462)
+      );
     }
     this.map.fitBounds(bounds);
   }
-  drawRect(id: string, bounds: L.LatLngBounds, color: string, weight: number, hover: string) {
-    const rect = L.rectangle(bounds, {color, weight}).bindTooltip(hover).addTo(this.rectLayer);
+  drawRect(
+    id: string,
+    bounds: L.LatLngBounds,
+    color: string,
+    weight: number,
+    hover: string
+  ) {
+    const rect = L.rectangle(bounds, { color, weight })
+      .bindTooltip(hover)
+      .addTo(this.rectLayer);
   }
   clearRects() {
     this.rectLayer.clearLayers();

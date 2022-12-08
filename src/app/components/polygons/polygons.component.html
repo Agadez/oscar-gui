@@ -1,0 +1,35 @@
+<button
+  class="add-polygon-button"
+  mat-raised-button
+  color="primary"
+  (click)="addTab()"
+>
+  Add Polygon
+</button>
+<mat-tab-group
+  #tabs
+  [hidden]="polygons.length == 0"
+  mat-stretch-tabs
+  style="margin-top: 10px; border-radius: 3px"
+  class="polygon-tabs"
+  (selectedTabChange)="changeTab($event)"
+>
+  <mat-tab *ngFor="let polygon of polygons">
+    <ng-template class="w-100 d-flex justify-content-between" mat-tab-label>
+      <i class="fa-solid fa-draw-polygon"></i>
+      <i
+        style="cursor: pointer"
+        (click)="closeTab(polygon)"
+        class="fas fa-times ml-4"
+      ></i>
+    </ng-template>
+    <app-polygon
+      [hidden]="polygonsEmpty"
+      [active]="polygon.active"
+      [color]="polygon.color"
+      [initialPoint]="polygonsEmpty"
+      [uuid]="polygon.uuid"
+      [polygonVisible]="polygonVisible"
+    ></app-polygon>
+  </mat-tab>
+</mat-tab-group>
