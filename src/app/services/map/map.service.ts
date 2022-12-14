@@ -4,7 +4,8 @@ import { OscarMinItem } from "../../models/oscar/oscar-min-item";
 import { GeoPoint } from "../../models/geo-point";
 import { BehaviorSubject } from "rxjs";
 import "../../../../node_modules/leaflet-webgl-heatmap/src/webgl-heatmap/webgl-heatmap";
-
+import { v4 as uuidv4 } from "uuid";
+import { PolygonNode } from "src/app/models/polygon-node.model";
 import { OscarItemsService } from "../oscar/oscar-items.service";
 import { RoutingMarker } from "../../models/routing-marker";
 import { LatLng, LatLngBounds, LayerGroup, Map as LeafletMap } from "leaflet";
@@ -27,6 +28,7 @@ export class MapService {
   regionLayer = new L.LayerGroup();
   rectLayer = new LayerGroup();
   zoom: number;
+  _route = new BehaviorSubject<any>(null);
   private readonly _zoom = new BehaviorSubject<any>(null);
   readonly onZoom$ = this._zoom.asObservable();
   private readonly _move = new BehaviorSubject<any>(null);
@@ -96,9 +98,7 @@ export class MapService {
     });
   }
 
-  drawPolygon(){
-    
-  }
+  drawPolygon() {}
   drawRoute(route: GeoPoint[]) {
     this.route.setLatLngs([]);
     const latLngs = [];

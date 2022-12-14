@@ -31,7 +31,6 @@ import { displayRegion } from "../region/region.component";
 import { clearItems } from "../search-result-view/search-result-view.component";
 import { TextUtil } from "../../util/text-util";
 import { PolygonServiceService } from "../../services/polygon-service.service";
-import { GeoPoint } from "src/app/models/geo-point";
 
 declare function getOscarQuery(input);
 
@@ -92,8 +91,6 @@ export class SearchComponent implements OnInit {
   routesVisible = false;
   sideButtonClass = "side-button";
   localSearch = false;
-  polygonSearch = false;
-  polygon: Array<GeoPoint> = [];
 
   @Output() polygonVisibleEvent = new EventEmitter<boolean>();
   polygonVisible = false;
@@ -171,12 +168,6 @@ export class SearchComponent implements OnInit {
 
     activateRouting.subscribe(() => this.showRouting());
     activatePolygon.subscribe(() => this.togglePolygon());
-    this.polygonService.polygon.subscribe((polygon) => {
-      this.polygon = polygon;
-      this.polygonSearch = true;
-      this.localSearch = false;
-      this.search();
-    });
   }
 
   async search() {
@@ -191,6 +182,8 @@ export class SearchComponent implements OnInit {
         first = false;
         idPrependix += "$cell:" + cellId;
       }
+    } else if (!this.localSearch && this.polygonService.polygonArray) {
+      idPrependix += this.polygonService.getPolygonQuery();
     }
     this.queryId++;
 
@@ -225,29 +218,7 @@ export class SearchComponent implements OnInit {
         fullQueryString = localString;
       }
     }
-    if (this.polygonSearch) {
-      let north = -10000;
-      let east = -10000;
-      let south = 10000;
-      let west = 10000;
-
-      for (const node of this.polygon) {
-        if (north < node.lat) north = node.lat;
-        if (east < node.lon) east = node.lon;
-        if (south > node.lat) south = node.lat;
-        if (west > node.lon) west = node.lon;
-      }
-      const localString =
-        fullQueryString + ` $geo:${west},${south},${east},${north}`;
-      console.log("url: " + localString);
-      const apxStats = await this.oscarItemService
-        .getApxItemCount(localString)
-        .toPromise();
-      if (apxStats.items > 0) {
-        fullQueryString = localString;
-      }
-      this.polygonSearch = false;
-    }
+    console.log("full: " + fullQueryString);
     this.itemStore.setHighlightedItem(null);
     this.loading = true;
     this.oscarItemService

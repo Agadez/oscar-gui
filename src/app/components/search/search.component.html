@@ -6,7 +6,7 @@
         [matAutocomplete]="normal_auto"
         [(ngModel)]="inputString"
         (ngModelChange)="inputUpdate($event)"
-        (keydown.enter)="polygonVisible || search()"
+        (keydown.enter)="search()"
         type="text"
         class="search-input"
         placeholder="Search"
@@ -104,13 +104,19 @@
 <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
 <div
   *ngIf="preferences"
-  class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between"
+  class="bg-white mt-2 rounded px-3 py-2 flex justify-content-between"
 >
-  <span>Local Search</span>
-  <mat-slide-toggle
-    color="primary"
-    [(ngModel)]="localSearch"
-  ></mat-slide-toggle>
+  <div class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between">
+    <span>Local Search</span>
+    <mat-slide-toggle
+      color="primary"
+      [(ngModel)]="localSearch"
+    ></mat-slide-toggle>
+  </div>
+  <div class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between">
+    <span>Max Items in Result</span>
+    <input [(ngModel)]="maxitems" />
+  </div>
 </div>
 <div [hidden]="!error" class="alert alert-danger" role="alert">
   Result to large. Please refine query.

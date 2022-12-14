@@ -68,19 +68,12 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
       opacity: 1,
       smoothFactor: 1,
     });
+    this.mapService._route.next(true);
     this.mapService.onClick$.subscribe((event) => {
-      
-      if (!event) {
-        return;
-      }
-      if (!this.active) {
-        return;
-      }
-      if (!this.routesVisible) {
+      if (!event || !this.active || !this.routesVisible) {
         return;
       }
       this.zone.run(() => {
-        console.log("zone")
         this.addRoutingPoint({
           point: new GeoPoint(event.latlng.lat, event.latlng.lng),
           name: "",
@@ -112,6 +105,7 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
   }
   ngOnChanges(changes: SimpleChanges): void {}
   ngOnDestroy(): void {
+    this.mapService._route.next(false);
     this.clearList();
     this.active = false;
   }

@@ -23,16 +23,16 @@
       ></div>
     </div>
     <button mat-stroked-button (click)="clearList()">clear</button>
-    <button mat-stroked-button (click) = "route()">route</button>
+    <mat-checkbox (change)="polygonProcess($event.checked)"></mat-checkbox>
   </div>
   <div
     style="margin-top: 5px; width: 95%; text-align: left; margin-left: 3%"
-    *ngIf="polygonNodes.length > 0"
+    *ngIf="nodes.length > 0"
     cdkDropList
     class="routing-list"
   >
     <div
-      *ngFor="let node of polygonNodes"
+      *ngFor="let node of nodes"
       cdkDrag
       class="routing-list-item"
       style="
@@ -45,7 +45,7 @@
       <div
         style="width: 13%; display: inline-flex; justify-content: space-around"
       >
-        <i class="fa-solid fa-circle" style="color:{{ node.color }}"></i>
+        <i class="fa-solid fa-circle" [style.color]="node.color"></i>
       </div>
       <div
         *ngIf="node.name === ''"
@@ -71,7 +71,7 @@
   </div>
   <div
     style="text-align: center; width: 100%; margin-top: 50px"
-    *ngIf="polygonNodes.length === 0"
+    *ngIf="nodes.length === 0"
   >
     Click on the map to add nodes for a Polygon.
   </div>

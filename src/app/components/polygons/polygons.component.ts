@@ -7,19 +7,23 @@ import {
   ViewChild,
 } from "@angular/core";
 import { MatTabChangeEvent } from "@angular/material/tabs";
-import { GeoPoint } from "../../models/geo-point";
+
 import { MatTabGroup } from "@angular/material/tabs";
 import { v4 as uuidv4 } from "uuid";
-import { BehaviorSubject } from "rxjs";
+import { MapService } from "src/app/services/map/map.service";
+import { PolygonServiceService } from "src/app/services/polygon-service.service";
 
-export const tabClosed = new BehaviorSubject(false);
 @Component({
   selector: "app-polygons",
   templateUrl: "./polygons.component.html",
   styleUrls: ["./polygons.component.sass"],
 })
 export class PolygonsComponent implements OnInit {
-  constructor(private zone: NgZone) {}
+  constructor(
+    private zone: NgZone,
+    private mapService: MapService,
+    private polygonService: PolygonServiceService
+  ) {}
 
   @Input()
   polygonVisible = false;
@@ -33,17 +37,29 @@ export class PolygonsComponent implements OnInit {
     name: string;
     uuid: uuidv4;
     color: string;
-    destroyed: boolean;
+    inSearch: boolean;
   }[] = [];
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.polygonService.inSearch.subscribe((uuid) => {
+      for (const polygon of this.polygons) {
+        if (uuid === polygon.uuid) {
+          polygon.inSearch = !polygon.inSearch;
+          if (polygon.inSearch) polygon.color = "#ff0000";
+          else polygon.color = "#007bff";
+          this.polygonService.polygonInSearch.next({uuid: polygon.uuid, color: polygon.color});
+          break;
+        }
+      }
+    });
+  }
 
   addTab() {
     this.polygons.push({
       active: true,
       name: "",
       uuid: uuidv4(),
-      color: this.getRandomColor(),
-      destroyed: false,
+      color: "#007bff",
+      inSearch: false,
     });
     if (this.polygonsEmpty) {
       this.polygonsEmpty = false;
@@ -58,13 +74,16 @@ export class PolygonsComponent implements OnInit {
     tabGroup.selectedIndex = this.polygons.length - 1;
   }
   changeTab($event: MatTabChangeEvent) {
+    let index = $event.index;
     if (this.polygonsEmpty) {
       return;
     }
     for (const polygon of this.polygons) {
       polygon.active = false;
+      if (!polygon.inSearch) this.polygonService.tabChanged.next(polygon.uuid);
     }
-    this.polygons[$event.index].active = true;
+    this.polygons[index].active = true;
+    this.polygonService.tabActivated.next(this.polygons[index].uuid);
   }
   closeTab(polygon: {
     active: boolean;
@@ -76,15 +95,11 @@ export class PolygonsComponent implements OnInit {
     this.polygons = this.polygons.filter(
       (value) => value.uuid !== polygon.uuid
     );
-    tabClosed.next(polygon.uuid);
+    this.polygonService.tabClosed.next(polygon.uuid);
     this.polygonsEmpty = this.polygons.length === 0;
-  }
-  getRandomColor(): string {
-    const letters = "0123456789ABCDEF";
-    let color = "#";
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
+    if (!this.polygonsEmpty)
+      this.polygonService.tabActivated.next(
+        this.polygons[this.activeTab.selectedIndex].uuid
+      );
   }
 }
