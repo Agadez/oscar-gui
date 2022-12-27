@@ -15,20 +15,44 @@ export class PolygonServiceService {
   inSearch = new BehaviorSubject(false);
 
   polygonArray: GeoPointId[][] = [];
+  polygonMapping = new Map();
+  nameMapping = new Map();
 
-  addPolygon(polygon: GeoPointId[]) {
-    this.polygonArray.push(polygon);
-    console.log(this.polygonArray);
+  checkName(name) {
+    if (!this.nameMapping.has(name)) return true;
+    return false;
   }
-  removePolygon(polygon: GeoPointId[]) {
+  addName(name, uuid) {
+    this.nameMapping.set(name, uuid);
+  }
+  removeName(name) {
+    this.nameMapping.delete(name);
+  }
+  addPolygon(polygon: GeoPointId[], uuid: uuidv4) {
+    this.polygonMapping.set(uuid, polygon);
+    console.log(this.polygonMapping);
+    this.polygonArray.push(polygon);
+  }
+  removePolygon(polygon: GeoPointId[], uuid: uuidv4) {
     const index = this.polygonArray.findIndex((polygonObject) => {
       return polygonObject[0].uuid === polygon[0].uuid;
     });
     console.log("index: ", index);
     if (index !== -1) this.polygonArray.splice(index, 1);
+    this.polygonMapping.delete(uuid);
   }
-  removeNode(uuid: uuidv4) {
+  removeNode(polygonUuid: uuidv4, uuid: uuidv4) {
     for (const polygon of this.polygonArray) {
+      const index = polygon.findIndex((node) => {
+        return node.uuid === uuid;
+      });
+      if (index !== -1) {
+        polygon.splice(index, 1);
+        break;
+      }
+    }
+
+    for (const polygon of this.polygonMapping.get(polygonUuid)) {
       const index = polygon.findIndex((node) => {
         return node.uuid === uuid;
       });
@@ -50,6 +74,19 @@ export class PolygonServiceService {
         } else polygonString += `,${node.lat},${node.lon}`;
         index++;
       }
+    }
+    return polygonString;
+  }
+  getPolygonQuery2(uuid: uuidv4): string {
+    console.log(uuid);
+    let polygonString = "";
+    let index = 0;
+
+    for (const node of this.polygonMapping.get(uuid)) {
+      if (index == 0) {
+        polygonString += `$poly:${node.lat},${node.lon}`;
+      } else polygonString += `,${node.lat},${node.lon}`;
+      index++;
     }
     return polygonString;
   }

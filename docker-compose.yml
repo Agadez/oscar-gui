@@ -1,8 +1,8 @@
-version: '3.6'
+version: "3.6"
 
 services:
   oscar-gui:
     build: ./
-    image: dbahrdt/oscar-gui:latest
-    ports:
+  image: nrat/oscar-gui:latest
+  ports:
     - "14085:80"

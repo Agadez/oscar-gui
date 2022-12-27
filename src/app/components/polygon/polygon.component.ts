@@ -26,6 +26,7 @@ export class PolygonComponent implements OnInit, OnDestroy {
     private polygonService: PolygonServiceService
   ) {}
 
+  showNameForm = false;
   @Input()
   active = true;
   @Input()
@@ -35,6 +36,8 @@ export class PolygonComponent implements OnInit, OnDestroy {
   inSearch = false;
   @Input()
   uuid = uuidv4();
+  name = "";
+  deprecatedName = "";
   mapPolygon: L.Polygon;
   nodes: Array<PolygonNode> = [];
   nodeLayer = new L.LayerGroup();
@@ -101,6 +104,23 @@ export class PolygonComponent implements OnInit, OnDestroy {
     });
     init = false;
   }
+  setName() {
+    if (this.deprecatedName == this.name) return;
+    if (!this.polygonService.checkName(this.name)) {
+      // hier dialog, dass name schon drin is
+      this.name = this.deprecatedName;
+      this.toggleNameForm();
+      console.log(this.name + " schon weg");
+      return;
+    }
+    this.polygonService.removeName(this.deprecatedName);
+    this.polygonService.addName(this.name, this.uuid);
+    this.deprecatedName = this.name;
+    this.toggleNameForm();
+  }
+  toggleNameForm() {
+    this.showNameForm = !this.showNameForm;
+  }
   addNode({ point, name, uuid }) {
     const node = {
       color: this.polygonService.getRandomColor(),
@@ -110,7 +130,8 @@ export class PolygonComponent implements OnInit, OnDestroy {
     };
     this.nodes.push(node);
     this.draw();
-    if (this.inSearch) this.polygonProcess(true);
+    this.polygonProcess(true);
+    // if (this.inSearch) this.polygonProcess(true);
   }
 
   draw() {
@@ -152,9 +173,11 @@ export class PolygonComponent implements OnInit, OnDestroy {
   removeNode(uuid: uuidv4) {
     this.nodes = this.nodes.filter((value) => value.uuid !== uuid);
     this.draw();
-    if (this.inSearch) {
-      this.polygonService.removeNode(uuid);
-    }
+    this.polygonService.removeNode(this.uuid, uuid);
+
+    // if (this.inSearch) {
+    //   this.polygonService.removeNode(uuid);
+    // }
   }
   ngOnDestroy(): void {
     this.clearList;
@@ -177,9 +200,9 @@ export class PolygonComponent implements OnInit, OnDestroy {
       queryPolygon.push(node.geoPoint);
     }
     if ($event) {
-      this.polygonService.addPolygon(queryPolygon);
+      this.polygonService.addPolygon(queryPolygon, this.uuid);
     } else {
-      this.polygonService.removePolygon(queryPolygon);
+      this.polygonService.removePolygon(queryPolygon, this.uuid);
     }
     this.polygonService.inSearch.next(this.uuid);
   }

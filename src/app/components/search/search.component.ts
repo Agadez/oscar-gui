@@ -31,6 +31,7 @@ import { displayRegion } from "../region/region.component";
 import { clearItems } from "../search-result-view/search-result-view.component";
 import { TextUtil } from "../../util/text-util";
 import { PolygonServiceService } from "../../services/polygon-service.service";
+import { split } from "lodash";
 
 declare function getOscarQuery(input);
 
@@ -102,6 +103,11 @@ export class SearchComponent implements OnInit {
   helpVisible = false;
 
   ngOnInit() {
+    this.subscribeRefinements();
+    activateRouting.subscribe(() => this.showRouting());
+    activatePolygon.subscribe(() => this.togglePolygon());
+  }
+  subscribeRefinements() {
     this.refinementStore.refinements$.subscribe((refinements) => {
       this.keyValuePrependix = "";
       refinements
@@ -165,14 +171,26 @@ export class SearchComponent implements OnInit {
         });
       this.search();
     });
-
-    activateRouting.subscribe(() => this.showRouting());
-    activatePolygon.subscribe(() => this.togglePolygon());
   }
 
+  mapPolygonName() {
+    const split = this.inputString.split(" ");
+    this.inputString = "";
+    for (const word of split) {
+      if (word[0] == "§") {
+        this.inputString +=
+          this.polygonService.getPolygonQuery2(
+            this.polygonService.nameMapping.get(word.substring(1))
+          ) + " ";
+      } else {
+        this.inputString += word + " ";
+      }
+    }
+  }
   async search() {
     this.error = false;
     let idPrependix = "(";
+    this.mapPolygonName();
     if (this.routingService.currentRoute) {
       let first = true;
       for (const cellId of this.routingService.currentRoute.cellIds) {
@@ -182,9 +200,10 @@ export class SearchComponent implements OnInit {
         first = false;
         idPrependix += "$cell:" + cellId;
       }
-    } else if (!this.localSearch && this.polygonService.polygonArray) {
-      idPrependix += this.polygonService.getPolygonQuery();
     }
+    // else if (!this.localSearch && this.polygonService.polygonArray) {
+    //   idPrependix += this.polygonService.getPolygonQuery();
+    // }
     this.queryId++;
 
     const routeQueryString = this.getRouteQueryString();
@@ -200,7 +219,6 @@ export class SearchComponent implements OnInit {
       this.parentAppendix +
       this.keyValueAppendix +
       routeQueryString;
-
     if (fullQueryString === "") {
       return;
     }

@@ -44,9 +44,12 @@ export class PolygonsComponent implements OnInit {
       for (const polygon of this.polygons) {
         if (uuid === polygon.uuid) {
           polygon.inSearch = !polygon.inSearch;
-          if (polygon.inSearch) polygon.color = "#ff0000";
-          else polygon.color = "#007bff";
-          this.polygonService.polygonInSearch.next({uuid: polygon.uuid, color: polygon.color});
+          if (polygon.inSearch) polygon.color = "#007bff";
+          else polygon.color = "#808080";
+          this.polygonService.polygonInSearch.next({
+            uuid: polygon.uuid,
+            color: polygon.color,
+          });
           break;
         }
       }
@@ -58,7 +61,7 @@ export class PolygonsComponent implements OnInit {
       active: true,
       name: "",
       uuid: uuidv4(),
-      color: "#007bff",
+      color: "#808080",
       inSearch: false,
     });
     if (this.polygonsEmpty) {
