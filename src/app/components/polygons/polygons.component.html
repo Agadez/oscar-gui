@@ -8,27 +8,23 @@
 </button>
 <mat-tab-group
   #tabs
-  [hidden]="polygons.length == 0"
+  [hidden]="!polygonsEmpty"
   mat-stretch-tabs
   style="margin-top: 10px; border-radius: 3px"
   class="polygon-tabs"
   (selectedTabChange)="changeTab($event)"
 >
-  <mat-tab *ngFor="let polygon of polygons">
+  <mat-tab *ngFor="let polygon of polygonService.polygonMapping | keyvalue">
     <ng-template class="w-100 d-flex justify-content-between" mat-tab-label>
       <i class="fa-solid fa-draw-polygon"></i>
       <i
         style="cursor: pointer"
-        (click)="closeTab(polygon)"
+        (click)="closeTab(polygon.key)"
         class="fas fa-times ml-4"
       ></i>
     </ng-template>
     <app-polygon
-      [hidden]="polygonsEmpty"
-      [active]="polygon.active"
-      [color]="polygon.color"
-      [initialPoint]="polygonsEmpty"
-      [uuid]="polygon.uuid"
+      [uuid]="polygon.key"
       [polygonVisible]="polygonVisible"
     ></app-polygon>
   </mat-tab>

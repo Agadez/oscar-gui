@@ -174,23 +174,51 @@ export class SearchComponent implements OnInit {
   }
 
   mapPolygonName() {
-    const split = this.inputString.split(" ");
-    this.inputString = "";
-    for (const word of split) {
-      if (word[0] == "§") {
-        this.inputString +=
-          this.polygonService.getPolygonQuery2(
-            this.polygonService.nameMapping.get(word.substring(1))
-          ) + " ";
-      } else {
-        this.inputString += word + " ";
-      }
-    }
+    // regex that finds all defined polygons
+    const reg = /\§(\w+)/g;
+    let polygonService = this.polygonService;
+    const newQueryString = this.inputString.replace(reg, function (_, p1) {
+      return polygonService.polygonMapping.get(
+        polygonService.nameMapping.get(p1)
+      ).polygonQuery;
+    });
+    return newQueryString;
   }
+
+  // mapPolygonName1() {
+  //   const split = this.inputString.split(" ");
+  //   let tempInputString = "";
+  //   let actualPolygonName = "";
+  //   let lastChar = "";
+  //   console.log("split: " + split);
+  //   for (const word of split) {
+  //     if (word[0] == "§") {
+  //       let polygonNames = word.split("§");
+  //       for (const polygonName of polygonNames) {
+  //         actualPolygonName = polygonName;
+  //         lastChar = polygonName[polygonName.length - 1];
+  //         if (lastChar === "-" || lastChar === "+" || lastChar === "/") {
+  //           actualPolygonName = polygonName.slice(0, -1);
+  //         }
+  //         if (this.polygonService.nameMapping.has(actualPolygonName)) {
+  //           tempInputString +=
+  //             this.polygonService.getPolygonQuery(
+  //               this.polygonService.nameMapping.get(actualPolygonName)
+  //             ) +
+  //             lastChar +
+  //             " ";
+  //         }
+  //       }
+  //     } else {
+  //       tempInputString += word + " ";
+  //     }
+  //   }
+  //   return tempInputString;
+  // }
   async search() {
     this.error = false;
     let idPrependix = "(";
-    this.mapPolygonName();
+    const newInputString = this.mapPolygonName();
     if (this.routingService.currentRoute) {
       let first = true;
       for (const cellId of this.routingService.currentRoute.cellIds) {
@@ -214,7 +242,7 @@ export class SearchComponent implements OnInit {
       this.keyPrependix +
       this.keyValuePrependix +
       this.parentPrependix +
-      this.inputString +
+      newInputString +
       this.keyAppendix +
       this.parentAppendix +
       this.keyValueAppendix +

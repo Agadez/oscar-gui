@@ -5,10 +5,17 @@ import { GeoPoint } from "../../models/geo-point";
 import { BehaviorSubject } from "rxjs";
 import "../../../../node_modules/leaflet-webgl-heatmap/src/webgl-heatmap/webgl-heatmap";
 import { v4 as uuidv4 } from "uuid";
-import { PolygonNode } from "src/app/models/polygon-node.model";
+import { PolygonNode } from "src/app/models/polygon/polygon-node.model";
 import { OscarItemsService } from "../oscar/oscar-items.service";
 import { RoutingMarker } from "../../models/routing-marker";
-import { LatLng, LatLngBounds, LayerGroup, Map as LeafletMap } from "leaflet";
+import {
+  CircleMarker,
+  LatLng,
+  LatLngBounds,
+  LayerGroup,
+  Map as LeafletMap,
+  Polygon,
+} from "leaflet";
 import { Region } from "../../models/oscar/region";
 import { OscarItem } from "../../models/oscar/oscar-item";
 import { SelectedItemService } from "../ui/selected-item.service";
@@ -19,14 +26,17 @@ declare var L;
 })
 export class MapService {
   routingMarkers = new Map<string, L.Marker>();
+  polygons = new Map<uuidv4, [L.Polygon, L.CircleMarker[]]>();
   maxZoom = 20;
 
   heatmap = new L.webGLHeatmap({ size: 10, units: "px" });
 
   searchMarkerLayer = new L.LayerGroup();
   routingMarkerLayer = new L.LayerGroup();
+  nodeLayer = new L.LayerGroup();
+  polygonLayer = new L.LayerGroup();
   regionLayer = new L.LayerGroup();
-  rectLayer = new LayerGroup();
+  rectLayer = new L.LayerGroup();
   zoom: number;
   _route = new BehaviorSubject<any>(null);
   private readonly _zoom = new BehaviorSubject<any>(null);
@@ -85,6 +95,8 @@ export class MapService {
     this.map.addLayer(this.routingMarkerLayer);
     this.map.addLayer(this.rectLayer);
     this.map.addLayer(this.regionLayer);
+    this.map.addLayer(this.polygonLayer);
+    this.map.addLayer(this.nodeLayer);
     this.map.on("zoom", (event) => {
       this.zoom = event.target._zoom;
       this._zoom.next(event);
@@ -98,7 +110,34 @@ export class MapService {
     });
   }
 
-  drawPolygon() {}
+  drawPolygon(polygonNodes: PolygonNode[], uuid: uuidv4, color: string) {
+    if (this.polygons.has(uuid)) {
+      this.polygonLayer.removeLayer(this.polygons.get(uuid)[0]);
+      this.polygons.get(uuid)[1].forEach((node) => {
+        this.nodeLayer.removeLayer(node);
+      });
+    }
+    let polygon = L.polygon([], {
+      color: color,
+      weight: 4,
+      opacity: 1,
+      smoothFactor: 1,
+    });
+    let nodes: L.CircleMarker[] = [];
+    for (const node of polygonNodes) {
+      const marker = L.circleMarker([node.lat, node.lon], {
+        color: node.color,
+        fillColor: node.color,
+        fillOpacity: 1,
+        radius: 5,
+      });
+      this.nodeLayer.addLayer(marker);
+      nodes.push(marker);
+      polygon.addLatLng([node.lat, node.lon]);
+    }
+    this.polygons.set(uuid, [polygon, nodes]);
+    this.polygonLayer.addLayer(polygon);
+  }
   drawRoute(route: GeoPoint[]) {
     this.route.setLatLngs([]);
     const latLngs = [];
@@ -205,6 +244,15 @@ export class MapService {
   }
   clearRoutingMarkers() {
     this.routingMarkerLayer.clearLayers();
+  }
+  clearPolygon(uuid: uuidv4) {
+    console.log(this.polygons.get(uuid)[0].getLatLngs());
+    console.log(this.polygonLayer);
+    this.polygonLayer.removeLayer(this.polygons.get(uuid)[0]);
+    for (const node of this.polygons.get(uuid)[1]) {
+      this.nodeLayer.removeLayer(node);
+    }
+    this.polygons.set(uuid, [L.polygon, []]);
   }
   clearAllLayers() {
     this.clearHeatMap();

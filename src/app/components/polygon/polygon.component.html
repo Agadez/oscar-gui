@@ -1,4 +1,4 @@
-<div style="border-radius: 2px" class="wrapper-routing-list">
+<div style="border-radius: 2px" class="wrapper-polygon-list">
   <div
     style="
       display: flex;
@@ -41,16 +41,18 @@
     </div>
 
     <button mat-stroked-button (click)="clearList()">clear</button>
-    <mat-checkbox (change)="polygonProcess($event.checked)"></mat-checkbox>
+    <!-- <mat-checkbox (change)="polygonProcess($event.checked)"></mat-checkbox> -->
   </div>
   <div
     style="margin-top: 5px; width: 95%; text-align: left; margin-left: 3%"
-    *ngIf="nodes.length > 0"
+    *ngIf="polygonService.polygonMapping.size > 0"
     cdkDropList
     class="routing-list"
   >
     <div
-      *ngFor="let node of nodes"
+      *ngFor="
+        let polygonNode of polygonService.polygonMapping.get(uuid).polygonNodes
+      "
       cdkDrag
       class="routing-list-item"
       style="
@@ -63,10 +65,10 @@
       <div
         style="width: 13%; display: inline-flex; justify-content: space-around"
       >
-        <i class="fa-solid fa-circle" [style.color]="node.color"></i>
+        <i class="fa-solid fa-circle" [style.color]="polygonNode.color"></i>
       </div>
       <div
-        *ngIf="node.name === ''"
+        *ngIf="polygonNode.color !== ''"
         style="
           display: inline-flex;
           align-items: center;
@@ -74,22 +76,22 @@
           width: 60%;
         "
       >
-        <span>lat: {{ node.geoPoint.lat | number : "1.0-6" }}</span>
-        <span>lon: {{ node.geoPoint.lon | number : "1.0-6" }}</span>
+        <span>lat: {{ polygonNode.lat | number : "1.0-6" }}</span>
+        <span>lon: {{ polygonNode.lon | number : "1.0-6" }}</span>
       </div>
-      <div *ngIf="node.name !== ''">
-        {{ node.name }}
-      </div>
+      <!-- <div *ngIf="polygonNode.name !== ''">
+        {{ polygonNode.name }}
+      </div> -->
       <i
         style="cursor: pointer; float: right"
-        (click)="removeNode(node.uuid)"
+        (click)="removeNode(polygonNode.uuid)"
         class="fas fa-times"
       ></i>
     </div>
   </div>
   <div
     style="text-align: center; width: 100%; margin-top: 50px"
-    *ngIf="nodes.length === 0"
+    *ngIf="polygonService.polygonMapping.get(uuid).polygonNodes.length === 0"
   >
     Click on the map to add nodes for a Polygon.
   </div>
