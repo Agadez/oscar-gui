@@ -26,80 +26,47 @@ export class PolygonsComponent implements OnInit {
     public polygonService: PolygonServiceService
   ) {}
 
-  @Input()
-  polygonVisible = false;
-
-  @Output()
   polygonsEmpty = true;
+  tabIndexToId : uuidv4[] = [];
+  uuidToName = new Map();
 
   @ViewChild("tabs", { static: false }) activeTab: MatTabGroup;
-  polygons: {
-    active: boolean;
-    name: string;
-    uuid: uuidv4;
-    color: string;
-    inSearch: boolean;
-  }[] = [];
   ngOnInit(): void {
-    // this.polygonService.inSearch.subscribe((uuid) => {
-    //   for (const polygon of this.polygons) {
-    //     if (uuid === polygon.uuid) {
-    //       polygon.inSearch = !polygon.inSearch;
-    //       if (polygon.inSearch) polygon.color = "#007bff";
-    //       else polygon.color = "#808080";
-    //       this.polygonService.polygonInSearch.next({
-    //         uuid: polygon.uuid,
-    //         color: polygon.color,
-    //       });
-    //       break;
-    //     }
-    //   }
-    // });
   }
-  addTab() {
-    console.log("hi");
-    this.polygonService.addPolygon(uuidv4(), []);
 
-    // this.polygons.push({
-    //   active: true,
-    //   name: "",
-    //   uuid: uuidv4(),
-    //   color: "#007bff",
-    //   inSearch: false,
-    // });
+  // Adds a Tab to the Polygon TabGroup, adds a new Polygon to the Dataset and assures that the Tab and therefor Polygon is selected.
+  addTab() {
+    const uuid = uuidv4();
+    this.polygonService.addPolygon(uuid, []);
+    this.tabIndexToId.push(uuid);
+    this.uuidToName.set(uuid,"");
     if (this.polygonsEmpty) {
       this.polygonsEmpty = false;
       return;
     }
-    console.log("jo");
-    // for (const polygon of this.polygons) {
-    //   polygon.active = false;
-    // }
-    // this.polygons[this.polygons.length - 1].active = true;
     const tabGroup = this.activeTab;
-    console.log("jo");
     if (!tabGroup || !(tabGroup instanceof MatTabGroup)) return;
-    console.log("jo");
-    tabGroup.selectedIndex = 0;
+    tabGroup.selectedIndex = this.tabIndexToId.length;
   }
+
+  // Method that assures that the selected Tab is activated and can therefor be modified.
   changeTab($event: MatTabChangeEvent) {
     let index = $event.index;
     if (this.polygonsEmpty) {
       return;
     }
-    // for (const polygon of this.polygons) {
-    //   polygon.active = false;
-    //   if (!polygon.inSearch) this.polygonService.tabChanged.next(polygon.uuid);
-    // }
-    // this.polygons[index].active = true;
-    this.polygonService.tabActivated.next(this.polygons[index].uuid);
+    this.polygonService.tabActivated.next(this.tabIndexToId[index]);
   }
+
+  // Method that deletes the Dataset and Shape on the Map of a Polygon whose Tab got closed
   closeTab(uuid: uuidv4) {
     this.polygonService.tabClosed.next(uuid);
-    // this.polygonsEmpty = this.polygons.length === 0;
-    if (!this.polygonsEmpty)
-      this.polygonService.tabActivated.next(
-        this.polygons[this.activeTab.selectedIndex].uuid
-      );
+    this.polygonService.polygonMapping.delete(uuid);
+    this.tabIndexToId.splice(this.tabIndexToId.indexOf(uuid), 1);
+    console.log(this.tabIndexToId);
+  }
+
+  addName(uuidName){
+    this.uuidToName.set(uuidName[0], uuidName[1]);
   }
 }

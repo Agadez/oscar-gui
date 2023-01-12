@@ -32,8 +32,6 @@ export class PolygonServiceService {
     this.nameMapping.delete(name);
   }
   addPolygon(uuid: uuidv4, polygonNodes: PolygonNode[]) {
-    console.log("uuid: " + uuid);
-    console.log(this.polygonMapping.size);
     this.polygonMapping.set(
       uuid,
       new Polygon(polygonNodes, this.getQueryString(polygonNodes))
@@ -52,6 +50,7 @@ export class PolygonServiceService {
       polygonUuid,
       new Polygon(polygon, this.getQueryString(polygon))
     );
+    console.log(this.polygonMapping.get(polygonUuid));
   }
 
   removeNode(polygonUuid: uuidv4, uuid: uuidv4) {
@@ -68,8 +67,6 @@ export class PolygonServiceService {
     );
   }
   getQueryString(polygon: PolygonNode[]) {
-    console.log(polygon.length);
-    if (polygon.length === 0) return "";
     let polygonString = "";
     let index = 0;
 

@@ -111,6 +111,7 @@ export class MapService {
   }
 
   drawPolygon(polygonNodes: PolygonNode[], uuid: uuidv4, color: string) {
+    
     if (this.polygons.has(uuid)) {
       this.polygonLayer.removeLayer(this.polygons.get(uuid)[0]);
       this.polygons.get(uuid)[1].forEach((node) => {
@@ -246,8 +247,7 @@ export class MapService {
     this.routingMarkerLayer.clearLayers();
   }
   clearPolygon(uuid: uuidv4) {
-    console.log(this.polygons.get(uuid)[0].getLatLngs());
-    console.log(this.polygonLayer);
+    if(!this.polygons.has(uuid)) return;
     this.polygonLayer.removeLayer(this.polygons.get(uuid)[0]);
     for (const node of this.polygons.get(uuid)[1]) {
       this.nodeLayer.removeLayer(node);
