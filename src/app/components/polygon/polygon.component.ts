@@ -1,15 +1,16 @@
-import { Component, Input, OnInit, NgZone, OnDestroy, Output, EventEmitter } from "@angular/core";
+import {
+  Component,
+  Input,
+  OnInit,
+  NgZone,
+  OnDestroy,
+  Output,
+  EventEmitter,
+} from "@angular/core";
 import { MapService } from "src/app/services/map/map.service";
 import { PolygonNode } from "src/app/models/polygon/polygon-node.model";
-import { Subject } from "rxjs";
-import { LeafletEvent, Polygon } from "leaflet";
-import { debounceTime } from "rxjs/operators";
-import { GeoPoint } from "../../models/geo-point";
-import { GeoPointId } from "../../models/geo-point-id.model";
 import { v4 as uuidv4 } from "uuid";
-import { OscarItemsService } from "../../services/oscar/oscar-items.service";
 import { PolygonServiceService } from "../../services/polygon-service.service";
-import { activateRouting } from "../search/search.component";
 
 declare var L;
 
@@ -25,22 +26,19 @@ export class PolygonComponent implements OnInit, OnDestroy {
   ) {}
 
   showNameForm = false;
-  
-  // @Output() closeEvent = new EventEmitter<uuidv4>();
-  @Output() newNameEvent = new EventEmitter<[uuidv4,string]>();
+
+  @Output() newNameEvent = new EventEmitter<[uuidv4, string]>();
 
   @Input()
   polygonVisible = false;
-
-  inSearch = false;
   @Input()
   uuid = uuidv4();
   name = "";
   deprecatedName = "";
   isActive = true;
-  
+
   routeActivated = false;
-    
+
   ngOnInit(): void {
     console.log("jojo:" + this.uuid);
     let init = true;
@@ -52,9 +50,9 @@ export class PolygonComponent implements OnInit, OnDestroy {
 
     // Allows the User to create a Polygon by adding a Node when clicking the map
     this.mapService.onClick$.subscribe((event) => {
-      console.log(this.isActive)
-      if (!event  || init || this.routeActivated || !this.isActive) {
-        console.log(!event , init , this.routeActivated , !this.isActive)
+      console.log(this.isActive);
+      if (!event || init || this.routeActivated || !this.isActive) {
+        console.log(!event, init, this.routeActivated, !this.isActive);
         return;
       }
       this.polygonService.addNode(
@@ -83,24 +81,21 @@ export class PolygonComponent implements OnInit, OnDestroy {
     // });
 
     /* Draws a specific Polygon if the Tab of the Polygon is active and deactivates all other Polygons.
-    */
+     */
     this.polygonService.tabActivated.subscribe((uuid) => {
-      if(this.uuid !== uuid){
+      if (this.uuid !== uuid) {
         this.isActive = false;
-        return
+        return;
       }
       this.isActive = true;
-      if (this.polygonService.polygonMapping.get(uuid).polygonNodes.length != 0) {
+      if (
+        this.polygonService.polygonMapping.get(uuid).polygonNodes.length != 0
+      ) {
         this.draw();
       }
     });
     init = false;
   }
-
-  // Method that emits the uuid of a Polygon when its Tab is closed to the parent component polygons.component.ts
-  // closeTab(){
-  //   this.closeEvent.emit(this.uuid);
-  // }
 
   // Sets the Name of a Polygon and checks whether the Name is chosen already.
   setName() {

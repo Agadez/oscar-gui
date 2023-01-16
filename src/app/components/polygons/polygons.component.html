@@ -16,17 +16,17 @@
 >
   <mat-tab *ngFor="let uuid of tabIndexToId">
     <ng-template class="w-100 d-flex justify-content-between" mat-tab-label>
-      <i class="fa-solid fa-draw-polygon"></i>
-      <h6>{{uuidToName.get(uuid)}}</h6>
+      <i
+        [hidden]="uuidToName.get(uuid) != ''"
+        class="fa-solid fa-draw-polygon"
+      ></i>
+      <h6>{{ uuidToName.get(uuid) }}</h6>
       <i
         style="cursor: pointer"
         (click)="closeTab(uuid)"
         class="fas fa-times ml-4"
       ></i>
     </ng-template>
-    <app-polygon
-      (newNameEvent) = "addName($event)"
-      [uuid]="uuid"
-    ></app-polygon>
+    <app-polygon (newNameEvent)="addName($event)" [uuid]="uuid"></app-polygon>
   </mat-tab>
 </mat-tab-group>

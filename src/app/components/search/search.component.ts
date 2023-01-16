@@ -184,37 +184,6 @@ export class SearchComponent implements OnInit {
     });
     return newQueryString;
   }
-
-  // mapPolygonName1() {
-  //   const split = this.inputString.split(" ");
-  //   let tempInputString = "";
-  //   let actualPolygonName = "";
-  //   let lastChar = "";
-  //   console.log("split: " + split);
-  //   for (const word of split) {
-  //     if (word[0] == "§") {
-  //       let polygonNames = word.split("§");
-  //       for (const polygonName of polygonNames) {
-  //         actualPolygonName = polygonName;
-  //         lastChar = polygonName[polygonName.length - 1];
-  //         if (lastChar === "-" || lastChar === "+" || lastChar === "/") {
-  //           actualPolygonName = polygonName.slice(0, -1);
-  //         }
-  //         if (this.polygonService.nameMapping.has(actualPolygonName)) {
-  //           tempInputString +=
-  //             this.polygonService.getPolygonQuery(
-  //               this.polygonService.nameMapping.get(actualPolygonName)
-  //             ) +
-  //             lastChar +
-  //             " ";
-  //         }
-  //       }
-  //     } else {
-  //       tempInputString += word + " ";
-  //     }
-  //   }
-  //   return tempInputString;
-  // }
   async search() {
     this.error = false;
     let idPrependix = "(";
@@ -229,9 +198,6 @@ export class SearchComponent implements OnInit {
         idPrependix += "$cell:" + cellId;
       }
     }
-    // else if (!this.localSearch && this.polygonService.polygonArray) {
-    //   idPrependix += this.polygonService.getPolygonQuery();
-    // }
     this.queryId++;
 
     const routeQueryString = this.getRouteQueryString();

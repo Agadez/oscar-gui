@@ -1,5 +1,4 @@
 import { Injectable } from "@angular/core";
-import { GeoPointId } from "../models/geo-point-id.model";
 import { BehaviorSubject } from "rxjs";
 import { v4 as uuidv4 } from "uuid";
 import { PolygonNode } from "../models/polygon/polygon-node.model";
@@ -78,20 +77,6 @@ export class PolygonServiceService {
     }
     return polygonString;
   }
-
-  // getPolygonQuery(uuid: uuidv4): string {
-  //   console.log(uuid);
-  //   let polygonString = "";
-  //   let index = 0;
-
-  //   for (const node of this.polygonMapping.get(uuid)) {
-  //     if (index == 0) {
-  //       polygonString += `$poly:${node.lat},${node.lon}`;
-  //     } else polygonString += `,${node.lat},${node.lon}`;
-  //     index++;
-  //   }
-  //   return polygonString;
-  // }
   getRandomColor(): string {
     const letters = "0123456789ABCDEF";
     let color = "#";
@@ -100,4 +85,14 @@ export class PolygonServiceService {
     }
     return color;
   }
+  // getUpdatedQuery(inputString: string) {
+  //   console.log(inputString);
+  //   const reg = /\§(\w+)/g;
+  //   const updatedInputString = inputString.replace(reg, function (_, p1) {
+  //     console.log("p1", p1);
+  //     console.log(this.polygonMapping);
+  //     return this.polygonMapping.get(this.nameMapping.get(p1)).polygonQuery;
+  //   });
+  //   return updatedInputString;
+  // }
 }
