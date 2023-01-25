@@ -50,7 +50,7 @@ export class GridService {
     };
     this.gridMap.forEach((value, key) => {
       const keyObj = JSON.parse(key) as { lat: number; lon: number };
-      
+
       if (
         keyObj.lat >= bbox.minLatPos - 1 &&
         keyObj.lon >= bbox.minLonPos - 1 &&
@@ -65,10 +65,10 @@ export class GridService {
           value.forEach((item) => {
             if (item) {
               if (
-                item.lat >= minLat &&
-                item.lon >= minLon &&
-                item.lat <= maxLat &&
-                item.lon <= maxLon
+                item.lat + item.boundingRadius >= minLat &&
+                item.lon + item.boundingRadius >= minLon &&
+                item.lat - item.boundingRadius <= maxLat &&
+                item.lon - item.boundingRadius <= maxLon
               ) {
                 currentMinItems.push(item);
               }

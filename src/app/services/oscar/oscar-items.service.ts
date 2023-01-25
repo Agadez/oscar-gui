@@ -20,7 +20,7 @@ export class OscarItemsService {
       this.configService.getOscarUrl() +
       `/oscar/cqr/clustered/itemswithlocation?q=${encodeURIComponent(
         queryString
-      )}`;
+      )}&bounding-radius=true`;
     return this.http.get(itemUrl, { responseType: "arraybuffer" });
     /*
       this.locationService.getPosition().then((location) => {
@@ -34,13 +34,15 @@ export class OscarItemsService {
   public binaryItemsToOscarMin(itemArray): OscarMinItem[] {
     const itemList = new Array<OscarMinItem>();
     const returnArray = new Uint32Array(itemArray);
-    for (let i = 0; i < returnArray.length; i += 3) {
+    for (let i = 0; i < returnArray.length; i += 4) {
       itemList.push({
         id: returnArray[i],
         lat: this.toDoubleLat(returnArray[i + 1]),
         lon: this.toDoubleLon(returnArray[i + 2]),
+        boundingRadius: this.toDoubleLat(returnArray[i + 3]),
       });
     }
+    console.log(itemList);
     return itemList;
   }
   getApxItemCount(queryString: string): Observable<OscarApxstats> {
