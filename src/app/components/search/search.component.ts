@@ -182,6 +182,7 @@ export class SearchComponent implements OnInit {
         polygonService.nameMapping.get(p1)
       ).polygonQuery;
     });
+    console.log("newquerystring: ", newQueryString);
     return newQueryString;
   }
   async search() {
@@ -251,7 +252,6 @@ export class SearchComponent implements OnInit {
           }
         }
         if (regions && regions.length > 0 && foundSimilarProperty) {
-          console.log(regions[0]);
           clearItems.next("clear");
           this.mapService.drawRegion(regions[0]);
           const region = regions[0];
@@ -344,9 +344,7 @@ export class SearchComponent implements OnInit {
     return input.slice(0, endNormalString);
   }
 
-  spanChange($event: Event) {
-    console.log($event);
-  }
+  spanChange($event: Event) {}
 
   normalSelectEvent($event: MatAutocompleteSelectedEvent) {}
 

@@ -1,3 +1,4 @@
 export const environment = {
-  production: true
+  production: true,
+  oscarUrl: window["env"]["oscarUrl"] || "https://old.oscar-web.de",
 };

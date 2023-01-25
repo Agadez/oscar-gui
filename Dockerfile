@@ -12,3 +12,5 @@ FROM nginx:stable
 RUN rm -rf /usr/share/nginx/html/*
 COPY --from=builder oscar-gui/dist/oscar-gui/ /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/nginx.conf
+
+CMD ["/bin/sh",  "-c",  "envsubst < /usr/share/nginx/html/assets/env.template.js > /usr/share/nginx/html/assets/env.js && exec nginx -g 'daemon off;'"]

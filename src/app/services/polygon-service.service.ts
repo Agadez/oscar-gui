@@ -23,8 +23,6 @@ export class PolygonServiceService {
     return false;
   }
   addName(name: string, uuid) {
-    console.log(name);
-    console.log(uuid);
     this.nameMapping.set(name, uuid);
   }
   removeName(name: string) {
@@ -49,7 +47,6 @@ export class PolygonServiceService {
       polygonUuid,
       new Polygon(polygon, this.getQueryString(polygon))
     );
-    console.log(this.polygonMapping.get(polygonUuid));
   }
 
   removeNode(polygonUuid: uuidv4, uuid: uuidv4) {
@@ -68,13 +65,13 @@ export class PolygonServiceService {
   getQueryString(polygon: PolygonNode[]) {
     let polygonString = "";
     let index = 0;
-
     for (const node of polygon) {
       if (index == 0) {
         polygonString += `$poly:${node.lat},${node.lon}`;
       } else polygonString += `,${node.lat},${node.lon}`;
       index++;
     }
+    console.log("polygonString: ", polygonString);
     return polygonString;
   }
   getRandomColor(): string {

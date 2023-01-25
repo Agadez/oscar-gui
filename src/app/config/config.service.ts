@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { environment } from "src/environments/environment";
 
 @Injectable({
   providedIn: "root",
@@ -6,8 +7,10 @@ import { Injectable } from "@angular/core";
 export class ConfigService {
   constructor() {}
   getOscarUrl(): string {
-    return "https://routing.oscar-web.de";
-    // return "old.oscar-web.de";
+    console.log(environment.oscarUrl);
+    // return environment.oscarUrl;
+    // return "https://routing.oscar-web.de";
+    return "https://old.oscar-web.de";
     // return 'http://localhost';
   }
   getRoutingUrl(): string {
