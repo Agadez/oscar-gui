@@ -1,7 +1,7 @@
 FROM node:lts-bullseye AS builder
 RUN mkdir -p /oscar-gui/src && mkdir -p /oscar-gui/e2e
 COPY src /oscar-gui/src/
-COPY e2e /osrc-gui/e2e/
+COPY e2e /oscar-gui/e2e/
 COPY package.json ts*.json angular.json /oscar-gui/
 WORKDIR /oscar-gui
 RUN yarn install

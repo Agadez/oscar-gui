@@ -7,10 +7,9 @@ import { environment } from "src/environments/environment";
 export class ConfigService {
   constructor() {}
   getOscarUrl(): string {
-    console.log(environment.oscarUrl);
-    // return environment.oscarUrl;
+    return environment.oscarUrl;
     // return "https://routing.oscar-web.de";
-    return "https://old.oscar-web.de";
+    // return "https://old.oscar-web.de";
     // return 'http://localhost';
   }
   getRoutingUrl(): string {
