@@ -174,15 +174,14 @@ export class SearchComponent implements OnInit {
   }
 
   mapPolygonName() {
-    // regex that finds all defined polygons
-    const reg = /\§(\w+)/g;
-    let polygonService = this.polygonService;
-    const newQueryString = this.inputString.replace(reg, function (_, p1) {
-      return polygonService.polygonMapping.get(
-        polygonService.nameMapping.get(p1)
-      ).polygonQuery;
-    });
-    console.log("newquerystring: ", newQueryString);
+    const polygonMapping = this.polygonService.polygonMapping;
+    const nameMapping = this.polygonService.nameMapping;
+    const newQueryString = this.inputString.replace(
+      /§(\w+)/g,
+      function (_, p1) {
+        return polygonMapping.get(nameMapping.get(p1)).polygonQuery;
+      }
+    );
     return newQueryString;
   }
   async search() {

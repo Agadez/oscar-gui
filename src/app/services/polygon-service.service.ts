@@ -71,7 +71,6 @@ export class PolygonServiceService {
       } else polygonString += `,${node.lat},${node.lon}`;
       index++;
     }
-    console.log("polygonString: ", polygonString);
     return polygonString;
   }
   getRandomColor(): string {
