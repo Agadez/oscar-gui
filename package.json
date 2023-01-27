@@ -28,7 +28,7 @@
     "gulp-cli": "^2.3.0",
     "heatmap.js": "^2.0.5",
     "jquery": "^3.5.1",
-    "leaflet": "^1.7.1",
+    "leaflet": "^1.9.3",
     "leaflet-heatmap": "^1.0.0",
     "leaflet-webgl-heatmap": "^0.2.7",
     "lodash": "^4.17.20",
