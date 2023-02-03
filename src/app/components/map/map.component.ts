@@ -13,6 +13,7 @@ import { radiusSearchTrigger } from "../search-result-view/search-result-view.co
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { addRoutingPointEvent } from "../routes/routes.component";
 import { GeoPoint } from "../../models/geo-point";
+import { OscarItemsService } from "src/app/services/oscar/oscar-items.service";
 
 @Component({
   selector: "app-map",
@@ -65,6 +66,7 @@ export class MapComponent implements OnInit {
       this.contextMenuY = event.containerPoint.y;
       this.openContextMenu();
     });
+
   }
   @HostListener("document:click")
   leftClick() {

@@ -19,6 +19,7 @@ import {
 import { Region } from "../../models/oscar/region";
 import { OscarItem } from "../../models/oscar/oscar-item";
 import { SelectedItemService } from "../ui/selected-item.service";
+import { SearchResultViewComponent } from "src/app/components/search-result-view/search-result-view.component";
 declare var L;
 
 @Injectable({
@@ -29,7 +30,10 @@ export class MapService {
   polygons = new Map<uuidv4, [L.Polygon, L.CircleMarker[]]>();
   maxZoom = 20;
 
-  heatmap = new L.webGLHeatmap({ size: 10, units: "px" });
+  heatmap = new L.webGLHeatmap({
+    size: 15,
+    units: "px",
+  });
 
   searchMarkerLayer = new L.LayerGroup();
   routingMarkerLayer = new L.LayerGroup();
@@ -111,7 +115,6 @@ export class MapService {
   }
 
   drawPolygon(polygonNodes: PolygonNode[], uuid: uuidv4, color: string) {
-    
     if (this.polygons.has(uuid)) {
       this.polygonLayer.removeLayer(this.polygons.get(uuid)[0]);
       this.polygons.get(uuid)[1].forEach((node) => {
@@ -156,6 +159,7 @@ export class MapService {
     this.heatmap.setData(dataPoints);
   }
   drawItemsMarker(items: OscarMinItem[]) {
+    var currentItemsId = new Map<number, boolean>();
     this.searchMarkerLayer.clearLayers();
     this.oscarItemsService.getMultipleItems(items).subscribe((data) => {
       const itemFeatures = data.features;
@@ -198,14 +202,22 @@ export class MapService {
             popupText
           );
         }
-        this.drawGeoJSON(item, popupText);
-        console.log(L.geoJSON(item, popupText).bounds);
+        const insideBounding = this.drawGeoJSON(item, popupText);
+        if (insideBounding) currentItemsId.set(item.properties.id, true);
+        // console.log(L.geoJSON(item, popupText).bounds);
       });
+      const currentItemsIds = [];
+      for (let key of currentItemsId.keys()) {
+        currentItemsIds.push(key);
+      }
+      console.log("jojoojo", currentItemsIds);
+      if (this.itemStore.currentItemsIds$.value != currentItemsIds)
+        this.itemStore.currentItemsIds$.next(currentItemsIds);
     });
   }
 
-  private drawGeoJSON(item, popupText: string) {
-    L.geoJSON(item, {
+  private drawGeoJSON(item, popupText: string): boolean {
+    const shape = L.geoJSON(item, {
       title: `${item.properties.id}`,
       pointToLayer: (geoJsonPoint, latlng) => {
         const smallIcon = new L.Icon({
@@ -223,7 +235,12 @@ export class MapService {
         });
       },
       style: { color: "blue", stroke: true, fill: false, opacity: 0.7 },
-    }).addTo(this.searchMarkerLayer);
+    });
+    if (this.bounds.intersects(shape.getBounds())) {
+      shape.addTo(this.searchMarkerLayer);
+      return true;
+    }
+    return false;
   }
   drawRegion(region: OscarItem) {
     this.clearRegions();
@@ -247,7 +264,7 @@ export class MapService {
     this.routingMarkerLayer.clearLayers();
   }
   clearPolygon(uuid: uuidv4) {
-    if(!this.polygons.has(uuid)) return;
+    if (!this.polygons.has(uuid)) return;
     this.polygonLayer.removeLayer(this.polygons.get(uuid)[0]);
     for (const node of this.polygons.get(uuid)[1]) {
       this.nodeLayer.removeLayer(node);
@@ -260,7 +277,6 @@ export class MapService {
     this.clearSearchMarkers();
   }
   fitBounds(bounds: L.LatLngBounds) {
-    console.log(bounds);
     if (bounds.getNorthEast().lat === 100000) {
       bounds = new LatLngBounds(
         new LatLng(55.203953, 4.21875),

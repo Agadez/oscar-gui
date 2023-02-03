@@ -5,6 +5,7 @@ import { OscarItem } from "../../models/oscar/oscar-item";
 import { ConfigService } from "../../config/config.service";
 import { OscarMinItem } from "../../models/oscar/oscar-min-item";
 import { OscarApxstats } from "../../models/oscar/oscar-apxstats";
+
 import {
   FacetRefinements,
   ParentRefinements,
@@ -15,6 +16,7 @@ import {
 })
 export class OscarItemsService {
   constructor(private http: HttpClient, private configService: ConfigService) {}
+
   getItemsBinary(queryString: string): Observable<any> {
     const itemUrl =
       this.configService.getOscarUrl() +
@@ -22,14 +24,6 @@ export class OscarItemsService {
         queryString
       )}&bounding-radius=true`;
     return this.http.get(itemUrl, { responseType: "arraybuffer" });
-    /*
-      this.locationService.getPosition().then((location) => {
-      itemList = itemList.sort((a, b) => {
-        return this.locationService.getDistanceFromLatLonInKm(a.lat, a.lon, location.lat, location.lng) -
-          this.locationService.getDistanceFromLatLonInKm(b.lat, b.lon, location.lat, location.lng);
-      });
-    */
-    // this.removeWithRadius(1);
   }
   public binaryItemsToOscarMin(itemArray): OscarMinItem[] {
     const itemList = new Array<OscarMinItem>();
@@ -42,7 +36,6 @@ export class OscarItemsService {
         boundingRadius: this.toDoubleLat(returnArray[i + 3]),
       });
     }
-    console.log(itemList);
     return itemList;
   }
   getApxItemCount(queryString: string): Observable<OscarApxstats> {
@@ -51,7 +44,6 @@ export class OscarItemsService {
       `/oscar/cqr/clustered/apxstats?q=${encodeURIComponent(
         queryString
       )}&rf=admin_level`;
-    console.log(itemUrl);
     return this.http.get<OscarApxstats>(itemUrl);
   }
   getItemsInfo(items: OscarMinItem[]): Observable<OscarItem[]> {

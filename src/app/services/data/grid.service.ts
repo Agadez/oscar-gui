@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { ItemCountComponent } from "src/app/components/item-count/item-count.component";
 import { OscarMinItem } from "../../models/oscar/oscar-min-item";
+import { ItemStoreService } from "./item-store.service";
 
 declare var L;
 
@@ -15,10 +16,11 @@ export class GridService {
   // divide lat and long fields by gridSize lat = [-90, +90] long = [-180,180]
   divLat = 180 / this.gridSizeX;
   divLon = 360 / this.gridSizeY;
-  constructor() {}
-  buildGrid(items: OscarMinItem[]) {
+  constructor(private itemStoreService: ItemStoreService) {}
+  buildGrid() {
     this.gridMap = new Map<string, OscarMinItem[]>();
-    for (const item of items) {
+
+    for (const item of this.itemStoreService.items$.value) {
       const latGridPos = this.getLatPositionInGrid(item.lat);
       const lonGridPos = this.getLonPositionInGrid(item.lon);
       if (
