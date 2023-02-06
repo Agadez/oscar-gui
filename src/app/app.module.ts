@@ -60,6 +60,8 @@ import { MatCheckboxModule } from "@angular/material/checkbox";
 import { SelectedItemComponent } from "./components/selected-item/selected-item.component";
 import { PolygonsComponent } from "./components/polygons/polygons.component";
 import { PolygonComponent } from "./components/polygon/polygon.component";
+import { GlobalItemListComponent } from './components/item-lists/global-item-list/global-item-list.component';
+import { LocalItemListComponent } from './components/item-lists/local-item-list/local-item-list.component';
 
 @NgModule({
   declarations: [
@@ -93,6 +95,8 @@ import { PolygonComponent } from "./components/polygon/polygon.component";
     SelectedItemComponent,
     PolygonsComponent,
     PolygonComponent,
+    GlobalItemListComponent,
+    LocalItemListComponent,
   ],
   imports: [
     BrowserModule,

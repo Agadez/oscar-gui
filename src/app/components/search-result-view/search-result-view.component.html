@@ -47,16 +47,14 @@
   ></app-item-count>
 </div>
 
-<app-new-item-list
+<app-global-item-list
   class="item-list"
   [hidden]="!showGlobal"
-  [currentItemsIds]="itemStoreService.itemsIds$ | async"
-></app-new-item-list>
-<app-new-item-list
+></app-global-item-list>
+<app-local-item-list
   class="item-list"
   [hidden]="!showLocal"
-  [currentItemsIds]="itemStoreService.currentItemsIds$ | async"
-></app-new-item-list>
+></app-local-item-list>
 <app-parents
   *ngIf="parentRefinements"
   class="item-list"
