@@ -5,8 +5,8 @@ COPY e2e /oscar-gui/e2e/
 COPY package.json ts*.json angular.json /oscar-gui/
 WORKDIR /oscar-gui
 RUN yarn install
-ENV NODE_OPTIONS=--openssl-legacy-provider
-RUN $(npm bin)/ng build --prod
+# ENV NODE_OPTIONS=--openssl-legacy-provider
+RUN npm run build
 
 FROM nginx:stable
 RUN rm -rf /usr/share/nginx/html/*
