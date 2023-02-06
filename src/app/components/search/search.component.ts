@@ -86,8 +86,7 @@ export class SearchComponent implements OnInit {
   options: string[] = ["One", "Two", "Three"];
   normalSuggestions = [];
   oscarQuery = true;
-  maxitems = 1000000;
-  queryId = -1;
+  maxItems = 1000000;
   @Output() routesVisibleEvent = new EventEmitter<boolean>();
   routesVisible = false;
   sideButtonClass = "side-button";
@@ -103,9 +102,11 @@ export class SearchComponent implements OnInit {
   helpVisible = false;
 
   ngOnInit() {
-    this.subscribeRefinements();
+    this.searchService.subscribeRefinements();
+    this.searchService.startSearch.subscribe(() => this.search());
     activateRouting.subscribe(() => this.showRouting());
     activatePolygon.subscribe(() => this.togglePolygon());
+    this.polygonService.activatedPolygonUpdated.subscribe(() => this.search());
   }
   subscribeRefinements() {
     this.refinementStore.refinements$.subscribe((refinements) => {
@@ -176,102 +177,55 @@ export class SearchComponent implements OnInit {
   mapPolygonName() {
     const polygonMapping = this.polygonService.polygonMapping;
     const nameMapping = this.polygonService.nameMapping;
+    this.polygonService.activatedPolygons = new Set();
+    let activatedPolygons = this.polygonService.activatedPolygons;
+
     const newQueryString = this.inputString.replace(
       /§(\w+)/g,
       function (_, p1) {
-        return polygonMapping.get(nameMapping.get(p1)).polygonQuery;
+        const uuid = nameMapping.get(p1);
+        activatedPolygons.add(uuid);
+        return polygonMapping.get(uuid).polygonQuery;
       }
     );
+    console.log("joj", this.polygonService.activatedPolygons);
     return newQueryString;
   }
-  async search() {
+  search() {
     this.error = false;
-    let idPrependix = "(";
-    const newInputString = this.mapPolygonName();
-    if (this.routingService.currentRoute) {
-      let first = true;
-      for (const cellId of this.routingService.currentRoute.cellIds) {
-        if (!first) {
-          idPrependix += " + ";
-        }
-        first = false;
-        idPrependix += "$cell:" + cellId;
-      }
-    }
-    this.queryId++;
-
-    const routeQueryString = this.getRouteQueryString();
-
-    let fullQueryString =
-      idPrependix +
-      ") " +
-      this.keyPrependix +
-      this.keyValuePrependix +
-      this.parentPrependix +
-      newInputString +
-      this.keyAppendix +
-      this.parentAppendix +
-      this.keyValueAppendix +
-      routeQueryString;
+    this.searchService.addRoute();
+    let fullQueryString = this.searchService.createQueryString(
+      this.inputString
+    );
     if (fullQueryString === "") {
       return;
     }
 
     if (this.localSearch && this.mapService.ready) {
-      const bounds = this.mapService.bounds;
-      const localString =
-        fullQueryString +
-        ` $geo:${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}`;
-
-      const apxStats = await this.oscarItemService
-        .getApxItemCount(localString)
-        .toPromise();
-      if (apxStats.items > 0) {
-        fullQueryString = localString;
-      }
+      this.searchService.queryStringForLocalSearch(this.inputString);
     }
-    console.log("full: " + fullQueryString);
+    this.searchService.globalSearch(this.inputString);
     this.itemStore.setHighlightedItem(null);
     this.loading = true;
-    this.oscarItemService
-      .getRegion(fullQueryString)
-      .subscribe(async (regions) => {
-        displayRegion.next(null);
-        // check all properties for similarity to see if the region name is similar to the input in all languages
-        let foundSimilarProperty = false;
-        if (regions && regions.length > 0) {
-          for (const property of regions[0].properties.v) {
-            const similarity = TextUtil.similarity(
-              property,
-              this.inputString.replaceAll('"', "")
-            );
-            if (similarity > 0.7) {
-              foundSimilarProperty = true;
+    this.oscarItemService.getRegion(fullQueryString).subscribe((regions) => {
+      const regionFound = this.searchService.searchForRegions(
+        this.inputString,
+        regions
+      );
+      if (regionFound) {
+        this.loading = false;
+        this.error = false;
+      } else {
+        this.oscarItemService
+          .getApxItemCount(fullQueryString)
+          .subscribe((apxStats) => {
+            if (!this.searchService.getItems(this.maxItems, apxStats)) {
+              this.error = true;
+              this.loading = false;
             }
-          }
-        }
-        if (regions && regions.length > 0 && foundSimilarProperty) {
-          clearItems.next("clear");
-          this.mapService.drawRegion(regions[0]);
-          const region = regions[0];
-          displayRegion.next(OscarItem.getValue(region, "wikidata"));
-          this.loading = false;
-          this.error = false;
-        } else {
-          displayRegion.next(null);
-          this.mapService.clearRegions();
-          this.oscarItemService
-            .getApxItemCount(fullQueryString)
-            .subscribe((apxStats) => {
-              if (apxStats.items < this.maxitems) {
-                this.searchService.queryToDraw.next(fullQueryString);
-              } else {
-                this.error = true;
-                this.loading = false;
-              }
-            });
-        }
-      });
+          });
+      }
+    });
   }
 
   searchPoint(point: L.LatLng) {}
@@ -372,37 +326,6 @@ export class SearchComponent implements OnInit {
     if (!this.routesVisible) {
       this.toggleRouting();
     }
-  }
-
-  private getRouteQueryString(): string {
-    let returnString = "";
-    const routes = [];
-    for (const route of this.routingDataStoreService.routesToAdd.values()) {
-      routes.push(route);
-    }
-    if (!routes) {
-      return returnString;
-    }
-    for (const route of routes) {
-      let routingTypeIndicator = 0;
-      switch (route.routingType) {
-        case RoutingType.Car:
-          routingTypeIndicator = 0;
-          break;
-        case RoutingType.Bike:
-          routingTypeIndicator = 1;
-          break;
-        case RoutingType.Foot:
-          routingTypeIndicator = 2;
-          break;
-      }
-      returnString += " $route(0," + routingTypeIndicator;
-      for (const point of route.geoPoints) {
-        returnString += `,${point.lat},${point.lon}`;
-      }
-      returnString += ")";
-    }
-    return returnString;
   }
 
   togglePreferences() {

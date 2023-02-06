@@ -1,31 +1,37 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, Subject } from "rxjs";
 import { v4 as uuidv4 } from "uuid";
 import { PolygonNode } from "../models/polygon/polygon-node.model";
 import { Polygon } from "../models/polygon/polygon.model";
+import { GridService } from "./data/grid.service";
+import { ItemStoreService } from "./data/item-store.service";
 
 @Injectable({
   providedIn: "root",
 })
 export class PolygonServiceService {
-  constructor() {}
+  constructor(
+    private gridService: GridService,
+    private store: ItemStoreService
+  ) {}
   tabClosed = new BehaviorSubject(false);
   tabChanged = new BehaviorSubject(false);
   tabActivated = new BehaviorSubject(false);
-  polygonInSearch = new BehaviorSubject({ uuid: uuidv4(), color: "" });
-  inSearch = new BehaviorSubject(false);
+  activatedPolygonUpdated = new Subject();
 
   polygonMapping = new Map<uuidv4, Polygon>();
   nameMapping = new Map<string, uuidv4>();
+  activatedPolygons = new Set();
 
   checkName(name) {
     if (!this.nameMapping.has(name)) return true;
     return false;
   }
-  addName(name: string, uuid) {
+  addName(name: string, uuid: uuidv4) {
     this.nameMapping.set(name, uuid);
   }
-  removeName(name: string) {
+  removeName(name: string, uuid: uuidv4) {
+    if (this.activatedPolygons.has(uuid)) this.activatedPolygons.delete(uuid);
     this.nameMapping.delete(name);
   }
   addPolygon(uuid: uuidv4, polygonNodes: PolygonNode[]) {
@@ -36,9 +42,17 @@ export class PolygonServiceService {
   }
   removePolygon(uuid: uuidv4) {
     this.polygonMapping.delete(uuid);
+    if (this.activatedPolygons.has(uuid)) {
+      this.gridService.gridMap = new Map();
+      this.store.updateItems([]);
+    }
   }
   clearPolygon(uuid: uuidv4) {
     this.polygonMapping.set(uuid, new Polygon([], ""));
+    if (this.activatedPolygons.has(uuid)) {
+      this.gridService.gridMap = new Map();
+      this.store.updateItems([]);
+    }
   }
   addNode(polygonUuid: uuidv4, polygonNode: PolygonNode) {
     let polygon = this.polygonMapping.get(polygonUuid).polygonNodes;
@@ -47,6 +61,9 @@ export class PolygonServiceService {
       polygonUuid,
       new Polygon(polygon, this.getQueryString(polygon))
     );
+    if (this.activatedPolygons.has(polygonUuid)) {
+      this.activatedPolygonUpdated.next(true);
+    }
   }
 
   removeNode(polygonUuid: uuidv4, uuid: uuidv4) {
@@ -61,6 +78,9 @@ export class PolygonServiceService {
       polygonUuid,
       new Polygon(polygon, this.getQueryString(polygon))
     );
+    if (this.activatedPolygons.has(polygonUuid)) {
+      this.activatedPolygonUpdated.next(true);
+    }
   }
   getQueryString(polygon: PolygonNode[]) {
     let polygonString = "";
@@ -81,14 +101,4 @@ export class PolygonServiceService {
     }
     return color;
   }
-  // getUpdatedQuery(inputString: string) {
-  //   console.log(inputString);
-  //   const reg = /\§(\w+)/g;
-  //   const updatedInputString = inputString.replace(reg, function (_, p1) {
-  //     console.log("p1", p1);
-  //     console.log(this.polygonMapping);
-  //     return this.polygonMapping.get(this.nameMapping.get(p1)).polygonQuery;
-  //   });
-  //   return updatedInputString;
-  // }
 }

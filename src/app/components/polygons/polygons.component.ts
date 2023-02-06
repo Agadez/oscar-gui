@@ -11,7 +11,6 @@ import { MatTabChangeEvent } from "@angular/material/tabs";
 import { MatTabGroup } from "@angular/material/tabs";
 import { v4 as uuidv4 } from "uuid";
 import { PolygonServiceService } from "src/app/services/polygon-service.service";
-import { PolygonNode } from "src/app/models/polygon/polygon-node.model";
 
 @Component({
   selector: "app-polygons",
@@ -19,10 +18,7 @@ import { PolygonNode } from "src/app/models/polygon/polygon-node.model";
   styleUrls: ["./polygons.component.sass"],
 })
 export class PolygonsComponent implements OnInit {
-  constructor(
-    private zone: NgZone,
-    public polygonService: PolygonServiceService
-  ) {}
+  constructor(public polygonService: PolygonServiceService) {}
 
   polygonsEmpty = true;
   tabIndexToId: uuidv4[] = [];

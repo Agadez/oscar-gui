@@ -20,7 +20,7 @@ export class GridService {
   buildGrid() {
     this.gridMap = new Map<string, OscarMinItem[]>();
 
-    for (const item of this.itemStoreService.items$.value) {
+    for (const item of this.itemStoreService.items) {
       const latGridPos = this.getLatPositionInGrid(item.lat);
       const lonGridPos = this.getLonPositionInGrid(item.lon);
       if (
@@ -41,7 +41,8 @@ export class GridService {
     minLat: number,
     minLon: number,
     maxLat: number,
-    maxLon: number
+    maxLon: number,
+    heatmap: boolean,
   ): OscarMinItem[] {
     const currentMinItems: OscarMinItem[] = [];
     const bbox = {
@@ -67,6 +68,7 @@ export class GridService {
           value.forEach((item) => {
             if (item) {
               if (
+                !heatmap &&
                 item.lat + item.boundingRadius >= minLat &&
                 item.lon + item.boundingRadius >= minLon &&
                 item.lat - item.boundingRadius <= maxLat &&
@@ -74,6 +76,14 @@ export class GridService {
               ) {
                 currentMinItems.push(item);
               }
+              if(
+                heatmap &&
+                item.lat >= minLat &&
+                item.lon >= minLon &&
+                item.lat <= maxLat &&
+                item.lon <= maxLon
+              )
+              currentMinItems.push(item);
             }
           });
         } else {

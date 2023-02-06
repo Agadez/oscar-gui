@@ -59,6 +59,7 @@ export class SearchResultViewComponent implements OnInit {
   noResult = new EventEmitter<boolean>();
   @Input()
   routesVisible = false;
+  
 
   ngOnInit(): void {
     this.itemStoreService.items$.subscribe((items) => {
@@ -83,7 +84,7 @@ export class SearchResultViewComponent implements OnInit {
         this.reDrawSearchMarkers();
       }
     });
-    clearItems.asObservable().subscribe((value) => {
+    this.searchService.clearItems.asObservable().subscribe((value) => {
       if (value) {
         this.clearItems();
       }
@@ -134,10 +135,7 @@ export class SearchResultViewComponent implements OnInit {
     }
   }
   itemCheck(queryString: string) {
-    if (
-      this.itemStoreService.items$.value.length === 0 &&
-      queryString !== "() "
-    ) {
+    if (this.itemStoreService.items.length === 0 && queryString !== "() ") {
       this.noResult.emit(true);
       this.searchLoading.emit(false);
       return;
@@ -156,7 +154,7 @@ export class SearchResultViewComponent implements OnInit {
       this.oscarItemsService
         .getItemsBinary(queryString)
         .subscribe((binaryItems) => {
-          this.itemStoreService.addItems(binaryItems);
+          this.itemStoreService.updateItemsFromBinary(binaryItems);
           this.itemCheck(queryString);
           this.gridService.buildGrid();
           this.reDrawSearchMarkers();
@@ -187,9 +185,9 @@ export class SearchResultViewComponent implements OnInit {
         bounds.getSouth(),
         bounds.getWest(),
         bounds.getNorth(),
-        bounds.getEast()
+        bounds.getEast(),
+        false
       );
-
       this.progress += 25;
     });
     if (
@@ -200,11 +198,18 @@ export class SearchResultViewComponent implements OnInit {
       this.mapService.drawItemsMarker(this.currentItems);
     } else {
       this.heatmapSliderVisible = true;
+      this.currentItems = this.gridService.getCurrentItems(
+        bounds.getSouth(),
+        bounds.getWest(),
+        bounds.getNorth(),
+        bounds.getEast(),
+        true
+      );
       const currentItemsIds = [];
       this.currentItems.forEach((item) => {
         currentItemsIds.push(item.id);
       });
-      this.itemStoreService.currentItemsIds$.next(currentItemsIds);
+      this.itemStoreService.currentItemsIds = currentItemsIds;
       this.mapService.drawItemsHeatmap(
         _.sampleSize(this.currentItems, 100000),
         this.heatMapIntensity
@@ -246,8 +251,6 @@ export class SearchResultViewComponent implements OnInit {
   }
 
   clearItems() {
-    console.log("clearing heatmap");
-    this.mapService.clearHeatMap();
     this.mapService.clearAllLayers();
     this.currentItems = [];
     this.parentRefinements = null;

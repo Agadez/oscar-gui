@@ -159,64 +159,35 @@ export class MapService {
     this.heatmap.setData(dataPoints);
   }
   drawItemsMarker(items: OscarMinItem[]) {
-    var currentItemsId = new Map<number, boolean>();
+    const currentItemsIds: number[] = [];
     this.searchMarkerLayer.clearLayers();
     this.oscarItemsService.getMultipleItems(items).subscribe((data) => {
       const itemFeatures = data.features;
       // draw markers
       itemFeatures.forEach((item) => {
-        const keyValues = [];
-        keyValues.push({ k: "osm-id", v: item.properties.osmid });
-        keyValues.push({ k: "oscar-id", v: item.properties.id });
-        for (let i = 0; i < item.properties.k.length; i++) {
-          keyValues.push({ k: item.properties.k[i], v: item.properties.v[i] });
-          if (item.properties.k[i] === "name") {
-            const name = item.properties.v[i];
-            if (name === "") {
-              item.properties.name = "Item without name";
-            } else {
-              item.properties.name = item.properties.v[i];
-            }
-          }
-        }
-        let popupText = `
-            <div><h6>${item.properties.name}</h6><br>
-            <a href="https://www.openstreetmap.org/${item.properties.type}/${item.properties.osmid}" target="_blank">OSM</a>
-            <ul style="list-style-type:none;">
-          `;
-        keyValues.forEach((k) => {
-          popupText += `<li>${k.k}:${k.v}</li>`;
-        });
-        popupText += "</ul></div>";
-
         if (item.geometry.type === "LineString") {
-          this.drawGeoJSON(
-            {
-              type: item.type,
-              properties: item.properties,
-              geometry: {
-                type: "Point",
-                coordinates: item.geometry.coordinates[0],
-              },
+          this.drawGeoJSON({
+            type: item.type,
+            properties: item.properties,
+            geometry: {
+              type: "Point",
+              coordinates: item.geometry.coordinates[0],
             },
-            popupText
-          );
+          });
         }
-        const insideBounding = this.drawGeoJSON(item, popupText);
-        if (insideBounding) currentItemsId.set(item.properties.id, true);
-        // console.log(L.geoJSON(item, popupText).bounds);
+        const insideBounding = this.drawGeoJSON(item);
+        if (insideBounding) currentItemsIds.push(item.properties.id);
       });
-      const currentItemsIds = [];
-      for (let key of currentItemsId.keys()) {
-        currentItemsIds.push(key);
+      if (
+        JSON.stringify(this.itemStore.currentItemsIds) !==
+        JSON.stringify(currentItemsIds)
+      ) {
+        this.itemStore.currentItemsIds = currentItemsIds;
       }
-      console.log("jojoojo", currentItemsIds);
-      if (this.itemStore.currentItemsIds$.value != currentItemsIds)
-        this.itemStore.currentItemsIds$.next(currentItemsIds);
     });
   }
 
-  private drawGeoJSON(item, popupText: string): boolean {
+  private drawGeoJSON(item): boolean {
     const shape = L.geoJSON(item, {
       title: `${item.properties.id}`,
       pointToLayer: (geoJsonPoint, latlng) => {
@@ -270,6 +241,8 @@ export class MapService {
       this.nodeLayer.removeLayer(node);
     }
     this.polygons.set(uuid, [L.polygon, []]);
+    this.clearHeatMap();
+    this.clearSearchMarkers();
   }
   clearAllLayers() {
     this.clearHeatMap();

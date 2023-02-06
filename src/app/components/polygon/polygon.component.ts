@@ -107,7 +107,7 @@ export class PolygonComponent implements OnInit, OnDestroy {
       console.log(this.name + " already taken");
       return;
     }
-    this.polygonService.removeName(this.deprecatedName);
+    this.polygonService.removeName(this.deprecatedName, this.uuid);
     this.polygonService.addName(this.name, this.uuid);
     this.newNameEvent.emit([this.uuid, this.name]);
     this.deprecatedName = this.name;
