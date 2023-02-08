@@ -10,6 +10,8 @@ import { OscarItem } from "src/app/models/oscar/oscar-item";
 import { RoutingDataStoreService } from "../data/routing-data-store.service";
 import { RoutingService, RoutingType } from "../routing/routing.service";
 import { OscarApxstats } from "src/app/models/oscar/oscar-apxstats";
+import { GridService } from "../data/grid.service";
+import { ItemStoreService } from "../data/item-store.service";
 
 @Injectable({
   providedIn: "root",
@@ -21,8 +23,12 @@ export class SearchService {
     private polygonService: PolygonServiceService,
     private refinementStore: RefinementsService,
     private routingDataStoreService: RoutingDataStoreService,
-    private routingService: RoutingService
-  ) {}
+    private routingService: RoutingService,
+    private gridService: GridService,
+    private store: ItemStoreService
+  ) {
+    this.subscribeRefinements();
+  }
 
   queryToDraw = new BehaviorSubject<string>("");
   readonly queryToDraw$ = this.queryToDraw.asObservable();
@@ -30,7 +36,7 @@ export class SearchService {
   displayRegion = new Subject<string>();
 
   clearItems = new Subject<string>();
-  
+
   startSearch = new Subject<string>();
 
   fullQueryString = "";
@@ -105,15 +111,23 @@ export class SearchService {
         .forEach((refinement) => {
           this.parentAppendix += `-"${refinement}" `;
         });
-        this.startSearch.next("start");
+      this.startSearch.next("start");
     });
   }
   mapPolygonName(inputString: string) {
     const polygonMapping = this.polygonService.polygonMapping;
-    const nameMapping = this.polygonService.nameMapping;
-    const newQueryString = inputString.replace(/§(\w+)/g, function (_, p1) {
-      return polygonMapping.get(nameMapping.get(p1)).polygonQuery;
-    });
+    const nameMapping = this.polygonService.idUuidMap;
+    this.polygonService.activatedPolygons = new Set();
+    let activatedPolygons = this.polygonService.activatedPolygons;
+
+    const newQueryString = inputString.replace(
+      /\$polygon:(\w+)/g,
+      function (_, p1) {
+        const uuid = nameMapping.get(p1);
+        activatedPolygons.add(uuid);
+        return polygonMapping.get(uuid).polygonQuery;
+      }
+    );
     return newQueryString;
   }
   createQueryString(inputString: string) {
@@ -140,6 +154,8 @@ export class SearchService {
           inputString.replaceAll('"', "")
         );
         if (similarity > 0.7) {
+          this.gridService.gridMap = new Map();
+          this.store.updateItems([]);
           this.clearItems.next("clear");
           this.mapService.drawRegion(regions[0]);
           const region = regions[0];
@@ -188,15 +204,6 @@ export class SearchService {
       returnString += ")";
     }
     return returnString;
-  }
-  globalSearch(inputString: string) {
-    let fullQueryString = this.createQueryString(inputString);
-    this.oscarService.getApxItemCount(fullQueryString).subscribe((apxStats) => {
-      if (apxStats.items > 0) fullQueryString = fullQueryString;
-      this.oscarService.getApxItemCount(fullQueryString).subscribe(() => {
-        this.queryToDraw.next(fullQueryString);
-      });
-    });
   }
   queryStringForLocalSearch(inputString: string) {
     let fullQueryString = this.createQueryString(inputString);

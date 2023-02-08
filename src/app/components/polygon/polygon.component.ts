@@ -33,8 +33,8 @@ export class PolygonComponent implements OnInit, OnDestroy {
   polygonVisible = false;
   @Input()
   uuid = uuidv4();
-  name = "";
-  deprecatedName = "";
+  id = "";
+  deprecatedId = "";
   isActive = true;
 
   routeActivated = false;
@@ -72,7 +72,7 @@ export class PolygonComponent implements OnInit, OnDestroy {
       if (this.uuid == uuid) {
         this.isActive = false;
         this.clearList();
-        this.polygonService.nameMapping.delete(this.name);
+        this.polygonService.idUuidMap.delete(this.id);
         this.polygonService.polygonMapping.delete(this.uuid);
       }
     });
@@ -98,19 +98,19 @@ export class PolygonComponent implements OnInit, OnDestroy {
   }
 
   // Sets the Name of a Polygon and checks whether the Name is chosen already.
-  setName() {
-    if (this.deprecatedName == this.name) return;
-    if (!this.polygonService.checkName(this.name)) {
+  setId() {
+    if (this.deprecatedId == this.id) return;
+    if (!this.polygonService.checkId(this.id)) {
       // hier dialog, dass name schon drin is
-      this.name = this.deprecatedName;
+      this.id = this.deprecatedId;
       this.toggleNameForm();
-      console.log(this.name + " already taken");
+      console.log(this.id + " already taken");
       return;
     }
-    this.polygonService.removeName(this.deprecatedName, this.uuid);
-    this.polygonService.addName(this.name, this.uuid);
-    this.newNameEvent.emit([this.uuid, this.name]);
-    this.deprecatedName = this.name;
+    this.polygonService.removeId(this.deprecatedId, this.uuid);
+    this.polygonService.addId(this.id, this.uuid);
+    this.newNameEvent.emit([this.uuid, this.id]);
+    this.deprecatedId = this.id;
     this.toggleNameForm();
   }
 

@@ -59,12 +59,17 @@ export class SearchResultViewComponent implements OnInit {
   noResult = new EventEmitter<boolean>();
   @Input()
   routesVisible = false;
-  
 
   ngOnInit(): void {
     this.itemStoreService.items$.subscribe((items) => {
-      if (items.length != 0) this.hideCounts = false;
-      this.zone.run(() => (this.globalCounts = items.length));
+      if (items.length == 0) {
+        this.hideCounts = true;
+
+      }
+      else {
+        this.hideCounts = false;
+        this.zone.run(() => (this.globalCounts = items.length));
+      }
     });
     this.itemStoreService.currentItemsIds$.subscribe((currentItemsIds) => {
       this.zone.run(() => {
@@ -221,7 +226,7 @@ export class SearchResultViewComponent implements OnInit {
   intensityChange() {
     this.reDrawSearchMarkers();
   }
-
+  
   globalClick($event: MouseEvent) {
     this.showLocal = false;
     this.showGlobal = !this.showGlobal;

@@ -20,19 +20,19 @@ export class PolygonServiceService {
   activatedPolygonUpdated = new Subject();
 
   polygonMapping = new Map<uuidv4, Polygon>();
-  nameMapping = new Map<string, uuidv4>();
+  idUuidMap = new Map<string, uuidv4>();
   activatedPolygons = new Set();
 
-  checkName(name) {
-    if (!this.nameMapping.has(name)) return true;
+  checkId(id) {
+    if (!this.idUuidMap.has(id)) return true;
     return false;
   }
-  addName(name: string, uuid: uuidv4) {
-    this.nameMapping.set(name, uuid);
+  addId(id: string, uuid: uuidv4) {
+    this.idUuidMap.set(id, uuid);
   }
-  removeName(name: string, uuid: uuidv4) {
+  removeId(id: string, uuid: uuidv4) {
     if (this.activatedPolygons.has(uuid)) this.activatedPolygons.delete(uuid);
-    this.nameMapping.delete(name);
+    this.idUuidMap.delete(id);
   }
   addPolygon(uuid: uuidv4, polygonNodes: PolygonNode[]) {
     this.polygonMapping.set(
