@@ -15,17 +15,17 @@
     (impressumVisibleEvent)="impressumVisible = $event"
     (helpVisibleEvent)="helpVisible = $event"
     (polygonVisibleEvent)="polygonVisible = $event.valueOf()"
+    (preferencesVisibleEvent)="preferencesVisible = $event.valueOf()"
   ></app-search>
   <div style="overflow: auto; margin-top: 5px">
     <app-impressum *ngIf="impressumVisible"></app-impressum>
     <app-help *ngIf="helpVisible"></app-help>
+    <app-preference *ngIf="preferencesVisible"></app-preference>
     <app-routes
       [routesVisible]="routesVisible"
       [hidden]="!routesVisible"
     ></app-routes>
-    <app-polygons
-      [hidden]="!polygonVisible"
-    ></app-polygons>
+    <app-polygons [hidden]="!polygonVisible"></app-polygons>
     <app-search-result-view
       (noResult)="noResult = $event"
       (searchLoading)="searchLoading = $event"

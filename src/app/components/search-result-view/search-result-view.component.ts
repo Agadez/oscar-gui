@@ -64,9 +64,7 @@ export class SearchResultViewComponent implements OnInit {
     this.itemStoreService.items$.subscribe((items) => {
       if (items.length == 0) {
         this.hideCounts = true;
-
-      }
-      else {
+      } else {
         this.hideCounts = false;
         this.zone.run(() => (this.globalCounts = items.length));
       }
@@ -149,6 +147,7 @@ export class SearchResultViewComponent implements OnInit {
     this.searchLoading.emit(false);
   }
   async drawQuery(queryString: string) {
+    var time = new Date().getTime();
     if (queryString) {
       this.noResult.emit(false);
       this.searchLoading.emit(true);
@@ -177,6 +176,9 @@ export class SearchResultViewComponent implements OnInit {
               this.progress += 25;
             });
           this.searchLoading.emit(false);
+          console.log(
+            `Map,facets,parents,grid time: ${new Date().getTime() - time}`
+          );
         });
     }
   }
@@ -226,7 +228,7 @@ export class SearchResultViewComponent implements OnInit {
   intensityChange() {
     this.reDrawSearchMarkers();
   }
-  
+
   globalClick($event: MouseEvent) {
     this.showLocal = false;
     this.showGlobal = !this.showGlobal;

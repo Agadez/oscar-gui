@@ -1,0 +1,32 @@
+<div class="bg-white mt-2 rounded px-3 py-2 flex justify-content-between">
+  <div class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between">
+    <span>Local Search</span>
+    <mat-slide-toggle
+      color="primary"
+      [(ngModel)]="localSearch"
+      (ngModelChange)="updateLocalSearch()"
+    ></mat-slide-toggle>
+  </div>
+  <div class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between">
+    <span>Max Items in Result</span>
+    <input [(ngModel)]="maxItems" (focusout)="updateMaxItems()" />
+  </div>
+  <mat-radio-group
+    aria-label="Choose accuracy for Polygon"
+    [(ngModel)]="polygonAccuracy"
+    (ngModelChange)="updatePolygonAccuracy()"
+  >
+    <mat-radio-button value="">none</mat-radio-button>
+    <mat-radio-button value="poly-item:">poly-item</mat-radio-button>
+    <mat-radio-button value="poly-itembbox:">poly-itembbox</mat-radio-button>
+    <mat-radio-button value="polybbox-item:">polybbox-item</mat-radio-button>
+    <mat-radio-button value="polybbox-itembbox:"
+      >polybbox-itembbox</mat-radio-button
+    >
+    <mat-radio-button value="poly-cell:">poly-cell</mat-radio-button>
+    <mat-radio-button value="polybbox-cell:">polybbox-cell</mat-radio-button>
+    <mat-radio-button value="polybbox-cellbox:"
+      >polybbox-cellbox</mat-radio-button
+    >
+  </mat-radio-group>
+</div>

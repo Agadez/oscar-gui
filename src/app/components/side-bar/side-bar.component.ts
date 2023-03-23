@@ -20,5 +20,6 @@ export class SideBarComponent implements OnInit {
   impressumVisible = false;
   helpVisible = false;
   polygonVisible = false;
+  preferencesVisible = false;
   ngOnInit() {}
 }

@@ -1,25 +1,25 @@
-<div class="input-group" style="margin-top: 10px">
-  <div class="search-form d-flex">
-    <form class="search-input-form w-100" [hidden]="!oscarQuery">
+<div class="input-group">
+  <div class="search-form">
+    <form class="search-input-form" [hidden]="!oscarQuery">
       <input
+        #input
         name="normal_input"
         [matAutocomplete]="normal_auto"
         [(ngModel)]="inputString"
         (ngModelChange)="inputUpdate($event)"
-        (keydown.enter)="search()"
+        (keydown.enter)="enterKey()"
         type="text"
         class="search-input"
         placeholder="Search"
       />
       <mat-autocomplete
         #normal_auto="matAutocomplete"
-        (optionSelected)="normalSelectEvent($event)"
+        (closed)="panelClosed()"
+        (optionActivated)="panelOpened()"
       >
         <mat-option
           *ngFor="let option of normalSuggestions"
-          [value]="
-            inputWithoutLastWord(inputString) + '@' + option.k + ':' + option.v
-          "
+          [value]="inputWithoutCurrentWord(inputString, option)"
           >@{{ option.k }}:{{ option.v }}</mat-option
         >
       </mat-autocomplete>
@@ -36,7 +36,8 @@
       />
       <mat-autocomplete
         #auto="matAutocomplete"
-        (optionSelected)="selectEvent($event)"
+        (optionSelected)="panelClosed()"
+        (optionActivated)="panelOpened()"
       >
         <mat-option
           *ngFor="let option of suggestions"
@@ -45,22 +46,12 @@
         >
       </mat-autocomplete>
     </form>
-    <div class="button-area" style="width: 35%">
-      <div
-        class="d-flex w-100 justify-content-around align-items-center px-2"
-        style="gap: 10px"
-      >
-        <i (click)="reload()" class="fas fa-times side-button"></i>
+    <div class="button-area">
+      <div id="times-button">
+        <i (click)="abort()" class="fas fa-times side-button"></i>
       </div>
       <span class="vertical-line"></span>
-      <!--<i [hidden]="oscarQuery" (click)="oscarQuery = !oscarQuery" class="fas fa-language side-button-active"
-         title="Use Oscar Query Language"></i>
-      <i [hidden]="!oscarQuery" (click)="oscarQuery = !oscarQuery" class="fas fa-language side-button"
-         title="Use Natural Query Language"></i>-->
-      <div
-        class="d-flex w-100 justify-content-around align-items-center px-2"
-        style="gap: 10px"
-      >
+      <div class="side-button-area">
         <i
           (click)="toggleRouting()"
           class="fas fa-route {{ sideButtonClass }}"
@@ -102,21 +93,8 @@
   </div>
 </div>
 <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
-<div
-  *ngIf="preferences"
-  class="bg-white mt-2 rounded px-3 py-2 flex justify-content-between"
->
-  <div class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between">
-    <span>Local Search</span>
-    <mat-slide-toggle
-      color="primary"
-      [(ngModel)]="localSearch"
-    ></mat-slide-toggle>
-  </div>
-  <div class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between">
-    <span>Max Items in Result</span>
-    <input [(ngModel)]="maxitems" />
-  </div>
+<div [hidden]="!aborted" class="alert alert-info" role="alert">
+  Query aborted
 </div>
 <div [hidden]="!error" class="alert alert-danger" role="alert">
   Result to large. Please refine query.

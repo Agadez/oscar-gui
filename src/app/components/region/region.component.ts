@@ -27,7 +27,6 @@ export class RegionComponent implements OnInit {
       .asObservable()
       .subscribe(async (entity) => {
         if (!entity) {
-          console.log("no region");
           this.wikiData = null;
           return;
         }

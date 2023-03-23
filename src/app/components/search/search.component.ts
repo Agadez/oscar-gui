@@ -4,6 +4,8 @@ import {
   Input,
   OnInit,
   Output,
+  ViewChild,
+  ElementRef,
 } from "@angular/core";
 import { OscarItemsService } from "../../services/oscar/oscar-items.service";
 import { ItemStoreService } from "../../services/data/item-store.service";
@@ -39,12 +41,15 @@ export class SearchComponent implements OnInit {
     private mapService: MapService,
     private polygonService: PolygonServiceService
   ) {}
+  @ViewChild("input") input: ElementRef;
   @Input()
   loading = false;
-
+  @Input()
+  selectionStart;
   @Input()
   noResult = false;
   error = false;
+  aborted = false;
   inputString = "";
   first = true;
   naturalInput = "";
@@ -56,16 +61,40 @@ export class SearchComponent implements OnInit {
   options: string[] = ["One", "Two", "Three"];
   normalSuggestions = [];
   oscarQuery = true;
-  maxItems = 1000000;
+  request;
+
+  inAutocompletePanel = false;
+
+  enterKey() {
+    if (this.inAutocompletePanel) return;
+    this.search();
+  }
+  panelClosed() {
+    setTimeout(() => {
+      this.inAutocompletePanel = false;
+      console.log(this.inAutocompletePanel);
+    }, 100);
+  }
+  panelOpened() {
+    this.inAutocompletePanel = true;
+    console.log(this.inAutocompletePanel);
+  }
+  abort() {
+    this.inputString = "";
+    if (this.loading) {
+      this.aborted = true;
+      this.request.unsubscribe();
+      this.loading = false;
+    }
+  }
 
   @Output() routesVisibleEvent = new EventEmitter<boolean>();
   routesVisible = false;
   sideButtonClass = "side-button";
-  localSearch = false;
 
   @Output() polygonVisibleEvent = new EventEmitter<boolean>();
   polygonVisible = false;
-
+  @Output() preferencesVisibleEvent = new EventEmitter<boolean>();
   preferences = false;
   @Output() impressumVisibleEvent = new EventEmitter<boolean>();
   impressumVisible = false;
@@ -79,6 +108,7 @@ export class SearchComponent implements OnInit {
     this.polygonService.activatedPolygonUpdated.subscribe(() => this.search());
   }
   search() {
+    this.aborted = false;
     this.error = false;
     this.searchService.addRoute();
     let fullQueryString = this.searchService.createQueryString(
@@ -87,39 +117,56 @@ export class SearchComponent implements OnInit {
     if (fullQueryString === "") {
       return;
     }
-    if (this.localSearch && this.mapService.ready) {
-      this.searchService.queryStringForLocalSearch(this.inputString);
-    }
     this.itemStore.setHighlightedItem(null);
     this.loading = true;
-    this.oscarItemService.getRegion(fullQueryString).subscribe((regions) => {
-      const regionFound = this.searchService.searchForRegions(
-        this.inputString,
-        regions
+    console.log("localsearch", this.searchService.localSearch);
+    if (this.searchService.localSearch && this.mapService.ready) {
+      fullQueryString = this.searchService.queryStringForLocalSearch(
+        this.inputString
       );
-      if (regionFound) {
-        this.loading = false;
-        this.error = false;
-      } else {
-        this.oscarItemService
-          .getApxItemCount(fullQueryString)
-          .subscribe((apxStats) => {
-            if (!this.searchService.getItems(this.maxItems, apxStats)) {
-              this.error = true;
-              this.loading = false;
-            }
-          });
-      }
-    });
+      // this.oscarItemService
+      //   .getApxItemCount(localString)
+      //   .subscribe((apxStats) => {
+      //     if (apxStats.items > 0) fullQueryString = localString;
+      //   });
+    }
+    this.startRequest(fullQueryString);
   }
 
+  startRequest(fullQueryString) {
+    var time = new Date().getTime();
+    console.log(fullQueryString);
+    this.request = this.oscarItemService
+      .getRegion(fullQueryString)
+      .subscribe((regions) => {
+        const regionFound = this.searchService.searchForRegions(
+          fullQueryString,
+          regions
+        );
+        if (regionFound) {
+          this.loading = false;
+          this.error = false;
+        } else {
+          this.oscarItemService
+            .getApxItemCount(fullQueryString)
+            .subscribe((apxStats) => {
+              if (!this.searchService.getItems(apxStats)) {
+                this.error = true;
+                this.loading = false;
+              }
+            });
+        }
+        console.log(`Time: ${new Date().getTime() - time}`);
+      });
+  }
   searchPoint(point: L.LatLng) {}
 
   inputUpdate($event) {
-    const splitString = $event.split(" ");
-    const lastWord = splitString[splitString.length - 1];
-    if (lastWord.charAt(0) === "@") {
-      if (lastWord.charAt(lastWord.length - 1) === " ") {
+    const currentPosition = this.input.nativeElement.selectionStart;
+    const splitString = $event.substring(0, currentPosition).split(" ");
+    const currentWord = splitString[splitString.length - 1];
+    if (currentWord.charAt(0) === "@") {
+      if (currentWord.charAt(currentWord.length - 1) === " ") {
         this.normalSuggestions = [];
       } else {
         let i = 0;
@@ -128,7 +175,9 @@ export class SearchComponent implements OnInit {
             return false;
           }
           const keyValueTag = item.k + ":" + item.v;
-          const isMatch = keyValueTag.match(new RegExp(lastWord.slice(1), "i"));
+          const isMatch = keyValueTag.match(
+            new RegExp(currentWord.slice(1), "i")
+          );
           if (isMatch) {
             ++i;
           }
@@ -170,6 +219,24 @@ export class SearchComponent implements OnInit {
 
   onFocused($event: void) {}
 
+  inputWithoutCurrentWord(input: string, option: any) {
+    const currentPosition = this.input.nativeElement.selectionStart;
+    var currentIndex = 0;
+
+    for (let i = currentPosition - 1; i >= 0; i--) {
+      if (input[i] === " ") {
+        break;
+      }
+      currentIndex = i;
+    }
+
+    const stringHead = input.substring(0, currentIndex);
+    const wordTail =
+      input[currentPosition] && input[currentPosition] != " " ? " " : "";
+    const stringTail = input.substring(currentPosition, input.length);
+
+    return stringHead + "@" + option.k + ":" + option.v + wordTail + stringTail;
+  }
   inputWithoutLastWord(input: string) {
     const charArray = [...input];
     let endNormalString = 0;
@@ -181,10 +248,6 @@ export class SearchComponent implements OnInit {
     }
     return input.slice(0, endNormalString);
   }
-
-  spanChange($event: Event) {}
-
-  normalSelectEvent($event: MatAutocompleteSelectedEvent) {}
 
   radiusChange($event: number) {
     let radius = $event;
@@ -214,6 +277,7 @@ export class SearchComponent implements OnInit {
   }
 
   togglePreferences() {
+    this.preferencesVisibleEvent.emit(!this.preferences);
     this.preferences = !this.preferences;
   }
   toggleImpressum() {

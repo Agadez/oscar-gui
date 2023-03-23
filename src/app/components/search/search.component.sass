@@ -1,11 +1,21 @@
+$primary-color: #3f51b5
+$secondary-color: #828688
+$secondary-lighter: #CBCDCD
+$secondary-darker: #323434
+
 .search-form
+  margin-top: 10px
   height: 40px
   background-color: white
-  border-radius: 5px
-  width: 550px
-  box-shadow: 1px 1px 2px #d4c5c5
+  border-radius: 7px
+  width: 100%
+  display: inline-flex
+  box-shadow: 1px 1px 2px $secondary-color
 .search-input
-  margin-top: -10px
+  display: flex
+  flex-direction: column
+  justify-content: center
+  align-items: center
   height: 100%
   margin-left: 10px
   border-style: none
@@ -14,26 +24,36 @@
   border-style: none
   border-color: white
   outline: none
-.mat-search-input
-  width: 100%
-  background-color: white
+// .mat-search-input
+//   width: 100%
 .search-input-form
-  margin-top: 10px
   width: 100%
-  float: left
 .vertical-line
+  margin: 0px 15px 0px 10px
   display: flex
-  border-left: 1px solid #ccc
+  border-left: 1px solid $secondary-lighter
   margin-top: 5px
   height: 30px
   width: 1px
-
 .side-button-active
   cursor: pointer
-  color: #3f51b5
+  color: $primary-color
 .side-button
   cursor: pointer
-  color: #828688
+  color: $secondary-color
+.side-button:hover
+  color: $secondary-darker
 .button-area
   display: inline-flex
-  margin-left: 15px
+  margin-right: 15px
+#times-button
+  cursor: pointer
+  display: flex
+  justify-content: space-around
+  align-items: center
+.side-button-area
+  overflow-y:auto
+  display: inline-flex
+  align-items: center
+  justify-content: space-around
+  gap: 10px

@@ -45,6 +45,7 @@ import { RoutesComponent } from "./components/routes/routes.component";
 import { MatTabsModule } from "@angular/material/tabs";
 import { MatButtonModule } from "@angular/material/button";
 import { MatExpansionModule } from "@angular/material/expansion";
+import {MatRadioModule} from '@angular/material/radio';
 
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { RegionComponent } from "./components/region/region.component";
@@ -62,6 +63,7 @@ import { PolygonsComponent } from "./components/polygons/polygons.component";
 import { PolygonComponent } from "./components/polygon/polygon.component";
 import { GlobalItemListComponent } from './components/item-lists/global-item-list/global-item-list.component';
 import { LocalItemListComponent } from './components/item-lists/local-item-list/local-item-list.component';
+import { PreferenceComponent } from './components/preference/preference.component';
 
 @NgModule({
   declarations: [
@@ -97,6 +99,7 @@ import { LocalItemListComponent } from './components/item-lists/local-item-list/
     PolygonComponent,
     GlobalItemListComponent,
     LocalItemListComponent,
+    PreferenceComponent,
   ],
   imports: [
     BrowserModule,
@@ -123,6 +126,7 @@ import { LocalItemListComponent } from './components/item-lists/local-item-list/
     MatIconModule,
     MatButtonToggleModule,
     MatCheckboxModule,
+    MatRadioModule
   ],
   providers: [OscarItemsService, ConfigService, ItemStoreService],
   bootstrap: [AppComponent],

@@ -19,6 +19,7 @@ export class PolygonServiceService {
   tabActivated = new BehaviorSubject(false);
   activatedPolygonUpdated = new Subject();
 
+  polygonAccuracy = "";
   polygonMapping = new Map<uuidv4, Polygon>();
   idUuidMap = new Map<string, uuidv4>();
   activatedPolygons = new Set();
@@ -61,7 +62,7 @@ export class PolygonServiceService {
       polygonUuid,
       new Polygon(polygon, this.getQueryString(polygon))
     );
-    if (this.activatedPolygons.has(polygonUuid)) {
+    if (this.activatedPolygons.has(polygonUuid) && polygon.length > 2) {
       this.activatedPolygonUpdated.next(true);
     }
   }
@@ -78,7 +79,7 @@ export class PolygonServiceService {
       polygonUuid,
       new Polygon(polygon, this.getQueryString(polygon))
     );
-    if (this.activatedPolygons.has(polygonUuid)) {
+    if (this.activatedPolygons.has(polygonUuid) && polygon.length > 2) {
       this.activatedPolygonUpdated.next(true);
     }
   }
@@ -87,12 +88,24 @@ export class PolygonServiceService {
     let index = 0;
     for (const node of polygon) {
       if (index == 0) {
-        polygonString += `$poly:${node.lat},${node.lon}`;
+        polygonString += `$poly:${this.polygonAccuracy}${node.lat},${node.lon}`;
+        console.log(polygonString);
+        console.log(this.polygonAccuracy);
       } else polygonString += `,${node.lat},${node.lon}`;
       index++;
     }
     return polygonString;
   }
+
+  updateQueryString() {
+    this.polygonMapping.forEach((value, key) => {
+      this.polygonMapping.set(
+        key,
+        new Polygon(value.polygonNodes, this.getQueryString(value.polygonNodes))
+      );
+    });
+  }
+
   getRandomColor(): string {
     const letters = "0123456789ABCDEF";
     let color = "#";

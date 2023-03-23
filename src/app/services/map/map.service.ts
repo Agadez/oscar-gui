@@ -165,16 +165,16 @@ export class MapService {
       const itemFeatures = data.features;
       // draw markers
       itemFeatures.forEach((item) => {
-        if (item.geometry.type === "LineString") {
-          this.drawGeoJSON({
-            type: item.type,
-            properties: item.properties,
-            geometry: {
-              type: "Point",
-              coordinates: item.geometry.coordinates[0],
-            },
-          });
-        }
+        // if (item.geometry.type === "LineString") {
+        //   this.drawGeoJSON({
+        //     type: item.type,
+        //     properties: item.properties,
+        //     geometry: {
+        //       type: "Point",
+        //       coordinates: item.geometry.coordinates[0],
+        //     },
+        //   });
+        // }
         const insideBounding = this.drawGeoJSON(item);
         if (insideBounding) currentItemsIds.push(item.properties.id);
       });

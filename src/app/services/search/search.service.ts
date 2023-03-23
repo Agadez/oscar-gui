@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, Subject } from "rxjs";
+import { BehaviorSubject, Observable, Subject } from "rxjs";
 import { RefinementsService } from "../data/refinements.service";
 import { MapService } from "../map/map.service";
 import { OscarItemsService } from "../oscar/oscar-items.service";
@@ -38,6 +38,10 @@ export class SearchService {
   clearItems = new Subject<string>();
 
   startSearch = new Subject<string>();
+
+  maxItems = 1000000;
+
+  localSearch = false;
 
   fullQueryString = "";
   routeQueryString = "";
@@ -166,10 +170,12 @@ export class SearchService {
     }
     return false;
   }
-  getItems(maxItems: number, apxStats: OscarApxstats): boolean {
+
+  getItems(apxStats: OscarApxstats): boolean {
     this.displayRegion.next(null);
     this.mapService.clearRegions();
-    if (apxStats.items < maxItems) {
+    console.log("items: " + apxStats.items);
+    if (apxStats.items < this.maxItems) {
       this.queryToDraw.next(this.fullQueryString);
       return true;
     }
@@ -206,16 +212,10 @@ export class SearchService {
     return returnString;
   }
   queryStringForLocalSearch(inputString: string) {
-    let fullQueryString = this.createQueryString(inputString);
+    this.createQueryString(inputString);
     const bounds = this.mapService.bounds;
-    const localString =
-      fullQueryString +
-      ` $geo:${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}`;
-
-    this.oscarService.getApxItemCount(localString).subscribe((apxStats) => {
-      if (apxStats.items > 0) fullQueryString = localString;
-    });
-    // this.getRegions(fullQueryString);
+    this.fullQueryString += ` $geo:${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}`;
+    return this.fullQueryString;
   }
   addRoute() {
     this.idPrependix = "(";
