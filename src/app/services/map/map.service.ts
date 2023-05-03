@@ -14,12 +14,15 @@ import {
   LatLngBounds,
   LayerGroup,
   Map as LeafletMap,
+  Marker,
   Polygon,
 } from "leaflet";
 import { Region } from "../../models/oscar/region";
 import { OscarItem } from "../../models/oscar/oscar-item";
 import { SelectedItemService } from "../ui/selected-item.service";
+import { ConfigService } from "src/app/config/config.service";
 import { SearchResultViewComponent } from "src/app/components/search-result-view/search-result-view.component";
+import "leaflet.awesome-markers";
 declare var L;
 
 @Injectable({
@@ -34,7 +37,6 @@ export class MapService {
     size: 15,
     units: "px",
   });
-
   searchMarkerLayer = new L.LayerGroup();
   routingMarkerLayer = new L.LayerGroup();
   nodeLayer = new L.LayerGroup();
@@ -64,7 +66,8 @@ export class MapService {
     private itemStore: ItemStoreService,
     private zone: NgZone,
     private oscarItemsService: OscarItemsService,
-    private selectedItemService: SelectedItemService
+    private selectedItemService: SelectedItemService,
+    private configService: ConfigService
   ) {}
 
   setView(lat: number, lng: number, zoom: number) {
@@ -188,15 +191,31 @@ export class MapService {
   }
 
   private drawGeoJSON(item): boolean {
+    console.log(item);
+    console.log(item.properties.k.length);
+    for (var i = 0; i < item.properties.k.length; i++) {
+      var key = item.properties.k[i];
+      console.log("key", key);
+      console.log(this.configService.iconMapping.amenity);
+      if (this.configService.iconMapping[key] !== undefined) {
+        var value = item.properties.v[i];
+        if (this.configService.iconMapping[key][value] !== undefined) {
+          var icon = this.configService.iconMapping[key][value];
+        }
+      }
+    }
+    console.log(icon);
     const shape = L.geoJSON(item, {
       title: `${item.properties.id}`,
       pointToLayer: (geoJsonPoint, latlng) => {
-        const smallIcon = new L.Icon({
-          iconSize: [25, 41],
-          iconAnchor: [13, 41],
-          iconUrl: "leaflet/marker-icon.png",
-          shadowUrl: "leaflet/marker-shadow.png",
-          popupAnchor: [1, -24],
+        const smallIcon = L.AwesomeMarkers.icon({
+          icon: icon,
+          prefix: "fa",
+          // iconSize: [25, 41],
+          // iconAnchor: [13, 41],
+          // iconUrl: "leaflet/marker-icon.png",
+          // shadowUrl: "leaflet/marker-shadow.png",
+          // popupAnchor: [1, -24],
         });
         return L.marker(latlng, { icon: smallIcon });
       },
@@ -244,6 +263,7 @@ export class MapService {
     this.clearHeatMap();
     this.clearSearchMarkers();
   }
+
   clearAllLayers() {
     this.clearHeatMap();
     this.clearRoutingMarkers();
