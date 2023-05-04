@@ -22,8 +22,8 @@ import { OscarItem } from "../../models/oscar/oscar-item";
 import { SelectedItemService } from "../ui/selected-item.service";
 import { ConfigService } from "src/app/config/config.service";
 import { SearchResultViewComponent } from "src/app/components/search-result-view/search-result-view.component";
-import "leaflet.awesome-markers";
 declare var L;
+import "leaflet.awesome-markers";
 
 @Injectable({
   providedIn: "root",
@@ -168,16 +168,18 @@ export class MapService {
       const itemFeatures = data.features;
       // draw markers
       itemFeatures.forEach((item) => {
-        // if (item.geometry.type === "LineString") {
-        //   this.drawGeoJSON({
-        //     type: item.type,
-        //     properties: item.properties,
-        //     geometry: {
-        //       type: "Point",
-        //       coordinates: item.geometry.coordinates[0],
-        //     },
-        //   });
-        // }
+        if (item.geometry.type === "LineString") {
+          if (this.getIcon(item)) {
+            this.drawGeoJSON({
+              type: item.type,
+              properties: item.properties,
+              geometry: {
+                type: "Point",
+                coordinates: item.geometry.coordinates[0],
+              },
+            });
+          }
+        }
         const insideBounding = this.drawGeoJSON(item);
         if (insideBounding) currentItemsIds.push(item.properties.id);
       });
@@ -190,32 +192,28 @@ export class MapService {
     });
   }
 
-  private drawGeoJSON(item): boolean {
-    console.log(item);
-    console.log(item.properties.k.length);
+  private getIcon(item) {
     for (var i = 0; i < item.properties.k.length; i++) {
       var key = item.properties.k[i];
-      console.log("key", key);
-      console.log(this.configService.iconMapping.amenity);
       if (this.configService.iconMapping[key] !== undefined) {
         var value = item.properties.v[i];
         if (this.configService.iconMapping[key][value] !== undefined) {
-          var icon = this.configService.iconMapping[key][value];
+          return this.configService.iconMapping[key][value];
         }
       }
     }
-    console.log(icon);
+    return undefined;
+  }
+  private drawGeoJSON(item): boolean {
+    var icon = this.getIcon(item);
     const shape = L.geoJSON(item, {
       title: `${item.properties.id}`,
       pointToLayer: (geoJsonPoint, latlng) => {
         const smallIcon = L.AwesomeMarkers.icon({
           icon: icon,
           prefix: "fa",
-          // iconSize: [25, 41],
-          // iconAnchor: [13, 41],
-          // iconUrl: "leaflet/marker-icon.png",
-          // shadowUrl: "leaflet/marker-shadow.png",
-          // popupAnchor: [1, -24],
+          iconColor: "white",
+          markerColor: "blue",
         });
         return L.marker(latlng, { icon: smallIcon });
       },

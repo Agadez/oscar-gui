@@ -1,19 +1,26 @@
 /* You can add global styles to this file, and also import other style files */
 $base-color: #007884;
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
-.refinement-item{
-  font-size: small
+html,
+body {
+  height: 100%;
+  width: 100%;
 }
-.item-count{
-  float: right
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
 }
-.refinement-list{
+.refinement-item {
+  font-size: small;
+}
+.item-count {
+  float: right;
+}
+.refinement-list {
   margin-top: 10px;
   width: 96%;
   margin-left: 2%;
 }
-.refinement-button{
+.refinement-button {
   cursor: pointer;
 }
 
