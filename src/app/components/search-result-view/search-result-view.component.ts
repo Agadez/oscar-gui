@@ -44,7 +44,6 @@ export class SearchResultViewComponent implements OnInit {
   hideCounts = true;
   parentRefinements: ParentRefinements;
   facetRefinements: FacetRefinements;
-  markerThreshHold = 200;
   heatmapSliderVisible = false;
   heatMapIntensity = 1;
   showGlobal = true;
@@ -197,8 +196,9 @@ export class SearchResultViewComponent implements OnInit {
       );
       this.progress += 25;
     });
+    console.log(this.searchService.markerThreshold);
     if (
-      this.currentItems.length < this.markerThreshHold ||
+      this.currentItems.length < this.searchService.markerThreshold ||
       this.mapService.zoom === this.mapService.maxZoom
     ) {
       this.heatmapSliderVisible = false;
@@ -259,6 +259,7 @@ export class SearchResultViewComponent implements OnInit {
 
   clearItems() {
     this.mapService.clearAllLayers();
+    this.gridService.clearGridMap();
     this.currentItems = [];
     this.parentRefinements = null;
     this.facetRefinements = null;

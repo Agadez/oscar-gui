@@ -15,9 +15,11 @@ export class PreferenceComponent implements OnInit {
   polygonAccuracy: string;
   maxItems: number;
   localSearch: boolean;
+  markerThreshold: number;
   ngOnInit(): void {
     this.maxItems = this.searchService.maxItems;
     this.localSearch = this.searchService.localSearch;
+    this.markerThreshold = this.searchService.markerThreshold;
   }
   updateMaxItems() {
     this.searchService.maxItems = this.maxItems;
@@ -28,5 +30,8 @@ export class PreferenceComponent implements OnInit {
   updatePolygonAccuracy() {
     this.polygonService.polygonAccuracy = this.polygonAccuracy;
     this.polygonService.updateQueryString();
+  }
+  updateMarkerThreshold() {
+    this.searchService.markerThreshold = this.markerThreshold;
   }
 }

@@ -18,6 +18,7 @@ import { SearchService } from "../../services/search/search.service";
 import { Subject } from "rxjs";
 import { MapService } from "../../services/map/map.service";
 import { PolygonServiceService } from "../../services/polygon-service.service";
+import { OscarMinItem } from "src/app/models/oscar/oscar-min-item";
 
 declare function getOscarQuery(input);
 
@@ -81,6 +82,8 @@ export class SearchComponent implements OnInit {
   }
   abort() {
     this.inputString = "";
+    this.searchService.clearItems.next("clear");
+    this.itemStore.updateItems([]);
     if (this.loading) {
       this.aborted = true;
       this.request.unsubscribe();

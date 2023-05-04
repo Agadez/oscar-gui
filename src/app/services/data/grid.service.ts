@@ -42,7 +42,7 @@ export class GridService {
     minLon: number,
     maxLat: number,
     maxLon: number,
-    heatmap: boolean,
+    heatmap: boolean
   ): OscarMinItem[] {
     const currentMinItems: OscarMinItem[] = [];
     const bbox = {
@@ -76,14 +76,14 @@ export class GridService {
               ) {
                 currentMinItems.push(item);
               }
-              if(
+              if (
                 heatmap &&
                 item.lat >= minLat &&
                 item.lon >= minLon &&
                 item.lat <= maxLat &&
                 item.lon <= maxLon
               )
-              currentMinItems.push(item);
+                currentMinItems.push(item);
             }
           });
         } else {
@@ -125,5 +125,8 @@ export class GridService {
     const southWest = L.latLng(minLat, minLon);
     const northEast = L.latLng(maxLat, maxLon);
     return new L.latLngBounds(southWest, northEast);
+  }
+  clearGridMap() {
+    this.gridMap.clear();
   }
 }

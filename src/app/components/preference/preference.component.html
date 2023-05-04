@@ -11,6 +11,10 @@
     <span>Max Items in Result</span>
     <input [(ngModel)]="maxItems" (focusout)="updateMaxItems()" />
   </div>
+  <div class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between">
+    <span>Max Objects Rendered (approximation)</span>
+    <input [(ngModel)]="markerThreshold" (focusout)="updateMarkerThreshold()" />
+  </div>
   <mat-radio-group
     aria-label="Choose accuracy for Polygon"
     [(ngModel)]="polygonAccuracy"
