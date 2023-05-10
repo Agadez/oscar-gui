@@ -9,13 +9,29 @@
   </div>
   <div class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between">
     <span>Max Items in Result</span>
-    <input [(ngModel)]="maxItems" (focusout)="updateMaxItems()" />
+    <input
+      [(ngModel)]="maxItems"
+      (focusout)="updateMaxItems()"
+      appBlurOnEnter
+    />
   </div>
   <div class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between">
     <span>Max Objects Rendered (approximation)</span>
-    <input [(ngModel)]="markerThreshold" (focusout)="updateMarkerThreshold()" />
+    <input
+      [(ngModel)]="markerThreshold"
+      (focusout)="updateMarkerThreshold()"
+      appBlurOnEnter
+    />
   </div>
-  <mat-radio-group
+  <div class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between">
+    <span>Debouncetime (ms) for Routing:</span>
+    <input
+      [(ngModel)]="debounceTime"
+      (focusout)="updateDebounceTime()"
+      appBlurOnEnter
+    />
+  </div>
+  <!-- <mat-radio-group
     aria-label="Choose accuracy for Polygon"
     [(ngModel)]="polygonAccuracy"
     (ngModelChange)="updatePolygonAccuracy()"
@@ -32,5 +48,5 @@
     <mat-radio-button value="polybbox-cellbox:"
       >polybbox-cellbox</mat-radio-button
     >
-  </mat-radio-group>
+  </mat-radio-group> -->
 </div>

@@ -64,6 +64,7 @@ import { PolygonComponent } from "./components/polygon/polygon.component";
 import { GlobalItemListComponent } from './components/item-lists/global-item-list/global-item-list.component';
 import { LocalItemListComponent } from './components/item-lists/local-item-list/local-item-list.component';
 import { PreferenceComponent } from './components/preference/preference.component';
+import { BlurOnEnterDirective } from './directives/blur-on-enter.directive';
 
 @NgModule({
   declarations: [
@@ -100,6 +101,7 @@ import { PreferenceComponent } from './components/preference/preference.componen
     GlobalItemListComponent,
     LocalItemListComponent,
     PreferenceComponent,
+    BlurOnEnterDirective,
   ],
   imports: [
     BrowserModule,

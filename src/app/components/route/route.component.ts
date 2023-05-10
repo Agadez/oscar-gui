@@ -220,9 +220,10 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
       const dragSubject = new Subject<LeafletEvent>();
       marker.on("drag", (event: LeafletEvent) => dragSubject.next(event));
       dragSubject
-        .pipe(debounceTime(150))
+        .pipe(debounceTime(this.routingService.debounceTime))
         .subscribe((event) => this.markerDragHandler(event));
       routingMarker.leafletId = marker._leaflet_id;
+      console.log(this.routingService.debounceTime);
       i++;
     }
   }
