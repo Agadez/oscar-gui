@@ -22,7 +22,7 @@ export class PolygonServiceService {
   polygonAccuracy = "";
   polygonMapping = new Map<uuidv4, Polygon>();
   idUuidMap = new Map<string, uuidv4>();
-  activatedPolygons = new Set();
+  activatedPolygons = new Set<uuidv4>();
 
   checkId(id) {
     if (!this.idUuidMap.has(id)) return true;

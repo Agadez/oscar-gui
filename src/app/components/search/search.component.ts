@@ -122,7 +122,6 @@ export class SearchComponent implements OnInit {
     }
     this.itemStore.setHighlightedItem(null);
     this.loading = true;
-    console.log("localsearch", this.searchService.localSearch);
     if (this.searchService.localSearch && this.mapService.ready) {
       fullQueryString = this.searchService.queryStringForLocalSearch(
         this.inputString

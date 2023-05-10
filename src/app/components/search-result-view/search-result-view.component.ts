@@ -19,6 +19,7 @@ import { SearchService } from "../../services/search/search.service";
 import { forkJoin, Subject } from "rxjs";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ItemStoreService } from "src/app/services/data/item-store.service";
+import { PolygonServiceService } from "src/app/services/polygon-service.service";
 
 export const clearItems = new Subject<string>();
 export const radiusSearchTrigger = new Subject<L.LatLng>();
@@ -36,7 +37,8 @@ export class SearchResultViewComponent implements OnInit {
     private zone: NgZone,
     private searchService: SearchService,
     private snackBar: MatSnackBar,
-    public itemStoreService: ItemStoreService
+    private itemStoreService: ItemStoreService,
+    private polygonService: PolygonServiceService
   ) {}
 
   globalCounts = 0;
@@ -175,14 +177,17 @@ export class SearchResultViewComponent implements OnInit {
               this.progress += 25;
             });
           this.searchLoading.emit(false);
-          console.log(
-            `Map,facets,parents,grid time: ${new Date().getTime() - time}`
-          );
         });
     }
   }
-
   reDrawSearchMarkers() {
+    // checking for every polygon right now
+    this.polygonService.activatedPolygons.forEach((uuid) => {
+      this.gridService.checkInside(
+        this.polygonService.polygonMapping.get(uuid)
+      );
+    });
+
     this.mapService.clearSearchMarkers();
     this.mapService.clearHeatMap();
     const bounds = this.mapService.bounds;
@@ -196,7 +201,6 @@ export class SearchResultViewComponent implements OnInit {
       );
       this.progress += 25;
     });
-    console.log(this.searchService.markerThreshold);
     if (
       this.currentItems.length < this.searchService.markerThreshold ||
       this.mapService.zoom === this.mapService.maxZoom
@@ -217,6 +221,7 @@ export class SearchResultViewComponent implements OnInit {
         currentItemsIds.push(item.id);
       });
       this.itemStoreService.currentItemsIds = currentItemsIds;
+      console.log("items", this.currentItems.length);
       this.mapService.drawItemsHeatmap(
         _.sampleSize(this.currentItems, 100000),
         this.heatMapIntensity

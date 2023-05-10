@@ -13,14 +13,14 @@
 >
   <div
     class="bg-light h-100 mat-elevation-z3"
-    style="max-width: 40vw; border-radius: 10px"
+    style="max-width: 30vw; border-radius: 10px"
   >
     <div *ngIf="expanded">
       <app-item-kv-table [oscarItem]="item"></app-item-kv-table>
     </div>
     <div
       style="
-        max-width: 40vw;
+        width: 30vw;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -30,7 +30,7 @@
     >
       <div
         class="d-flex align-items-center"
-        style="justify-content: space-between; width: 60em"
+        style="justify-content: space-between; width: 40%"
       >
         <mat-icon color="primary">place</mat-icon>
         <span style="margin-top: 2px">{{ item.properties.name }}</span>

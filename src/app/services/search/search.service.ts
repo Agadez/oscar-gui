@@ -176,7 +176,6 @@ export class SearchService {
   getItems(apxStats: OscarApxstats): boolean {
     this.displayRegion.next(null);
     this.mapService.clearRegions();
-    console.log("items: " + apxStats.items);
     if (apxStats.items < this.maxItems) {
       this.queryToDraw.next(this.fullQueryString);
       return true;
