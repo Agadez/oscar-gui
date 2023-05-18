@@ -12,11 +12,16 @@ import { GeoPoint } from "../../models/geo-point";
 export class SelectedItemComponent implements OnInit {
   constructor(public selectedItemService: SelectedItemService) {
     selectedItemService.subject.subscribe((item) => {
-      this.item = item;
+      console.log("hey");
+      if (item != null) {
+        this.name = item.properties.v[item.properties.k.indexOf("name")];
+        this.item = item;
+      }
     });
   }
   expanded = false;
-  item: OscarItem;
+  name: string = "";
+  item?: OscarItem;
   ngOnInit(): void {}
   close() {
     this.selectedItemService.subject.next(null);

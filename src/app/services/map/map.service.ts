@@ -16,6 +16,7 @@ import {
   Map as LeafletMap,
   Marker,
   Polygon,
+  latLng,
 } from "leaflet";
 import { Region } from "../../models/oscar/region";
 import { OscarItem } from "../../models/oscar/oscar-item";
@@ -206,20 +207,32 @@ export class MapService {
   }
   private drawGeoJSON(item): boolean {
     var icon = this.getIcon(item);
+    const smallIcon = L.AwesomeMarkers.icon({
+      icon: icon,
+      prefix: "fa",
+      iconColor: "white",
+      markerColor: "green",
+    });
     const shape = L.geoJSON(item, {
       title: `${item.properties.id}`,
-      pointToLayer: (geoJsonPoint, latlng) => {
-        const smallIcon = L.AwesomeMarkers.icon({
-          icon: icon,
-          prefix: "fa",
-          iconColor: "white",
-          markerColor: "blue",
+      pointToLayer: (_, latlng) => {
+        return L.marker(latlng, {
+          icon: smallIcon,
         });
-        return L.marker(latlng, { icon: smallIcon });
       },
       onEachFeature: (feature, layer) => {
         layer.on("click", (event) => {
           this.selectedItemService.subject.next(item);
+          layer.options.icon.options.markerColor = "red";
+          console.log(layer);
+          layer.pointToLayer = L.marker(layer.pointToLayer);
+          console.log(layer.options.icon.options.markerColor);
+          layer.bindPopup(
+            feature.properties.v[item.properties.k.indexOf("name")]
+          );
+        });
+        layer.on("mouseover", (event) => {
+          layer.bindPopup("");
         });
       },
       style: { color: "blue", stroke: true, fill: false, opacity: 0.7 },
