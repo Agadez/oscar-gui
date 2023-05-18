@@ -11,33 +11,79 @@ declare var L;
   providedIn: "root",
 })
 export class GridService {
-  gridMap = new Map<string, OscarMinItem[]>();
-  gridSizeY = 3600;
-  gridSizeX = 1800;
-  private buildStatus = false;
-  // divide lat and long fields by gridSize lat = [-90, +90] long = [-180,180]
-  divLat = 18 / this.gridSizeX;
-  divLon = 36 / this.gridSizeY;
+  gridX = 100;
+  gridY = 100;
+  grid: OscarMinItem[][][];
+  resolutionX: number;
+  resolutionY: number;
+  gridBBox;
+  minLat = 100000;
+  minLon = 100000;
+  maxLat = -100000;
+  maxLon = -100000;
+
   constructor(private itemStoreService: ItemStoreService) {}
+
+  getGridBounds() {
+    for (const item of this.itemStoreService.items) {
+      if (item.lat < this.minLat) this.minLat = item.lat;
+
+      if (item.lat > this.maxLat) this.maxLat = item.lat;
+
+      if (item.lon < this.minLon) this.minLon = item.lon;
+
+      if (item.lon > this.maxLon) this.maxLon = item.lon;
+    }
+    this.gridBBox = new L.latLngBounds(
+      L.latLng(this.minLat, this.minLon),
+      L.latLng(this.maxLat, this.maxLon)
+    );
+    let distanceLat = this.maxLat - this.minLat;
+    let distanceLon = this.maxLon - this.minLon;
+    this.resolutionX = distanceLat / (this.gridX - 1);
+    this.resolutionY = distanceLon / (this.gridY - 1);
+  }
+
   buildGrid() {
-    this.gridMap = new Map<string, OscarMinItem[]>();
+    this.grid = Array.from({ length: this.gridX }, () =>
+      Array.from({ length: this.gridY }, () => [])
+    );
+    console.time("bbox");
+    this.getGridBounds();
+    console.time("bbox");
     for (const item of this.itemStoreService.items) {
       const latGridPos = this.getLatPositionInGrid(item.lat);
       const lonGridPos = this.getLonPositionInGrid(item.lon);
-      if (
-        !this.gridMap.has(JSON.stringify({ lat: latGridPos, lon: lonGridPos }))
-      ) {
-        this.gridMap.set(
-          JSON.stringify({ lat: latGridPos, lon: lonGridPos }),
-          new Array<OscarMinItem>()
-        );
-      }
-      this.gridMap
-        .get(JSON.stringify({ lat: latGridPos, lon: lonGridPos }))
-        .push(item);
+      this.grid[latGridPos][lonGridPos].push(item);
     }
-    this.buildStatus = true;
   }
+  // gridMap = new Map<string, OscarMinItem[]>();
+  // gridSizeY = 3600;
+  // gridSizeX = 1800;
+  // private buildStatus = false;
+  // // divide lat and long fields by gridSize lat = [-90, +90] long = [-180,180]
+  // divLat = 18 / this.gridSizeX;
+  // divLon = 36 / this.gridSizeY;
+
+  // buildGrid() {
+  //   this.gridMap = new Map<string, OscarMinItem[]>();
+  //   for (const item of this.itemStoreService.items) {
+  //     const latGridPos = this.getLatPositionInGrid(item.lat);
+  //     const lonGridPos = this.getLonPositionInGrid(item.lon);
+  //     if (
+  //       !this.gridMap.has(JSON.stringify({ lat: latGridPos, lon: lonGridPos }))
+  //     ) {
+  //       this.gridMap.set(
+  //         JSON.stringify({ lat: latGridPos, lon: lonGridPos }),
+  //         new Array<OscarMinItem>()
+  //       );
+  //     }
+  //     this.gridMap
+  //       .get(JSON.stringify({ lat: latGridPos, lon: lonGridPos }))
+  //       .push(item);
+  //   }
+  //   this.buildStatus = true;
+  // }
   getCurrentItems(
     minLat: number,
     minLon: number,
@@ -46,89 +92,98 @@ export class GridService {
     heatmap: boolean
   ): OscarMinItem[] {
     const currentMinItems: OscarMinItem[] = [];
-    const bbox = {
-      minLonPos: minLon / this.divLon,
-      minLatPos: minLat / this.divLat,
-      maxLonPos: maxLon / this.divLon,
-      maxLatPos: maxLat / this.divLat,
-    };
-    this.gridMap.forEach((value, key) => {
-      const keyObj = JSON.parse(key) as { lat: number; lon: number };
+    if (minLat < this.minLat) minLat = this.minLat;
+    if (minLon < this.minLon) minLon = this.minLon;
+    if (maxLat > this.maxLat) maxLat = this.maxLat;
+    if (maxLon > this.maxLon) maxLon = this.maxLon;
 
-      if (
-        keyObj.lat >= bbox.minLatPos - 1 &&
-        keyObj.lon >= bbox.minLonPos - 1 &&
-        keyObj.lat <= bbox.maxLatPos &&
-        keyObj.lon <= bbox.maxLonPos
-      ) {
-        if (
-          keyObj.lat < bbox.minLatPos ||
-          keyObj.lon < bbox.minLonPos ||
-          keyObj.lat > bbox.maxLatPos - 1
-        ) {
-          value.forEach((item) => {
-            if (item) {
-              if (
-                !heatmap &&
-                item.lat + item.boundingRadius >= minLat &&
-                item.lon + item.boundingRadius >= minLon &&
-                item.lat - item.boundingRadius <= maxLat &&
-                item.lon - item.boundingRadius <= maxLon
-              ) {
-                currentMinItems.push(item);
-              }
-              if (
-                heatmap &&
-                item.lat >= minLat &&
-                item.lon >= minLon &&
-                item.lat <= maxLat &&
-                item.lon <= maxLon
-              )
-                currentMinItems.push(item);
-            }
-          });
-        } else {
-          currentMinItems.push(...value);
+    const minLonPos = this.getLonPositionInGrid(minLon);
+    const minLatPos = this.getLatPositionInGrid(minLat);
+    const maxLonPos = this.getLonPositionInGrid(maxLon);
+    const maxLatPos = this.getLatPositionInGrid(maxLat);
+
+    // adding all items that in the bounding box for sure
+    for (let i = minLatPos + 1; i < maxLatPos; i++) {
+      for (let j = minLonPos + 1; j < maxLonPos; j++) {
+        for (const item of this.grid[i][j]) {
+          currentMinItems.push(item);
         }
       }
-    });
+    }
+    for (let j = minLonPos; j < maxLonPos + 1; j++) {
+      for (const item of this.grid[minLatPos][j]) {
+        if (
+          item.lat + item.boundingRadius > minLat &&
+          item.lon - item.boundingRadius < maxLon &&
+          item.lon + item.boundingRadius > minLon
+        ) {
+          currentMinItems.push(item);
+        }
+      }
+    }
+    for (let j = minLonPos; j < maxLonPos + 1; j++) {
+      for (const item of this.grid[maxLatPos][j]) {
+        if (
+          item.lat - item.boundingRadius < maxLat &&
+          item.lon - item.boundingRadius < maxLon &&
+          item.lon + item.boundingRadius > minLon
+        ) {
+          currentMinItems.push(item);
+        }
+      }
+    }
+    for (let i = minLatPos + 1; i < maxLatPos; i++) {
+      for (const item of this.grid[i][minLonPos]) {
+        if (item.lon + item.boundingRadius > minLon) {
+          currentMinItems.push(item);
+        }
+      }
+    }
+    for (let i = minLatPos + 1; i < maxLatPos; i++) {
+      for (const item of this.grid[i][maxLonPos]) {
+        if (item.lon - item.boundingRadius < maxLon) {
+          currentMinItems.push(item);
+        }
+      }
+    }
     return currentMinItems;
   }
   getLatPositionInGrid(lat: number): number {
     // calculate distance from the first cell in the grid divided by the divisor("resolution") and rounded down
-    return Math.round(lat / this.divLat);
+    // return Math.round(lat / this.divLat);
+    return Math.round((lat - this.minLat) / this.resolutionX);
   }
   getLonPositionInGrid(lon: number): number {
     // calculate distance from the first cell in the grid divided by the divisor("resolution") and rounded down
-    return Math.round(lon / this.divLon);
+    return Math.round((lon - this.minLon) / this.resolutionY);
   }
-  getBBox(): L.LatLngBounds {
-    let minLat = 100000;
-    let minLon = 100000;
-    let maxLat = -100000;
-    let maxLon = -100000;
-    this.gridMap.forEach((value, key) => {
-      value.forEach((e) => {
-        if (e.lat < minLat) {
-          minLat = e.lat;
-        }
-        if (e.lon < minLon) {
-          minLon = e.lon;
-        }
-        if (e.lat > maxLat) {
-          maxLat = e.lat;
-        }
-        if (e.lon > maxLon) {
-          maxLon = e.lon;
-        }
-      });
-    });
-    const southWest = L.latLng(minLat, minLon);
-    const northEast = L.latLng(maxLat, maxLon);
-    return new L.latLngBounds(southWest, northEast);
-  }
+  // getBBox(): L.LatLngBounds {
+  //   let minLat = 100000;
+  //   let minLon = 100000;
+  //   let maxLat = -100000;
+  //   let maxLon = -100000;
+  //   this.gridMap.forEach((value, key) => {
+  //     value.forEach((e) => {
+  //       if (e.lat < minLat) {
+  //         minLat = e.lat;
+  //       }
+  //       if (e.lon < minLon) {
+  //         minLon = e.lon;
+  //       }
+  //       if (e.lat > maxLat) {
+  //         maxLat = e.lat;
+  //       }
+  //       if (e.lon > maxLon) {
+  //         maxLon = e.lon;
+  //       }
+  //     });
+  //   });
+  //   const southWest = L.latLng(minLat, minLon);
+  //   const northEast = L.latLng(maxLat, maxLon);
+  //   return new L.latLngBounds(southWest, northEast);
+  // }
   clearGridMap() {
-    this.gridMap.clear();
+    this.grid = [];
   }
   //polygonCoordinates davor umwandeln
   checkInside(polygon: Polygon) {
@@ -138,31 +193,32 @@ export class GridService {
       // make a function
       // gridPoint.x = this.getLatPositionInGrid(node.lat);
       // gridPoint.y = this.getLonPositionInGrid(node.lon);`
-      gridPoint.x = node.lat / this.divLat;
-      gridPoint.y = node.lon / this.divLon;
+      gridPoint.x = this.getLatPositionInGrid(node.lat);
+      gridPoint.y = this.getLonPositionInGrid(node.lon);
       polygonCoordinates.push(gridPoint);
     });
-    this.gridMap.forEach((value: OscarMinItem[], key: string) => {
-      var counter = 0;
-      var cellCoords = JSON.parse(key);
-      var startingPoint = new Point(cellCoords.lat, cellCoords.lon);
-      var endingPoint = new Point(1800, cellCoords.lon);
-      var infiniteLine = new Line(startingPoint, endingPoint);
-      for (var i = 0; i < polygonCoordinates.length; i++) {
-        var border = new Line(
-          polygonCoordinates[i],
-          polygonCoordinates[(i + 1) % polygonCoordinates.length]
-        );
+    for (let i = 0 + 1; i < this.grid.length; i++) {
+      for (let j = 0 + 1; j < this.grid[i].length; j++) {
+        var counter = 0;
+        var startingPoint = new Point(i, j);
+        var endingPoint = new Point(110, j);
+        var infiniteLine = new Line(startingPoint, endingPoint);
+        for (var k = 0; k < polygonCoordinates.length; k++) {
+          var border = new Line(
+            polygonCoordinates[k],
+            polygonCoordinates[(k + 1) % polygonCoordinates.length]
+          );
 
-        if (this.checkIntersect(infiniteLine, border)) {
-          counter++;
+          if (this.checkIntersect(infiniteLine, border)) {
+            counter++;
+          }
+        }
+
+        if (counter % 2 == 0) {
+          this.grid[i][j] = [];
         }
       }
-
-      if (counter % 2 == 0) {
-        this.gridMap.delete(key);
-      }
-    });
+    }
   }
   checkIntersect(infiniteLine: Line, border: Line) {
     let dir1 = this.orientation(

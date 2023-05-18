@@ -160,7 +160,7 @@ export class SearchService {
           inputString.replaceAll('"', "")
         );
         if (similarity > 0.7) {
-          this.gridService.gridMap = new Map();
+          this.gridService.grid = [];
           this.store.updateItems([]);
           this.clearItems.next("clear");
           this.mapService.drawRegion(regions[0]);

@@ -148,7 +148,6 @@ export class SearchResultViewComponent implements OnInit {
     this.searchLoading.emit(false);
   }
   async drawQuery(queryString: string) {
-    var time = new Date().getTime();
     if (queryString) {
       this.noResult.emit(false);
       this.searchLoading.emit(true);
@@ -161,9 +160,20 @@ export class SearchResultViewComponent implements OnInit {
         .subscribe((binaryItems) => {
           this.itemStoreService.updateItemsFromBinary(binaryItems);
           this.itemCheck(queryString);
+          console.log(this.itemStoreService.items.length);
+          console.time("buildGrid");
           this.gridService.buildGrid();
+          console.timeEnd("buildGrid");
+          // checking for every polygon right now
+          this.polygonService.activatedPolygons.forEach((uuid) => {
+            console.time("checkinside");
+            this.gridService.checkInside(
+              this.polygonService.polygonMapping.get(uuid)
+            );
+            console.timeEnd("checkinside");
+          });
           this.reDrawSearchMarkers();
-          this.mapService.fitBounds(this.gridService.getBBox());
+          this.mapService.fitBounds(this.gridService.gridBBox);
           this.oscarItemsService
             .getParents(queryString, 0)
             .subscribe((parents) => {
@@ -181,17 +191,11 @@ export class SearchResultViewComponent implements OnInit {
     }
   }
   reDrawSearchMarkers() {
-    // checking for every polygon right now
-    this.polygonService.activatedPolygons.forEach((uuid) => {
-      this.gridService.checkInside(
-        this.polygonService.polygonMapping.get(uuid)
-      );
-    });
-
     this.mapService.clearSearchMarkers();
     this.mapService.clearHeatMap();
     const bounds = this.mapService.bounds;
     this.zone.run(() => {
+      console.time("currentitems1");
       this.currentItems = this.gridService.getCurrentItems(
         bounds.getSouth(),
         bounds.getWest(),
@@ -200,6 +204,7 @@ export class SearchResultViewComponent implements OnInit {
         false
       );
       this.progress += 25;
+      console.timeEnd("currentitems1");
     });
     if (
       this.currentItems.length < this.searchService.markerThreshold ||
@@ -209,6 +214,7 @@ export class SearchResultViewComponent implements OnInit {
       this.mapService.drawItemsMarker(this.currentItems);
     } else {
       this.heatmapSliderVisible = true;
+      console.time("currentitems2");
       this.currentItems = this.gridService.getCurrentItems(
         bounds.getSouth(),
         bounds.getWest(),
@@ -216,6 +222,7 @@ export class SearchResultViewComponent implements OnInit {
         bounds.getEast(),
         true
       );
+      console.timeEnd("currentitems2");
       const currentItemsIds = [];
       this.currentItems.forEach((item) => {
         currentItemsIds.push(item.id);

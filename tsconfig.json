@@ -16,5 +16,8 @@
     {
       "path": "./e2e/tsconfig.e2e.json"
     }
-  ]
+  ],
+  "angularCompilerOptions": {
+    "strictTemplates": true
+  }
 }
