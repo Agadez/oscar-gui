@@ -121,7 +121,7 @@ export class PolygonComponent implements OnInit, OnDestroy {
 
   // Method to draw a Polygon by using the mapService
   draw() {
-    this.mapService.clearAllLayers();
+    // this.mapService.clearAllLayers();
     this.mapService.drawPolygon(
       this.polygonService.polygonMapping.get(this.uuid).polygonNodes,
       this.uuid,

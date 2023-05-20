@@ -83,6 +83,7 @@ export class SearchComponent implements OnInit {
   abort() {
     this.inputString = "";
     this.searchService.clearItems.next("clear");
+    this.polygonService.activatedPolygons.clear();
     this.itemStore.updateItems([]);
     if (this.loading) {
       this.aborted = true;

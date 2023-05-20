@@ -26,12 +26,11 @@
       <p>id:</p>
       <p [hidden]="showNameForm">{{ id }}</p>
       <input
-        matInput
         [(ngModel)]="id"
         style="max-width: 100px; height: 26px"
         [hidden]="!showNameForm"
-        type="text"
-        (keyup.enter)="setId()"
+        (focusout)="setId()"
+        appBlurOnEnter
       />
       <i
         [hidden]="showNameForm"

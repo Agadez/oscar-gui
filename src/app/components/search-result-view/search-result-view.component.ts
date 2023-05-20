@@ -20,7 +20,7 @@ import { forkJoin, Subject } from "rxjs";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ItemStoreService } from "src/app/services/data/item-store.service";
 import { PolygonServiceService } from "src/app/services/polygon-service.service";
-
+import { debounceTime, throttleTime } from "rxjs/operators";
 export const clearItems = new Subject<string>();
 export const radiusSearchTrigger = new Subject<L.LatLng>();
 
@@ -60,6 +60,7 @@ export class SearchResultViewComponent implements OnInit {
   noResult = new EventEmitter<boolean>();
   @Input()
   routesVisible = false;
+  drawing = false;
 
   ngOnInit(): void {
     this.itemStoreService.items$.subscribe((items) => {
@@ -78,12 +79,18 @@ export class SearchResultViewComponent implements OnInit {
     this.searchService.queryToDraw$.subscribe(async (queryString) => {
       await this.drawQuery(queryString);
     });
-    this.mapService.onZoom$.subscribe((event) => {
-      if (event !== null) {
-        this.reDrawSearchMarkers();
-      }
-    });
-    this.mapService.onMove$.subscribe((event) => {
+    // this.mapService.onZoom$.subscribe((event) => {
+    //   if (event !== null) {
+    //     console.log("jo");
+    //     if (this.drawing) return;
+    //     else {
+    //       this.drawing = true;
+    //       this.reDrawSearchMarkers();
+    //       this.drawing = false;
+    //     }
+    //   }
+    // });
+    this.mapService.onMove$.pipe(debounceTime(100)).subscribe((event) => {
       if (event !== null) {
         this.reDrawSearchMarkers();
       }
@@ -164,14 +171,17 @@ export class SearchResultViewComponent implements OnInit {
           console.time("buildGrid");
           this.gridService.buildGrid();
           console.timeEnd("buildGrid");
-          // checking for every polygon right now
-          this.polygonService.activatedPolygons.forEach((uuid) => {
-            console.time("checkinside");
-            this.gridService.checkInside(
-              this.polygonService.polygonMapping.get(uuid)
-            );
-            console.timeEnd("checkinside");
-          });
+          // checking for all activated polygons
+          if (this.polygonService.polyClientCalc) {
+            this.polygonService.activatedPolygons.forEach((uuid) => {
+              console.time("checkinside");
+              this.gridService.checkInside(
+                this.polygonService.polygonMapping.get(uuid)
+              );
+              console.timeEnd("checkinside");
+            });
+          }
+
           this.reDrawSearchMarkers();
           this.mapService.fitBounds(this.gridService.gridBBox);
           this.oscarItemsService
@@ -271,7 +281,7 @@ export class SearchResultViewComponent implements OnInit {
 
   clearItems() {
     this.mapService.clearAllLayers();
-    this.gridService.clearGridMap();
+    this.gridService.deleteGrid();
     this.currentItems = [];
     this.parentRefinements = null;
     this.facetRefinements = null;

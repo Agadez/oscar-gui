@@ -105,13 +105,18 @@ export class MapService {
     this.map.addLayer(this.regionLayer);
     this.map.addLayer(this.polygonLayer);
     this.map.addLayer(this.nodeLayer);
-    this.map.on("zoom", (event) => {
+
+    // actually not used since move is triggered on zoom aswell
+    this.map.on("zoomend", (event) => {
       this.zoom = event.target._zoom;
       this._zoom.next(event);
     });
-    this.map.on("moveend", (event) => {
+
+    this.map.on("move", (event) => {
+      this.zoom = event.target._zoom;
       this._move.next(event);
     });
+
     this.map.on("click", (event) => this._click.next(event));
     this.map.on("contextmenu", (event) => {
       this._contextMenu.next(event);
@@ -160,6 +165,7 @@ export class MapService {
       dataPoints.push([item.lat, item.lon, intensity]);
     }
     this.clearHeatMap();
+    console.log("jojojo");
     this.heatmap.setData(dataPoints);
   }
   drawItemsMarker(items: OscarMinItem[]) {

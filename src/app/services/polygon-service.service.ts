@@ -23,6 +23,7 @@ export class PolygonServiceService {
   polygonMapping = new Map<uuidv4, Polygon>();
   idUuidMap = new Map<string, uuidv4>();
   activatedPolygons = new Set<uuidv4>();
+  polyClientCalc = false;
 
   checkId(id) {
     if (!this.idUuidMap.has(id)) return true;

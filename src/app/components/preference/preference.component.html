@@ -8,6 +8,37 @@
     ></mat-slide-toggle>
   </div>
   <div class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between">
+    <span>Increase Polygon accuracy (refine on Client)</span>
+    <mat-slide-toggle
+      color="primary"
+      [(ngModel)]="polyClientCalc"
+      (ngModelChange)="updatePolygonCalculation()"
+    ></mat-slide-toggle>
+  </div>
+  <div class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between">
+    <span>Amount of Cells in Grid</span>
+    <div class="bg-white mt-2 px-3 py-2 d-flex justify-content-between">
+      <mat-form-field>
+        <mat-label>X Cells</mat-label>
+        <input
+          matInput
+          [(ngModel)]="gridX"
+          type="number"
+          (ngModelChange)="updateGridResolution()"
+        />
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Y Cells</mat-label>
+        <input
+          matInput
+          [(ngModel)]="gridY"
+          type="number"
+          (ngModelChange)="updateGridResolution()"
+        />
+      </mat-form-field>
+    </div>
+  </div>
+  <div class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between">
     <span>Max Items in Result</span>
     <input
       [(ngModel)]="maxItems"

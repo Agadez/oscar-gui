@@ -66,7 +66,6 @@ export class MapComponent implements OnInit {
       this.contextMenuY = event.containerPoint.y;
       this.openContextMenu();
     });
-
   }
   @HostListener("document:click")
   leftClick() {
