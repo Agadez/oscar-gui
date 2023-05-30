@@ -12,7 +12,6 @@ import { GeoPoint } from "../../models/geo-point";
 export class SelectedItemComponent implements OnInit {
   constructor(public selectedItemService: SelectedItemService) {
     selectedItemService.subject.subscribe((item) => {
-      console.log("hey");
       if (item != null) {
         this.name = item.properties.v[item.properties.k.indexOf("name")];
         this.item = item;

@@ -38,7 +38,6 @@ export class GridService {
      * Calculate the grid bounds is necessary before building the grid
      */
     this.getGridBounds();
-
     /**
      * Initialize the grid as 2d array with OscarMinItem arrays as elements
      */
@@ -147,9 +146,9 @@ export class GridService {
     const maxLonPos = this.getLonPositionInGrid(maxLon);
     const maxLatPos = this.getLatPositionInGrid(maxLat);
 
-    // adding all items that in the bounding box for sure
-    for (let i = minLatPos + 1; i < maxLatPos; i++) {
-      for (let j = minLonPos + 1; j < maxLonPos; j++) {
+    // adding all items that are in the bounding box for sure
+    for (let i = minLatPos; i <= maxLatPos; i++) {
+      for (let j = minLonPos; j <= maxLonPos; j++) {
         for (const item of this.grid[i][j]) {
           currentMinItems.push(item);
         }
@@ -178,54 +177,54 @@ export class GridService {
     //   }
     // }
 
-    for (let j = minLonPos; j < maxLonPos + 1; j++) {
-      for (const item of this.grid[minLatPos][j]) {
-        if (
-          item.lat + item.boundingRadius > minLat &&
-          item.lat - item.boundingRadius < maxLat &&
-          item.lon - item.boundingRadius < maxLon &&
-          item.lon + item.boundingRadius > minLon
-        ) {
-          currentMinItems.push(item);
-        }
-      }
-    }
-    for (let j = minLonPos; j < maxLonPos + 1; j++) {
-      for (const item of this.grid[maxLatPos][j]) {
-        if (
-          item.lat + item.boundingRadius > minLat &&
-          item.lat - item.boundingRadius < maxLat &&
-          item.lon - item.boundingRadius < maxLon &&
-          item.lon + item.boundingRadius > minLon
-        ) {
-          currentMinItems.push(item);
-        }
-      }
-    }
-    for (let i = minLatPos + 1; i < maxLatPos; i++) {
-      for (const item of this.grid[i][minLonPos]) {
-        if (
-          item.lat + item.boundingRadius > minLat &&
-          item.lat - item.boundingRadius < maxLat &&
-          item.lon - item.boundingRadius < maxLon &&
-          item.lon + item.boundingRadius > minLon
-        ) {
-          currentMinItems.push(item);
-        }
-      }
-    }
-    for (let i = minLatPos + 1; i < maxLatPos; i++) {
-      for (const item of this.grid[i][maxLonPos]) {
-        if (
-          item.lat + item.boundingRadius > minLat &&
-          item.lat - item.boundingRadius < maxLat &&
-          item.lon - item.boundingRadius < maxLon &&
-          item.lon + item.boundingRadius > minLon
-        ) {
-          currentMinItems.push(item);
-        }
-      }
-    }
+    // for (let j = minLonPos; j < maxLonPos + 1; j++) {
+    //   for (const item of this.grid[minLatPos][j]) {
+    //     if (
+    //       item.lat + item.boundingRadius > minLat &&
+    //       item.lat - item.boundingRadius < maxLat &&
+    //       item.lon - item.boundingRadius < maxLon &&
+    //       item.lon + item.boundingRadius > minLon
+    //     ) {
+    //       currentMinItems.push(item);
+    //     }
+    //   }
+    // }
+    // for (let j = minLonPos; j < maxLonPos + 1; j++) {
+    //   for (const item of this.grid[maxLatPos][j]) {
+    //     if (
+    //       item.lat + item.boundingRadius > minLat &&
+    //       item.lat - item.boundingRadius < maxLat &&
+    //       item.lon - item.boundingRadius < maxLon &&
+    //       item.lon + item.boundingRadius > minLon
+    //     ) {
+    //       currentMinItems.push(item);
+    //     }
+    //   }
+    // }
+    // for (let i = minLatPos + 1; i < maxLatPos; i++) {
+    //   for (const item of this.grid[i][minLonPos]) {
+    //     if (
+    //       item.lat + item.boundingRadius > minLat &&
+    //       item.lat - item.boundingRadius < maxLat &&
+    //       item.lon - item.boundingRadius < maxLon &&
+    //       item.lon + item.boundingRadius > minLon
+    //     ) {
+    //       currentMinItems.push(item);
+    //     }
+    //   }
+    // }
+    // for (let i = minLatPos + 1; i < maxLatPos; i++) {
+    //   for (const item of this.grid[i][maxLonPos]) {
+    //     if (
+    //       item.lat + item.boundingRadius > minLat &&
+    //       item.lat - item.boundingRadius < maxLat &&
+    //       item.lon - item.boundingRadius < maxLon &&
+    //       item.lon + item.boundingRadius > minLon
+    //     ) {
+    //       currentMinItems.push(item);
+    //     }
+    //   }
+    // }
     return currentMinItems;
   }
 
@@ -243,7 +242,7 @@ export class GridService {
       for (let j = 0; j < this.grid[i].length; j++) {
         var counter = 0;
         var startingPoint = new Point(i, j);
-        var endingPoint = new Point(110, j);
+        var endingPoint = new Point(this.gridX + 1, j);
         var infiniteLine = new Line(startingPoint, endingPoint);
         for (var k = 0; k < polygonCoordinates.length; k++) {
           var border = new Line(

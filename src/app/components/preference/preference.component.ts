@@ -39,10 +39,6 @@ export class PreferenceComponent implements OnInit {
   updateLocalSearch() {
     this.searchService.localSearch = this.localSearch;
   }
-  updatePolygonAccuracy() {
-    this.polygonService.polygonAccuracy = this.polygonAccuracy;
-    this.polygonService.updateQueryString();
-  }
   updateMarkerThreshold() {
     this.searchService.markerThreshold = this.markerThreshold;
   }

@@ -5,6 +5,7 @@ import { PolygonNode } from "../models/polygon/polygon-node.model";
 import { Polygon } from "../models/polygon/polygon.model";
 import { GridService } from "./data/grid.service";
 import { ItemStoreService } from "./data/item-store.service";
+import { LatLng } from "leaflet";
 
 @Injectable({
   providedIn: "root",
@@ -19,7 +20,6 @@ export class PolygonServiceService {
   tabActivated = new BehaviorSubject(false);
   activatedPolygonUpdated = new Subject();
 
-  polygonAccuracy = "";
   polygonMapping = new Map<uuidv4, Polygon>();
   idUuidMap = new Map<string, uuidv4>();
   activatedPolygons = new Set<uuidv4>();
@@ -76,6 +76,24 @@ export class PolygonServiceService {
     }
   }
 
+  dragNode(polygonUuid: uuidv4, nodeUuid: uuidv4, dragEndPosition: LatLng) {
+    let newPolygon = this.polygonMapping.get(polygonUuid);
+    const index = newPolygon.polygonNodes.findIndex((n) => n.uuid === nodeUuid);
+    newPolygon.polygonNodes[index].lat = dragEndPosition.lat;
+    newPolygon.polygonNodes[index].lon = dragEndPosition.lng;
+    newPolygon.polygonQuery = this.getQueryString(newPolygon.polygonNodes);
+    newPolygon.boundingBoxString = this.getBoundingBoxString(
+      newPolygon.polygonNodes
+    );
+    this.polygonMapping.set(polygonUuid, newPolygon);
+    if (
+      this.activatedPolygons.has(polygonUuid) &&
+      this.polygonMapping.get(polygonUuid).polygonNodes.length > 2
+    ) {
+      this.activatedPolygonUpdated.next(true);
+    }
+  }
+
   removeNode(polygonUuid: uuidv4, uuid: uuidv4) {
     const polygon = this.polygonMapping.get(polygonUuid).polygonNodes;
     const index = polygon.findIndex((node) => {
@@ -101,9 +119,7 @@ export class PolygonServiceService {
     let index = 0;
     for (const node of polygon) {
       if (index == 0) {
-        polygonString += `$poly:${this.polygonAccuracy}${node.lat},${node.lon}`;
-        console.log(polygonString);
-        console.log(this.polygonAccuracy);
+        polygonString += `$poly:${node.lat},${node.lon}`;
       } else polygonString += `,${node.lat},${node.lon}`;
       index++;
     }

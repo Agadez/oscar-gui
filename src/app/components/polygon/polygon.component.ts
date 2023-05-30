@@ -40,7 +40,6 @@ export class PolygonComponent implements OnInit, OnDestroy {
   routeActivated = false;
 
   ngOnInit(): void {
-    console.log("jojo:" + this.uuid);
     let init = true;
 
     // Observes if the User is currently planning a Route

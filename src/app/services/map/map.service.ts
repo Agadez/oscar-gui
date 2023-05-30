@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 import { PolygonNode } from "src/app/models/polygon/polygon-node.model";
 import { OscarItemsService } from "../oscar/oscar-items.service";
 import { RoutingMarker } from "../../models/routing-marker";
+import { PolygonServiceService } from "../polygon-service.service";
 import {
   CircleMarker,
   LatLng,
@@ -31,7 +32,7 @@ import "leaflet.awesome-markers";
 })
 export class MapService {
   routingMarkers = new Map<string, L.Marker>();
-  polygons = new Map<uuidv4, [L.Polygon, L.CircleMarker[]]>();
+  polygons = new Map<uuidv4, [L.Polygon, L.Marker[]]>();
   maxZoom = 20;
 
   heatmap = new L.webGLHeatmap({
@@ -68,7 +69,8 @@ export class MapService {
     private zone: NgZone,
     private oscarItemsService: OscarItemsService,
     private selectedItemService: SelectedItemService,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private polygonService: PolygonServiceService
   ) {}
 
   setView(lat: number, lng: number, zoom: number) {
@@ -136,13 +138,26 @@ export class MapService {
       opacity: 1,
       smoothFactor: 1,
     });
-    let nodes: L.CircleMarker[] = [];
+    let nodes: L.Marker[] = [];
+    const markerHtmlStyles = `
+    width: 1.5rem;
+    height: 1.5rem;
+    left: -0.5rem;
+    top: -0.5rem;
+    display: block;
+    position: relative;
+    border-radius: 50%`;
     for (const node of polygonNodes) {
-      const marker = L.circleMarker([node.lat, node.lon], {
-        color: node.color,
-        fillColor: node.color,
-        fillOpacity: 1,
-        radius: 5,
+      var icon = new L.divIcon({
+        html: `<span style= "background-color: ${node.color};${markerHtmlStyles}"></span>`,
+      });
+      const marker = L.marker([node.lat, node.lon], {
+        icon: icon,
+        draggable: true,
+      });
+      marker.on("dragend", () => {
+        this.polygonService.dragNode(uuid, node.uuid, marker.getLatLng());
+        this.drawPolygon(polygonNodes, uuid, color);
       });
       this.nodeLayer.addLayer(marker);
       nodes.push(marker);
@@ -165,7 +180,6 @@ export class MapService {
       dataPoints.push([item.lat, item.lon, intensity]);
     }
     this.clearHeatMap();
-    console.log("jojojo");
     this.heatmap.setData(dataPoints);
   }
   drawItemsMarker(items: OscarMinItem[]) {
