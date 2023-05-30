@@ -39,7 +39,11 @@ export class PolygonServiceService {
   addPolygon(uuid: uuidv4, polygonNodes: PolygonNode[]) {
     this.polygonMapping.set(
       uuid,
-      new Polygon(polygonNodes, this.getQueryString(polygonNodes))
+      new Polygon(
+        polygonNodes,
+        this.getQueryString(polygonNodes),
+        this.getBoundingBoxString(polygonNodes)
+      )
     );
   }
   removePolygon(uuid: uuidv4) {
@@ -50,7 +54,7 @@ export class PolygonServiceService {
     }
   }
   clearPolygon(uuid: uuidv4) {
-    this.polygonMapping.set(uuid, new Polygon([], ""));
+    this.polygonMapping.set(uuid, new Polygon([], "", ""));
     if (this.activatedPolygons.has(uuid)) {
       this.gridService.grid = [];
       this.store.updateItems([]);
@@ -61,7 +65,11 @@ export class PolygonServiceService {
     polygon.push(polygonNode);
     this.polygonMapping.set(
       polygonUuid,
-      new Polygon(polygon, this.getQueryString(polygon))
+      new Polygon(
+        polygon,
+        this.getQueryString(polygon),
+        this.getBoundingBoxString(polygon)
+      )
     );
     if (this.activatedPolygons.has(polygonUuid) && polygon.length > 2) {
       this.activatedPolygonUpdated.next(true);
@@ -78,7 +86,11 @@ export class PolygonServiceService {
     }
     this.polygonMapping.set(
       polygonUuid,
-      new Polygon(polygon, this.getQueryString(polygon))
+      new Polygon(
+        polygon,
+        this.getQueryString(polygon),
+        this.getBoundingBoxString(polygon)
+      )
     );
     if (this.activatedPolygons.has(polygonUuid) && polygon.length > 2) {
       this.activatedPolygonUpdated.next(true);
@@ -97,12 +109,29 @@ export class PolygonServiceService {
     }
     return polygonString;
   }
+  getBoundingBoxString(polygon: PolygonNode[]) {
+    let west = 1000;
+    let south = 1000;
+    let east = -1000;
+    let north = -1000;
+    for (const node of polygon) {
+      if (node.lon < west) west = node.lon;
+      if (node.lon > east) east = node.lon;
+      if (node.lat < south) south = node.lat;
+      if (node.lat > north) north = node.lat;
+    }
+    return `$geo:${west},${south},${east},${north}`;
+  }
 
   updateQueryString() {
     this.polygonMapping.forEach((value, key) => {
       this.polygonMapping.set(
         key,
-        new Polygon(value.polygonNodes, this.getQueryString(value.polygonNodes))
+        new Polygon(
+          value.polygonNodes,
+          this.getQueryString(value.polygonNodes),
+          this.getBoundingBoxString(value.polygonNodes)
+        )
       );
     });
   }

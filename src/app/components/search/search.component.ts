@@ -115,9 +115,18 @@ export class SearchComponent implements OnInit {
     this.aborted = false;
     this.error = false;
     this.searchService.addRoute();
-    let fullQueryString = this.searchService.createQueryString(
-      this.inputString
-    );
+    let fullQueryString = "";
+    if (this.polygonService.polyClientCalc) {
+      fullQueryString = this.searchService.createQueryString(
+        this.inputString,
+        true
+      );
+    } else {
+      fullQueryString = this.searchService.createQueryString(
+        this.inputString,
+        false
+      );
+    }
     if (fullQueryString === "") {
       return;
     }
@@ -125,7 +134,8 @@ export class SearchComponent implements OnInit {
     this.loading = true;
     if (this.searchService.localSearch && this.mapService.ready) {
       fullQueryString = this.searchService.queryStringForLocalSearch(
-        this.inputString
+        this.inputString,
+        this.polygonService.polyClientCalc
       );
       // this.oscarItemService
       //   .getApxItemCount(localString)
@@ -137,7 +147,6 @@ export class SearchComponent implements OnInit {
   }
 
   startRequest(fullQueryString) {
-    var time = new Date().getTime();
     console.log(fullQueryString);
     this.request = this.oscarItemService
       .getRegion(fullQueryString)
@@ -159,7 +168,6 @@ export class SearchComponent implements OnInit {
               }
             });
         }
-        console.log(`Time: ${new Date().getTime() - time}`);
       });
   }
   searchPoint(point: L.LatLng) {}

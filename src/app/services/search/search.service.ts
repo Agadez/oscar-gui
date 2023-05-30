@@ -120,30 +120,41 @@ export class SearchService {
       this.startSearch.next("start");
     });
   }
-  mapPolygonName(inputString: string) {
+  mapPolygonName(inputString: string, clientRenderingMode: boolean) {
     const polygonMapping = this.polygonService.polygonMapping;
     const nameMapping = this.polygonService.idUuidMap;
     this.polygonService.activatedPolygons = new Set();
     let activatedPolygons = this.polygonService.activatedPolygons;
-
-    const newQueryString = inputString.replace(
-      /\$polygon:(\w+)/g,
-      function (_, p1) {
-        const uuid = nameMapping.get(p1);
-        activatedPolygons.add(uuid);
-        return polygonMapping.get(uuid).polygonQuery;
-      }
-    );
+    let newQueryString = "";
+    if (clientRenderingMode) {
+      newQueryString = inputString.replace(
+        /\$polygon:(\w+)/g,
+        function (_, p1) {
+          const uuid = nameMapping.get(p1);
+          activatedPolygons.add(uuid);
+          return polygonMapping.get(uuid).boundingBoxString;
+        }
+      );
+    } else {
+      newQueryString = inputString.replace(
+        /\$polygon:(\w+)/g,
+        function (_, p1) {
+          const uuid = nameMapping.get(p1);
+          activatedPolygons.add(uuid);
+          return polygonMapping.get(uuid).polygonQuery;
+        }
+      );
+    }
     return newQueryString;
   }
-  createQueryString(inputString: string) {
+  createQueryString(inputString: string, clientRenderingMode: boolean) {
     this.fullQueryString =
       this.idPrependix +
       ") " +
       this.keyPrependix +
       this.keyValuePrependix +
       this.parentPrependix +
-      this.mapPolygonName(inputString) +
+      this.mapPolygonName(inputString, clientRenderingMode) +
       this.keyAppendix +
       this.parentAppendix +
       this.keyValueAppendix +
@@ -173,6 +184,9 @@ export class SearchService {
     return false;
   }
 
+  rerender() {
+    this.queryToDraw.next(this.fullQueryString);
+  }
   getItems(apxStats: OscarApxstats): boolean {
     this.displayRegion.next(null);
     this.mapService.clearRegions();
@@ -212,8 +226,8 @@ export class SearchService {
     }
     return returnString;
   }
-  queryStringForLocalSearch(inputString: string) {
-    this.createQueryString(inputString);
+  queryStringForLocalSearch(inputString: string, clientRenderingMode: boolean) {
+    this.createQueryString(inputString, clientRenderingMode);
     const bounds = this.mapService.bounds;
     this.fullQueryString += ` $geo:${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}`;
     return this.fullQueryString;

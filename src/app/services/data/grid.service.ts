@@ -102,7 +102,7 @@ export class GridService {
    * @returns x index in the grid for the given latitude
    */
   getLatPositionInGrid(lat: number): number {
-    return Math.round((lat - this.minLat) / this.resolutionX);
+    return Math.floor((lat - this.minLat) / this.resolutionX);
   }
 
   /**
@@ -111,7 +111,7 @@ export class GridService {
    * @returns y index in the grid for the given longitude
    */
   getLonPositionInGrid(lon: number): number {
-    return Math.round((lon - this.minLon) / this.resolutionY);
+    return Math.floor((lon - this.minLon) / this.resolutionY);
   }
 
   /**
@@ -131,7 +131,6 @@ export class GridService {
     heatmap: boolean
   ): OscarMinItem[] {
     const currentMinItems: OscarMinItem[] = [];
-
     /**
      * Check whether the corners of BBcurrent are outside the grids bounding box and puts them on the edge of the grid if so.
      */
@@ -239,7 +238,6 @@ export class GridService {
       // gridPoint.y = this.getLonPositionInGrid(node.lon);
       gridPoint.y = (node.lon - this.minLon) / this.resolutionY;
       polygonCoordinates.push(gridPoint);
-      console.log(polygonCoordinates);
     });
     for (let i = 0; i < this.grid.length; i++) {
       for (let j = 0; j < this.grid[i].length; j++) {
@@ -263,6 +261,15 @@ export class GridService {
         }
       }
     }
+    let itemsInGrid: OscarMinItem[] = [];
+    for (let i = 0; i < this.grid.length; i++) {
+      for (let j = 0; j < this.grid[i].length; j++) {
+        for (let k = 0; k < this.grid[i][j].length; k++) {
+          itemsInGrid.push(this.grid[i][j][k]);
+        }
+      }
+    }
+    this.itemStoreService.updateItems(itemsInGrid);
   }
   checkIntersect(infiniteLine: Line, border: Line) {
     let dir1 = this.orientation(

@@ -51,9 +51,15 @@ export class PreferenceComponent implements OnInit {
   }
   updatePolygonCalculation() {
     this.polygonService.polyClientCalc = this.polyClientCalc;
+    this.searchService.startSearch.next("start");
   }
-  updateGridResolution() {
+  updateX() {
     this.gridService.gridX = this.gridX;
+  }
+  updateY() {
     this.gridService.gridY = this.gridY;
+  }
+  recalculateGrid() {
+    this.searchService.rerender();
   }
 }
