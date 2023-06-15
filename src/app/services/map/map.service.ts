@@ -34,9 +34,8 @@ export class MapService {
   routingMarkers = new Map<string, L.Marker>();
   polygons = new Map<uuidv4, [L.Polygon, L.Marker[]]>();
   maxZoom = 20;
-
   heatmap = new L.webGLHeatmap({
-    size: 10,
+    size: 30,
     units: "px",
   });
   searchMarkerLayer = new L.LayerGroup();
@@ -181,6 +180,7 @@ export class MapService {
     }
     this.clearHeatMap();
     this.heatmap.setData(dataPoints);
+    // this.heatmap.multiply(0.5);
   }
   drawItemsMarker(items: OscarMinItem[]) {
     const currentItemsIds: number[] = [];
