@@ -14,6 +14,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { addRoutingPointEvent } from "../routes/routes.component";
 import { GeoPoint } from "../../models/geo-point";
 import { OscarItemsService } from "src/app/services/oscar/oscar-items.service";
+import { QueryParamsService } from "src/app/services/query-params.service";
 
 @Component({
   selector: "app-map",
@@ -23,6 +24,9 @@ import { OscarItemsService } from "src/app/services/oscar/oscar-items.service";
 export class MapComponent implements OnInit {
   @ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
   i = 0;
+  lat = 48.43379;
+  lng = 9.00203;
+  zoom = 7;
   data = {
     data: [],
   };
@@ -33,8 +37,8 @@ export class MapComponent implements OnInit {
         attribution: "...",
       }),
     ],
-    zoom: 7,
-    center: latLng([48.43379, 9.00203]),
+    zoom: this.zoom,
+    center: latLng([this.lat, this.lng]),
   };
   contextMenuX = 10;
   contextMenuY = 10;
@@ -42,10 +46,21 @@ export class MapComponent implements OnInit {
   constructor(
     private itemStore: ItemStoreService,
     private mapService: MapService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private queryParams: QueryParamsService
   ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.queryParams.setMap.subscribe((set) => {
+      if (set) {
+        this.lat = this.queryParams.lat;
+        this.lng = this.queryParams.lng;
+        this.zoom = this.queryParams.zoom;
+        this.mapService._map.setView(latLng([this.lat, this.lng]), this.zoom);
+        this.queryParams.setQuery.next(true);
+      }
+    });
+  }
 
   openContextMenu() {
     this.trigger.openMenu();

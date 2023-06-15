@@ -21,6 +21,8 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { ItemStoreService } from "src/app/services/data/item-store.service";
 import { PolygonServiceService } from "src/app/services/polygon-service.service";
 import { debounceTime, throttleTime } from "rxjs/operators";
+import { QueryParamsService } from "src/app/services/query-params.service";
+
 export const clearItems = new Subject<string>();
 export const radiusSearchTrigger = new Subject<L.LatLng>();
 
@@ -38,7 +40,8 @@ export class SearchResultViewComponent implements OnInit {
     private searchService: SearchService,
     private snackBar: MatSnackBar,
     private itemStoreService: ItemStoreService,
-    private polygonService: PolygonServiceService
+    private polygonService: PolygonServiceService,
+    private paramsService: QueryParamsService
   ) {}
 
   globalCounts = 0;
@@ -61,8 +64,12 @@ export class SearchResultViewComponent implements OnInit {
   @Input()
   routesVisible = false;
   drawing = false;
+  sharedQuery = false;
 
   ngOnInit(): void {
+    this.paramsService.setQuery.subscribe((set) => {
+      if (set && this.paramsService.queryString != "") this.sharedQuery = true;
+    });
     this.itemStoreService.items$.subscribe((items) => {
       if (items.length == 0) {
         this.hideCounts = true;
@@ -79,17 +86,11 @@ export class SearchResultViewComponent implements OnInit {
     this.searchService.queryToDraw$.subscribe(async (queryString) => {
       await this.drawQuery(queryString);
     });
-    // this.mapService.onZoom$.subscribe((event) => {
-    //   if (event !== null) {
-    //     console.log("jo");
-    //     if (this.drawing) return;
-    //     else {
-    //       this.drawing = true;
-    //       this.reDrawSearchMarkers();
-    //       this.drawing = false;
-    //     }
-    //   }
-    // });
+    this.mapService.onZoom$.subscribe((event) => {
+      if (event !== null) {
+        this.reDrawSearchMarkers();
+      }
+    });
     this.mapService.onMove$.pipe(debounceTime(100)).subscribe((event) => {
       if (event !== null) {
         this.reDrawSearchMarkers();
@@ -167,23 +168,21 @@ export class SearchResultViewComponent implements OnInit {
         .subscribe((binaryItems) => {
           this.itemStoreService.updateItemsFromBinary(binaryItems);
           this.itemCheck(queryString);
-          console.log(this.itemStoreService.items.length);
-          console.time("buildGrid");
           this.gridService.buildGrid();
-          console.timeEnd("buildGrid");
           // checking for all activated polygons
           if (this.polygonService.polyClientCalc) {
             this.polygonService.activatedPolygons.forEach((uuid) => {
-              console.time("checkinside");
               this.gridService.checkInside(
                 this.polygonService.polygonMapping.get(uuid)
               );
-              console.timeEnd("checkinside");
             });
           }
 
           this.reDrawSearchMarkers();
-          this.mapService.fitBounds(this.gridService.gridBBox);
+
+          if (this.sharedQuery) this.sharedQuery = false;
+          else this.mapService.fitBounds(this.gridService.gridBBox);
+
           this.oscarItemsService
             .getParents(queryString, 0)
             .subscribe((parents) => {
@@ -205,7 +204,6 @@ export class SearchResultViewComponent implements OnInit {
     this.mapService.clearHeatMap();
     const bounds = this.mapService.bounds;
     this.zone.run(() => {
-      console.time("currentitems1");
       this.currentItems = this.gridService.getCurrentItems(
         bounds.getSouth(),
         bounds.getWest(),
@@ -214,7 +212,6 @@ export class SearchResultViewComponent implements OnInit {
         false
       );
       this.progress += 25;
-      console.timeEnd("currentitems1");
     });
     if (
       this.currentItems.length < this.searchService.markerThreshold ||
@@ -224,7 +221,6 @@ export class SearchResultViewComponent implements OnInit {
       this.mapService.drawItemsMarker(this.currentItems);
     } else {
       this.heatmapSliderVisible = true;
-      console.time("currentitems2");
       this.currentItems = this.gridService.getCurrentItems(
         bounds.getSouth(),
         bounds.getWest(),
@@ -232,13 +228,11 @@ export class SearchResultViewComponent implements OnInit {
         bounds.getEast(),
         true
       );
-      console.timeEnd("currentitems2");
       const currentItemsIds = [];
       this.currentItems.forEach((item) => {
         currentItemsIds.push(item.id);
       });
       this.itemStoreService.currentItemsIds = currentItemsIds;
-      console.log("items", this.currentItems.length);
       this.mapService.drawItemsHeatmap(
         _.sampleSize(this.currentItems, 100000),
         this.heatMapIntensity

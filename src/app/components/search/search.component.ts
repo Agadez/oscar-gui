@@ -19,6 +19,9 @@ import { Subject } from "rxjs";
 import { MapService } from "../../services/map/map.service";
 import { PolygonServiceService } from "../../services/polygon-service.service";
 import { OscarMinItem } from "src/app/models/oscar/oscar-min-item";
+import { QueryParamsService } from "src/app/services/query-params.service";
+import { Clipboard } from "@angular/cdk/clipboard";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 declare function getOscarQuery(input);
 
@@ -40,7 +43,10 @@ export class SearchComponent implements OnInit {
     public refinementStore: RefinementsService,
     private searchService: SearchService,
     private mapService: MapService,
-    private polygonService: PolygonServiceService
+    private polygonService: PolygonServiceService,
+    private queryParams: QueryParamsService,
+    private clipboard: Clipboard,
+    private snackBar: MatSnackBar
   ) {}
   @ViewChild("input") input: ElementRef;
   @Input()
@@ -91,7 +97,14 @@ export class SearchComponent implements OnInit {
       this.loading = false;
     }
   }
-
+  copyToClipboard() {
+    this.clipboard.copy(this.queryParams.getCurrentState(this.inputString));
+    this.snackBar.open(
+      "The search state is copied to the clipboard!",
+      "Close",
+      { duration: 2000 }
+    );
+  }
   @Output() routesVisibleEvent = new EventEmitter<boolean>();
   routesVisible = false;
   sideButtonClass = "side-button";
@@ -110,6 +123,12 @@ export class SearchComponent implements OnInit {
     activateRouting.subscribe(() => this.showRouting());
     // activatePolygon.subscribe(() => this.togglePolygon());
     this.polygonService.activatedPolygonUpdated.subscribe(() => this.search());
+    this.queryParams.setQuery.subscribe((set) => {
+      if (set) {
+        this.inputString = this.queryParams.queryString;
+        this.search();
+      }
+    });
   }
   search() {
     this.aborted = false;
@@ -204,7 +223,6 @@ export class SearchComponent implements OnInit {
     this.naturalInput = $event;
     let colorOutputTags: ColorTag[];
     colorOutputTags = getOscarQuery(this.naturalInput);
-    this.inputString = "";
     colorOutputTags.forEach((colorTag) => {
       this.inputString += `${colorTag.tags} `;
     });

@@ -1,10 +1,9 @@
 import { MatProgressBarModule } from "@angular/material/progress-bar";
 
 declare var L;
-
+import { RouterModule, Routes } from "@angular/router";
 import { BrowserModule } from "@angular/platform-browser";
 import { NgModule } from "@angular/core";
-
 import { AppComponent } from "./app.component";
 import { SearchComponent } from "./components/search/search.component";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
@@ -45,7 +44,7 @@ import { RoutesComponent } from "./components/routes/routes.component";
 import { MatTabsModule } from "@angular/material/tabs";
 import { MatButtonModule } from "@angular/material/button";
 import { MatExpansionModule } from "@angular/material/expansion";
-import {MatRadioModule} from '@angular/material/radio';
+import { MatRadioModule } from "@angular/material/radio";
 
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { RegionComponent } from "./components/region/region.component";
@@ -61,10 +60,12 @@ import { MatCheckboxModule } from "@angular/material/checkbox";
 import { SelectedItemComponent } from "./components/selected-item/selected-item.component";
 import { PolygonsComponent } from "./components/polygons/polygons.component";
 import { PolygonComponent } from "./components/polygon/polygon.component";
-import { GlobalItemListComponent } from './components/item-lists/global-item-list/global-item-list.component';
-import { LocalItemListComponent } from './components/item-lists/local-item-list/local-item-list.component';
-import { PreferenceComponent } from './components/preference/preference.component';
-import { BlurOnEnterDirective } from './directives/blur-on-enter.directive';
+import { GlobalItemListComponent } from "./components/item-lists/global-item-list/global-item-list.component";
+import { LocalItemListComponent } from "./components/item-lists/local-item-list/local-item-list.component";
+import { PreferenceComponent } from "./components/preference/preference.component";
+import { BlurOnEnterDirective } from "./directives/blur-on-enter.directive";
+
+const routes: Routes = [{ path: "**", redirectTo: "", pathMatch: "full" }];
 
 @NgModule({
   declarations: [
@@ -104,6 +105,7 @@ import { BlurOnEnterDirective } from './directives/blur-on-enter.directive';
     BlurOnEnterDirective,
   ],
   imports: [
+    RouterModule.forRoot(routes),
     BrowserModule,
     FormsModule,
     HttpClientModule,
@@ -128,7 +130,7 @@ import { BlurOnEnterDirective } from './directives/blur-on-enter.directive';
     MatIconModule,
     MatButtonToggleModule,
     MatCheckboxModule,
-    MatRadioModule
+    MatRadioModule,
   ],
   providers: [OscarItemsService, ConfigService, ItemStoreService],
   bootstrap: [AppComponent],

@@ -36,7 +36,7 @@ export class MapService {
   maxZoom = 20;
 
   heatmap = new L.webGLHeatmap({
-    size: 15,
+    size: 10,
     units: "px",
   });
   searchMarkerLayer = new L.LayerGroup();
