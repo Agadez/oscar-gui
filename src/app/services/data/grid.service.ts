@@ -59,6 +59,8 @@ export class GridService {
    * Calculates the grid bounds and resolution based on the the items received from the Server
    */
   getGridBounds() {
+    this.minLon = this.minLat = 100000;
+    this.maxLat = this.maxLon = -100000;
     /**
      * Determine the bounding box by iterating over all items
      */
@@ -146,7 +148,7 @@ export class GridService {
     const maxLonPos = this.getLonPositionInGrid(maxLon);
     const maxLatPos = this.getLatPositionInGrid(maxLat);
 
-    // adding all items that are in the bounding box for sure
+    // adding all items that are in the bounding box
     for (let i = minLatPos; i <= maxLatPos; i++) {
       for (let j = minLonPos; j <= maxLonPos; j++) {
         for (const item of this.grid[i][j]) {
@@ -154,77 +156,6 @@ export class GridService {
         }
       }
     }
-    /**
-     * Check every item in the same cell as the corners of BBCurrent and determine whether they are inside or outside of it.
-     * Add all items, which are inside of BBCurrent.
-     */
-    // let itemsOnEdge = this.grid[minLatPos].concat(
-    //   this.grid[maxLatPos],
-    //   this.grid[minLonPos],
-    //   this.grid[maxLonPos]
-    // );
-    // console.log(itemsOnEdge);
-    // for (const edgeArray of itemsOnEdge) {
-    //   for (const item of edgeArray) {
-    //     if (
-    //       item.lat + item.boundingRadius > minLat &&
-    //       item.lat - item.boundingRadius < maxLat &&
-    //       item.lon - item.boundingRadius < maxLon &&
-    //       item.lon + item.boundingRadius > minLon
-    //     ) {
-    //       currentMinItems.push(item);
-    //     }
-    //   }
-    // }
-
-    // for (let j = minLonPos; j < maxLonPos + 1; j++) {
-    //   for (const item of this.grid[minLatPos][j]) {
-    //     if (
-    //       item.lat + item.boundingRadius > minLat &&
-    //       item.lat - item.boundingRadius < maxLat &&
-    //       item.lon - item.boundingRadius < maxLon &&
-    //       item.lon + item.boundingRadius > minLon
-    //     ) {
-    //       currentMinItems.push(item);
-    //     }
-    //   }
-    // }
-    // for (let j = minLonPos; j < maxLonPos + 1; j++) {
-    //   for (const item of this.grid[maxLatPos][j]) {
-    //     if (
-    //       item.lat + item.boundingRadius > minLat &&
-    //       item.lat - item.boundingRadius < maxLat &&
-    //       item.lon - item.boundingRadius < maxLon &&
-    //       item.lon + item.boundingRadius > minLon
-    //     ) {
-    //       currentMinItems.push(item);
-    //     }
-    //   }
-    // }
-    // for (let i = minLatPos + 1; i < maxLatPos; i++) {
-    //   for (const item of this.grid[i][minLonPos]) {
-    //     if (
-    //       item.lat + item.boundingRadius > minLat &&
-    //       item.lat - item.boundingRadius < maxLat &&
-    //       item.lon - item.boundingRadius < maxLon &&
-    //       item.lon + item.boundingRadius > minLon
-    //     ) {
-    //       currentMinItems.push(item);
-    //     }
-    //   }
-    // }
-    // for (let i = minLatPos + 1; i < maxLatPos; i++) {
-    //   for (const item of this.grid[i][maxLonPos]) {
-    //     if (
-    //       item.lat + item.boundingRadius > minLat &&
-    //       item.lat - item.boundingRadius < maxLat &&
-    //       item.lon - item.boundingRadius < maxLon &&
-    //       item.lon + item.boundingRadius > minLon
-    //     ) {
-    //       currentMinItems.push(item);
-    //     }
-    //   }
-    // }
     return currentMinItems;
   }
 
@@ -232,9 +163,7 @@ export class GridService {
     var polygonCoordinates: Point[] = [];
     polygon.polygonNodes.forEach((node) => {
       var gridPoint = new Point();
-      // gridPoint.x = this.getLatPositionInGrid(node.lat);
       gridPoint.x = (node.lat - this.minLat) / this.resolutionX;
-      // gridPoint.y = this.getLonPositionInGrid(node.lon);
       gridPoint.y = (node.lon - this.minLon) / this.resolutionY;
       polygonCoordinates.push(gridPoint);
     });
