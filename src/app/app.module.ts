@@ -45,6 +45,7 @@ import { MatTabsModule } from "@angular/material/tabs";
 import { MatButtonModule } from "@angular/material/button";
 import { MatExpansionModule } from "@angular/material/expansion";
 import { MatRadioModule } from "@angular/material/radio";
+import { MatTooltipModule } from "@angular/material/tooltip";
 
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { RegionComponent } from "./components/region/region.component";
@@ -118,6 +119,7 @@ const routes: Routes = [{ path: "**", redirectTo: "", pathMatch: "full" }];
     MatInputModule,
     MatAutocompleteModule,
     MatSliderModule,
+    MatTooltipModule,
     MatTabsModule,
     MatButtonModule,
     MatSlideToggleModule,

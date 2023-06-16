@@ -52,46 +52,58 @@
       </div>
       <span class="vertical-line"></span>
       <div class="side-button-area">
-        <i
-          (click)="toggleRouting()"
-          class="fas fa-route {{ sideButtonClass }}"
-        ></i>
-        <i
-          (click)="togglePolygon()"
-          class="fa-solid fa-draw-polygon"
-          [ngClass]="{
-            'side-button': !polygonVisible,
-            'side-button-active': polygonVisible
-          }"
-        ></i>
-        <i
-          (click)="togglePreferences()"
-          class="fas fa-cog"
-          [ngClass]="{
-            'side-button': !preferences,
-            'side-button-active': preferences
-          }"
-        ></i>
-        <i
-          (click)="toggleImpressum()"
-          class="fa fa-paragraph"
-          [ngClass]="{
-            'side-button': !impressumVisible,
-            'side-button-active': impressumVisible
-          }"
-        ></i>
-        <i
-          (click)="toggleHelp()"
-          class="fa fa-question"
-          [ngClass]="{
-            'side-button': !helpVisible,
-            'side-button-active': helpVisible
-          }"
-        ></i>
-        <i
-          (click)="copyToClipboard()"
-          class="fa fa-share {{ sideButtonClass }}"
-        ></i>
+        <span matTooltip="Routen-Menü">
+          <i
+            (click)="toggleRouting()"
+            class="fas fa-route {{ sideButtonClass }}"
+          ></i>
+        </span>
+        <span matTooltip="Polygon-Menü">
+          <i
+            (click)="togglePolygon()"
+            class="fa-solid fa-draw-polygon"
+            [ngClass]="{
+              'side-button': !polygonVisible,
+              'side-button-active': polygonVisible
+            }"
+          ></i>
+        </span>
+        <span matTooltip="Einstellungen">
+          <i
+            (click)="togglePreferences()"
+            class="fas fa-cog"
+            [ngClass]="{
+              'side-button': !preferences,
+              'side-button-active': preferences
+            }"
+          ></i>
+        </span>
+        <span matTooltip="Teilen">
+          <i
+            (click)="copyToClipboard()"
+            class="fa fa-share-nodes {{ sideButtonClass }}"
+          ></i>
+        </span>
+        <span matTooltip="Impressum"
+          ><i
+            (click)="toggleImpressum()"
+            class="fa fa-paragraph"
+            [ngClass]="{
+              'side-button': !impressumVisible,
+              'side-button-active': impressumVisible
+            }"
+          ></i>
+        </span>
+        <span matTooltip="Hilfe"
+          ><i
+            (click)="toggleHelp()"
+            class="fa fa-question"
+            [ngClass]="{
+              'side-button': !helpVisible,
+              'side-button-active': helpVisible
+            }"
+          ></i
+        ></span>
       </div>
     </div>
   </div>

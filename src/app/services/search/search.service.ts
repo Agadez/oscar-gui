@@ -244,6 +244,6 @@ export class SearchService {
         this.idPrependix += "$cell:" + cellId;
       }
     }
-    this.getRouteQueryString();
+    this.routeQueryString = this.getRouteQueryString();
   }
 }
