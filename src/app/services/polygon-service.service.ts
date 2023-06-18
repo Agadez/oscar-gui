@@ -49,14 +49,14 @@ export class PolygonServiceService {
   removePolygon(uuid: uuidv4) {
     this.polygonMapping.delete(uuid);
     if (this.activatedPolygons.has(uuid)) {
-      this.gridService.grid = [];
+      // this.gridService.deleteGrid();
       this.store.updateItems([]);
     }
   }
   clearPolygon(uuid: uuidv4) {
     this.polygonMapping.set(uuid, new Polygon([], "", ""));
     if (this.activatedPolygons.has(uuid)) {
-      this.gridService.grid = [];
+      // this.gridService.deleteGrid();
       this.store.updateItems([]);
     }
   }

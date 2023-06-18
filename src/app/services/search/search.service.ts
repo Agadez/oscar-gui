@@ -171,7 +171,7 @@ export class SearchService {
           inputString.replaceAll('"', "")
         );
         if (similarity > 0.7) {
-          this.gridService.grid = [];
+          // this.gridService.deleteGrid();
           this.store.updateItems([]);
           this.clearItems.next("clear");
           this.mapService.drawRegion(regions[0]);
