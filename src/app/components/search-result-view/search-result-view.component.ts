@@ -170,13 +170,13 @@ export class SearchResultViewComponent implements OnInit {
           this.itemCheck(queryString);
           this.gridService.buildGrid();
           // checking for all activated polygons
-          // if (this.polygonService.polyClientCalc) {
-          //   this.polygonService.activatedPolygons.forEach((uuid) => {
-          //     this.gridService.checkInside(
-          //       this.polygonService.polygonMapping.get(uuid)
-          //     );
-          //   });
-          // }
+          if (this.polygonService.polyClientCalc) {
+            this.polygonService.activatedPolygons.forEach((uuid) => {
+              this.gridService.getPolygonItems(
+                this.polygonService.polygonMapping.get(uuid)
+              );
+            });
+          }
 
           this.reDrawSearchMarkers();
 
@@ -209,27 +209,19 @@ export class SearchResultViewComponent implements OnInit {
         bounds.getWest(),
         bounds.getNorth(),
         bounds.getEast(),
-        false,
         this.mapService.zoom
       );
       this.progress += 25;
     });
     if (
-      this.currentItems.length < this.searchService.markerThreshold ||
-      this.mapService.zoom === this.mapService.maxZoom
+      (this.currentItems.length < this.searchService.markerThreshold ||
+        this.mapService.zoom === this.mapService.maxZoom) &&
+      this.mapService.zoom >= 14
     ) {
       this.heatmapSliderVisible = false;
       this.mapService.drawItemsMarker(this.currentItems);
     } else {
       this.heatmapSliderVisible = true;
-      // this.currentItems = this.gridService.getCurrentItems(
-      //   bounds.getSouth(),
-      //   bounds.getWest(),
-      //   bounds.getNorth(),
-      //   bounds.getEast(),
-      //   true,
-      //   this.mapService.zoom
-      // );
       const currentItemsIds = [];
       this.currentItems.forEach((item) => {
         currentItemsIds.push(item.id);
@@ -277,7 +269,7 @@ export class SearchResultViewComponent implements OnInit {
 
   clearItems() {
     this.mapService.clearAllLayers();
-    // this.gridService.deleteGrid();
+    this.gridService.deleteGrid();
     this.currentItems = [];
     this.parentRefinements = null;
     this.facetRefinements = null;

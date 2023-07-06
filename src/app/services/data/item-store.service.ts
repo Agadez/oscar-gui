@@ -40,6 +40,7 @@ export class ItemStoreService {
       itemIds.push(item.id);
     });
     this.itemsIds.next(itemIds);
+    console.log(itemIds.length);
   }
   get currentItemsIds() {
     return this._currentItemsIds.value;
