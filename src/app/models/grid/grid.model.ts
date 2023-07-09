@@ -3,6 +3,7 @@ import { LatLngBounds } from "leaflet";
 import { Polygon } from "src/app/models/polygon/polygon.model";
 import { Point } from "src/app/models/ray/point.model";
 import { Line } from "src/app/models/ray/line.model";
+import { Cell } from "src/app/models/cell/cell.model";
 
 export class Grid {
   grid: OscarMinItem[][][];
@@ -24,6 +25,8 @@ export class Grid {
   minResolution: number;
 
   imprecise: boolean;
+
+  distInMeters: number;
 
   items: OscarMinItem[];
 
@@ -56,7 +59,7 @@ export class Grid {
       this.minResolution = minResolution;
       let distanceLat = maxLat - minLat;
       let distanceLon = maxLon - minLon;
-
+      
       this.gridX = Math.ceil(distanceLat / minResolution) + 1;
       this.gridY = Math.ceil(distanceLon / minResolution) + 1;
       this.resolutionX = distanceLat / (this.gridX - 1);
@@ -66,15 +69,32 @@ export class Grid {
       Array.from({ length: this.gridY }, () => [])
     );
     for (const item of this.items) {
-      let latGridPos = this.getLatPositionInGrid(item.lat);
-      if (latGridPos >= this.gridX) latGridPos = this.gridX - 1;
-      if (latGridPos < 0) latGridPos = 0;
-      let lonGridPos = this.getLonPositionInGrid(item.lon);
-      if (lonGridPos >= this.gridY) lonGridPos = this.gridY - 1;
-      if (lonGridPos < 0) lonGridPos = 0;
-      this.grid[latGridPos][lonGridPos].push(item);
+      let minLatGridPos = this.getLatPositionInGrid(
+        item.lat - item.boundingRadius
+      );
+      let maxLatGridPos = this.getLatPositionInGrid(
+        item.lat + item.boundingRadius
+      );
+
+      let minLonGridPos = this.getLonPositionInGrid(
+        item.lon - item.boundingRadius
+      );
+      let maxLonGridPos = this.getLonPositionInGrid(
+        item.lon + item.boundingRadius
+      );
+
+      for (let i = minLatGridPos; i <= maxLatGridPos; i++) {
+        for (let j = minLonGridPos; j <= maxLonGridPos; j++) {
+          let latGridPos = i;
+          if (latGridPos >= this.gridX) latGridPos = this.gridX - 1;
+          if (latGridPos < 0) latGridPos = 0;
+          let lonGridPos = j;
+          if (lonGridPos >= this.gridY) lonGridPos = this.gridY - 1;
+          if (lonGridPos < 0) lonGridPos = 0;
+          this.grid[latGridPos][lonGridPos].push(item);
+        }
+      }
     }
-    console.log(this.grid);
   }
 
   /**
@@ -95,6 +115,17 @@ export class Grid {
     return Math.floor((lon - this.minLon) / this.resolutionY);
   }
 
+  getLatCenter(gridLatPosition: number) {
+    return (
+      gridLatPosition * this.resolutionX + this.minLat + 0.5 * this.resolutionX
+    );
+  }
+  getLonCenter(gridLonPosition: number) {
+    return (
+      gridLonPosition * this.resolutionY + this.minLon + 0.5 * this.resolutionY
+    );
+  }
+
   getCurrentItems(
     minLat: number,
     minLon: number,
@@ -102,6 +133,7 @@ export class Grid {
     maxLon: number,
     withBoundingRadius: boolean
   ) {
+    const currentCells: Cell[] = [];
     const currentMinItems: OscarMinItem[] = [];
     let minLonPos = this.getLonPositionInGrid(minLon);
     let minLatPos = this.getLatPositionInGrid(minLat);
@@ -109,6 +141,11 @@ export class Grid {
     let maxLatPos = this.getLatPositionInGrid(maxLat);
     for (let i = minLatPos + 1; i < maxLatPos; i++) {
       for (let j = minLonPos + 1; j < maxLonPos; j++) {
+        const currentCell = new Cell(
+          this.getLatCenter(i),
+          this.getLonCenter(j),
+          0
+        );
         for (const item of this.grid[i][j]) {
           if (
             this.itemInside(
@@ -120,9 +157,11 @@ export class Grid {
               withBoundingRadius
             )
           ) {
+            currentCell.numObjects += 1;
             currentMinItems.push(item);
           }
         }
+        currentCells.push(currentCell);
       }
     }
     for (let j = minLonPos; j <= maxLonPos; j++) {
@@ -190,7 +229,7 @@ export class Grid {
       }
     }
 
-    return currentMinItems;
+    return { items: currentMinItems, cells: currentCells };
   }
   itemInside(
     item: OscarMinItem,

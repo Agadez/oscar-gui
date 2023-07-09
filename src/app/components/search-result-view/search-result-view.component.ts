@@ -22,6 +22,7 @@ import { ItemStoreService } from "src/app/services/data/item-store.service";
 import { PolygonServiceService } from "src/app/services/polygon-service.service";
 import { debounceTime, throttleTime } from "rxjs/operators";
 import { QueryParamsService } from "src/app/services/query-params.service";
+import { Cell } from "src/app/models/cell/cell.model";
 
 export const clearItems = new Subject<string>();
 export const radiusSearchTrigger = new Subject<L.LatLng>();
@@ -57,6 +58,7 @@ export class SearchResultViewComponent implements OnInit {
   showFacets = false;
   progress = 0;
   currentItems: OscarMinItem[] = [];
+  cells: Cell[] = [];
   @Output()
   searchLoading = new EventEmitter<boolean>();
   @Output()
@@ -204,13 +206,15 @@ export class SearchResultViewComponent implements OnInit {
     this.mapService.clearHeatMap();
     const bounds = this.mapService.bounds;
     this.zone.run(() => {
-      this.currentItems = this.gridService.getCurrentItems(
+      const current = this.gridService.getCurrentItems(
         bounds.getSouth(),
         bounds.getWest(),
         bounds.getNorth(),
         bounds.getEast(),
         this.mapService.zoom
       );
+      this.currentItems = current.items;
+      this.cells = current.cells;
       this.progress += 25;
     });
     if (
@@ -228,7 +232,7 @@ export class SearchResultViewComponent implements OnInit {
       });
       this.itemStoreService.currentItemsIds = currentItemsIds;
       this.mapService.drawItemsHeatmap(
-        _.sampleSize(this.currentItems, 100000),
+        _.sampleSize(this.cells, 100000),
         this.heatMapIntensity
       );
     }

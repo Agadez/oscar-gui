@@ -5,6 +5,7 @@ import { ItemStoreService } from "./item-store.service";
 import { LatLngBounds } from "leaflet";
 import { Grid } from "src/app/models/grid/grid.model";
 import { Polygon } from "src/app/models/polygon/polygon.model";
+import { Cell } from "src/app/models/cell/cell.model";
 declare var L;
 
 @Injectable({
@@ -113,12 +114,12 @@ export class GridService {
     maxLat: number,
     maxLon: number,
     zoom: number
-  ): OscarMinItem[] {
+  ): { items: OscarMinItem[]; cells: Cell[] } {
     if (minLat < this.minLat) minLat = this.minLat;
     if (minLon < this.minLon) minLon = this.minLon;
     if (maxLat > this.maxLat) maxLat = this.maxLat;
     if (maxLon > this.maxLon) maxLon = this.maxLon;
-    if (!this.globalGrid) return [];
+    if (!this.globalGrid) return { items: [], cells: [] };
     let insideLocalGrid = this.localGrid?.checkBounds(
       minLat,
       minLon,
@@ -131,7 +132,13 @@ export class GridService {
       (!this.localGrid || !insideLocalGrid)
     ) {
       this.localGrid = new Grid(
-        this.globalGrid.getCurrentItems(minLat, minLon, maxLat, maxLon, true),
+        this.globalGrid.getCurrentItems(
+          minLat,
+          minLon,
+          maxLat,
+          maxLon,
+          true
+        ).items,
         minLat,
         maxLat,
         minLon,

@@ -26,6 +26,8 @@ import { ConfigService } from "src/app/config/config.service";
 import { SearchResultViewComponent } from "src/app/components/search-result-view/search-result-view.component";
 declare var L;
 import "leaflet.awesome-markers";
+import { Cell } from "src/app/models/cell/cell.model";
+import { maxBy, minBy } from "lodash";
 
 @Injectable({
   providedIn: "root",
@@ -35,7 +37,7 @@ export class MapService {
   polygons = new Map<uuidv4, [L.Polygon, L.Marker[]]>();
   maxZoom = 20;
   heatmap = new L.webGLHeatmap({
-    size: 30,
+    size: 50,
     units: "px",
   });
   searchMarkerLayer = new L.LayerGroup();
@@ -173,10 +175,20 @@ export class MapService {
     }
     this.route.setLatLngs(latLngs);
   }
-  drawItemsHeatmap(items: OscarMinItem[], intensity: number) {
+  drawItemsHeatmap(cells: Cell[], intensity: number) {
     const dataPoints = [];
-    for (const item of items) {
-      dataPoints.push([item.lat, item.lon, intensity]);
+    const max = maxBy(cells, "numObjects").numObjects;
+    const min = minBy(cells, "numObjects").numObjects;
+    let dist: number = max - min;
+    for (const cell of cells) {
+      if (cell.numObjects != 0) {
+        console.log(intensity * (0.8 * ((cell.numObjects - min) / dist) + 0.2));
+        dataPoints.push([
+          cell.lat,
+          cell.lon,
+          intensity * (0.8 * ((cell.numObjects - min) / dist) + 0.2),
+        ]);
+      }
     }
     this.clearHeatMap();
     this.heatmap.setData(dataPoints);
