@@ -112,7 +112,7 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
   addRoutingPoint({ point, name }) {
     const routingMarker = {
       color: this.getRandomColor(),
-      geoPoint: { lat: point.lat, lon: point.lon },
+      geoPoint: { lat: point.lat, lng: point.lng },
       name,
     };
     this.routingMarkers.push(routingMarker);
@@ -170,7 +170,7 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
     this.polyLine.setLatLngs([]);
     const latLngs = [];
     for (const point of route) {
-      latLngs.push(L.latLng([point.lat, point.lon]));
+      latLngs.push(L.latLng([point.lat, point.lng]));
     }
     this.polyLine.setLatLngs(latLngs);
     this.calcDistance();
@@ -213,7 +213,7 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
         markerColor: routingMarker.color,
       });
       const marker = L.marker(
-        [routingMarker.geoPoint.lat, routingMarker.geoPoint.lon],
+        [routingMarker.geoPoint.lat, routingMarker.geoPoint.lng],
         { icon: redMarker, draggable: true }
       );
       marker.addTo(this.routingMarkerLayer);

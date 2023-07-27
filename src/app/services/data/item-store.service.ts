@@ -18,7 +18,9 @@ export class ItemStoreService {
   readonly items$ = this._items.asObservable();
   itemsIds = new BehaviorSubject<number[]>([]);
   // readonly itemsIds$ = this.itemsIds.asObservable();
-  private readonly _currentItemsIds = new BehaviorSubject<number[]>([]);
+  private readonly _currentItemsIds = new BehaviorSubject<Set<number>>(
+    new Set()
+  );
   readonly currentItemsIds$ = this._currentItemsIds.asObservable();
 
   constructor(private oscarItemsService: OscarItemsService) {}
@@ -40,7 +42,6 @@ export class ItemStoreService {
       itemIds.push(item.id);
     });
     this.itemsIds.next(itemIds);
-    console.log(itemIds.length);
   }
   get currentItemsIds() {
     return this._currentItemsIds.value;

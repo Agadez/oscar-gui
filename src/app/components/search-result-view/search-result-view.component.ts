@@ -44,7 +44,6 @@ export class SearchResultViewComponent implements OnInit {
     private polygonService: PolygonServiceService,
     private paramsService: QueryParamsService
   ) {}
-
   globalCounts = 0;
   localCounts = 0;
   hideCounts = true;
@@ -82,19 +81,21 @@ export class SearchResultViewComponent implements OnInit {
     });
     this.itemStoreService.currentItemsIds$.subscribe((currentItemsIds) => {
       this.zone.run(() => {
-        this.localCounts = currentItemsIds.length;
+        this.localCounts = currentItemsIds.size;
       });
     });
     this.searchService.queryToDraw$.subscribe(async (queryString) => {
       await this.drawQuery(queryString);
     });
-    this.mapService.onZoom$.subscribe((event) => {
-      if (event !== null) {
-        this.reDrawSearchMarkers();
-      }
-    });
+    // this.mapService.onZoom$.subscribe((event) => {
+    //   if (event !== null) {
+    //     console.log("zoom", event);
+    //     this.reDrawSearchMarkers();
+    //   }
+    // });
     this.mapService.onMove$.pipe(debounceTime(100)).subscribe((event) => {
       if (event !== null) {
+        console.log("move", event);
         this.reDrawSearchMarkers();
       }
     });
@@ -183,7 +184,7 @@ export class SearchResultViewComponent implements OnInit {
           this.reDrawSearchMarkers();
 
           if (this.sharedQuery) this.sharedQuery = false;
-          else this.mapService.fitBounds(this.gridService.gridBBox);
+          else this.mapService.fitBounds(this.gridService.globalGrid.gridBBox);
 
           this.oscarItemsService
             .getParents(queryString, 0)
@@ -213,10 +214,12 @@ export class SearchResultViewComponent implements OnInit {
         bounds.getEast(),
         this.mapService.zoom
       );
-      this.currentItems = current.items;
+
+      this.currentItems = Array.from(new Set(current.items));
       this.cells = current.cells;
       this.progress += 25;
     });
+
     if (
       (this.currentItems.length < this.searchService.markerThreshold ||
         this.mapService.zoom === this.mapService.maxZoom) &&
@@ -225,15 +228,17 @@ export class SearchResultViewComponent implements OnInit {
       this.heatmapSliderVisible = false;
       this.mapService.drawItemsMarker(this.currentItems);
     } else {
-      this.heatmapSliderVisible = true;
-      const currentItemsIds = [];
+      const currentItemsIds = new Set<number>();
       this.currentItems.forEach((item) => {
-        currentItemsIds.push(item.id);
+        currentItemsIds.add(item.id);
       });
+      this.heatmapSliderVisible = true;
       this.itemStoreService.currentItemsIds = currentItemsIds;
       this.mapService.drawItemsHeatmap(
+        this.currentItems,
         _.sampleSize(this.cells, 100000),
-        this.heatMapIntensity
+        this.heatMapIntensity,
+        this.gridService.currentGrid?.cellDiameter
       );
     }
     this.progress += 25;

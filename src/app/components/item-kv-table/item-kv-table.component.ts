@@ -1,17 +1,23 @@
-import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
-import {OscarItem} from '../../models/oscar/oscar-item';
-import {GeoPoint} from '../../models/geo-point';
-import {addRoutingPointEvent} from '../routes/routes.component';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+} from "@angular/core";
+import { OscarItem } from "../../models/oscar/oscar-item";
+import { GeoPoint } from "../../models/geo-point";
+import { addRoutingPointEvent } from "../routes/routes.component";
 
 @Component({
-  selector: 'app-item-kv-table',
-  templateUrl: './item-kv-table.component.html',
-  styleUrls: ['./item-kv-table.component.sass']
+  selector: "app-item-kv-table",
+  templateUrl: "./item-kv-table.component.html",
+  styleUrls: ["./item-kv-table.component.sass"],
 })
 export class ItemKvTableComponent implements OnInit, OnChanges {
   @Input() oscarItem: OscarItem;
-  keyValues: object[] = [];
-  constructor() { }
+  keyValues = [];
+  constructor() {}
   lat: number;
   lon: number;
   ngOnInit() {
@@ -30,14 +36,17 @@ export class ItemKvTableComponent implements OnInit, OnChanges {
       this.lat = this.oscarItem.firstPoint.lat;
       this.lon = this.oscarItem.firstPoint.lon;
     }
-    this.keyValues.push({k: 'osm-id', v: this.oscarItem.properties.osmid});
-    this.keyValues.push({k: 'oscar-id', v: this.oscarItem.properties.id});
+    this.keyValues.push({ k: "osm-id", v: this.oscarItem.properties.osmid });
+    this.keyValues.push({ k: "oscar-id", v: this.oscarItem.properties.id });
     for (let i = 0; i < this.oscarItem.properties.k.length; i++) {
-      this.keyValues.push({k : this.oscarItem.properties.k[i], v : this.oscarItem.properties.v[i]});
-      if (this.oscarItem.properties.k[i] === 'name') {
+      this.keyValues.push({
+        k: this.oscarItem.properties.k[i],
+        v: this.oscarItem.properties.v[i],
+      });
+      if (this.oscarItem.properties.k[i] === "name") {
         const name = this.oscarItem.properties.v[i];
-        if (name === '') {
-          this.oscarItem.properties.name = 'Item without name';
+        if (name === "") {
+          this.oscarItem.properties.name = "Item without name";
         } else {
           this.oscarItem.properties.name = this.oscarItem.properties.v[i];
         }
@@ -47,8 +56,11 @@ export class ItemKvTableComponent implements OnInit, OnChanges {
 
   addToRoute() {
     addRoutingPointEvent.next({
-      point: new GeoPoint(this.oscarItem.firstPoint.lat, this.oscarItem.firstPoint.lon),
-      name: this.oscarItem.properties.name
+      point: new GeoPoint(
+        this.oscarItem.firstPoint.lat,
+        this.oscarItem.firstPoint.lon
+      ),
+      name: this.oscarItem.properties.name,
     });
   }
 }

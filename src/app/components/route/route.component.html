@@ -92,7 +92,7 @@
         "
       >
         <span>lat: {{ routingMarker.geoPoint.lat | number : "1.0-6" }}</span>
-        <span>lon: {{ routingMarker.geoPoint.lon | number : "1.0-6" }}</span>
+        <span>lon: {{ routingMarker.geoPoint.lng | number : "1.0-6" }}</span>
       </div>
       <div *ngIf="routingMarker.name !== ''">
         {{ routingMarker.name }}

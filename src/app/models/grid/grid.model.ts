@@ -4,67 +4,92 @@ import { Polygon } from "src/app/models/polygon/polygon.model";
 import { Point } from "src/app/models/ray/point.model";
 import { Line } from "src/app/models/ray/line.model";
 import { Cell } from "src/app/models/cell/cell.model";
+import { max, mean } from "lodash";
+
+declare var L;
 
 export class Grid {
   grid: OscarMinItem[][][];
+  gridBBox: LatLngBounds;
   gridX: number;
   gridY: number;
+  cellDiameter: number;
 
-  minLat: number;
-  maxLat: number;
-  minLatPos: number;
-  maxLatPos: number;
+  minLat: number = 100000;
+  maxLat: number = -100000;
+  minLng: number = 100000;
+  maxLng: number = -100000;
 
-  minLon: number;
-  maxLon: number;
-  minLonPos: number;
-  maxLonPos: number;
+  currentMinLat: number;
+  currentMaxLat: number;
+  currentMinLng: number;
+  currentMaxLng: number;
+
+  currentMinLatPos: number;
+  currentMaxLatPos: number;
+  currentMinLngPos: number;
+  currentMaxLngPos: number;
 
   resolutionX: number;
   resolutionY: number;
-  minResolution: number;
 
-  imprecise: boolean;
-
-  distInMeters: number;
-
+  maxItemsCell: number;
   items: OscarMinItem[];
 
-  constructor(
-    items: OscarMinItem[],
-    minLat: number,
-    maxLat: number,
-    minLon: number,
-    maxLon: number,
-    resolutionX?: number,
-    resolutionY?: number,
-    gridX?: number,
-    gridY?: number,
-    minResolution?: number
-  ) {
+  constructor(items: OscarMinItem[], gridX: number, gridY: number) {
     this.items = items;
-    this.minLat = minLat;
-    this.maxLat = maxLat;
-    this.minLon = minLon;
-    this.maxLon = maxLon;
+    this.gridX = gridX;
+    this.gridY = gridY;
+    if (this.items.length > 0) this.buildGrid();
+  }
 
-    if (gridX && gridY && minResolution) {
-      this.resolutionX = resolutionX;
-      this.resolutionY = resolutionY;
-      this.gridX = gridX;
-      this.gridY = gridY;
-      this.imprecise =
-        resolutionX > minResolution || resolutionY > minResolution;
-    } else {
-      this.minResolution = minResolution;
-      let distanceLat = maxLat - minLat;
-      let distanceLon = maxLon - minLon;
-      
-      this.gridX = Math.ceil(distanceLat / minResolution) + 1;
-      this.gridY = Math.ceil(distanceLon / minResolution) + 1;
-      this.resolutionX = distanceLat / (this.gridX - 1);
-      this.resolutionY = distanceLon / (this.gridY - 1);
+  /**
+   * Calculates the grid bounds and resolution based on the items received from the Server
+   */
+  private buildGrid() {
+    /**
+     * Determine the bounding box by iterating over all items
+     */
+    for (const item of this.items) {
+      if (item.lat - item.boundingRadius < this.minLat)
+        this.minLat = item.lat - item.boundingRadius;
+
+      if (item.lat + item.boundingRadius > this.maxLat)
+        this.maxLat = item.lat + item.boundingRadius;
+
+      if (item.lng - item.boundingRadius < this.minLng)
+        this.minLng = item.lng - item.boundingRadius;
+
+      if (item.lng + item.boundingRadius > this.maxLng)
+        this.maxLng = item.lng + item.boundingRadius;
     }
+
+    /**
+     * Store the bounding box in the gridBBox variable
+     * @type {L.LatLngBounds}
+     */
+    this.gridBBox = new L.latLngBounds(
+      L.latLng(this.minLat, this.minLng),
+      L.latLng(this.maxLat, this.maxLng)
+    );
+    /**
+     * Calculate and store the X-axis resolution
+     * @type {number}
+     */
+
+    let distanceLat = Math.abs(this.maxLat - this.minLat);
+    this.resolutionX = distanceLat / (this.gridX - 1);
+
+    /**
+     * Calculate and store the Y-axis resolution
+     * @type {number}
+     */
+    let distanceLng = Math.abs(this.maxLng - this.minLng);
+    this.resolutionY = distanceLng / (this.gridY - 1);
+
+    this.cellDiameter =
+      2000 * 111.3 * max([this.resolutionX, this.resolutionY]);
+
     this.grid = Array.from({ length: this.gridX }, () =>
       Array.from({ length: this.gridY }, () => [])
     );
@@ -76,25 +101,31 @@ export class Grid {
         item.lat + item.boundingRadius
       );
 
-      let minLonGridPos = this.getLonPositionInGrid(
-        item.lon - item.boundingRadius
+      let minLngGridPos = this.getLngPositionInGrid(
+        item.lng - item.boundingRadius
       );
-      let maxLonGridPos = this.getLonPositionInGrid(
-        item.lon + item.boundingRadius
+      let maxLngGridPos = this.getLngPositionInGrid(
+        item.lng + item.boundingRadius
       );
 
       for (let i = minLatGridPos; i <= maxLatGridPos; i++) {
-        for (let j = minLonGridPos; j <= maxLonGridPos; j++) {
+        for (let j = minLngGridPos; j <= maxLngGridPos; j++) {
           let latGridPos = i;
           if (latGridPos >= this.gridX) latGridPos = this.gridX - 1;
           if (latGridPos < 0) latGridPos = 0;
-          let lonGridPos = j;
-          if (lonGridPos >= this.gridY) lonGridPos = this.gridY - 1;
-          if (lonGridPos < 0) lonGridPos = 0;
-          this.grid[latGridPos][lonGridPos].push(item);
+          let lngGridPos = j;
+          if (lngGridPos >= this.gridY) lngGridPos = this.gridY - 1;
+          if (lngGridPos < 0) lngGridPos = 0;
+          this.grid[latGridPos][lngGridPos].push(item);
         }
       }
     }
+    // for (const item of this.items) {
+    //   let latGridPos = this.getLatPositionInGrid(item.lat);
+    //   let lngGridPos = this.getLngPositionInGrid(item.lng);
+
+    //   this.grid[latGridPos][lngGridPos].push(item);
+    // }
   }
 
   /**
@@ -103,16 +134,23 @@ export class Grid {
    * @returns x index in the grid for the given latitude
    */
   getLatPositionInGrid(lat: number) {
-    return Math.floor((lat - this.minLat) / this.resolutionX);
+    return Math.floor(Math.abs(lat - this.minLat) / this.resolutionX);
   }
 
   /**
    * Helper function to determine the right cell for an item in the grid
-   * @param lon
-   * @returns y index in the grid for the given longitude
+   * @param lng
+   * @returns y index in the grid for the given lnggitude
    */
-  getLonPositionInGrid(lon: number) {
-    return Math.floor((lon - this.minLon) / this.resolutionY);
+  getLngPositionInGrid(lng: number) {
+    return Math.floor(Math.abs(lng - this.minLng) / this.resolutionY);
+  }
+
+  getPositionInGrid(lng: number, lat: number) {
+    return {
+      x: Math.floor((lat - this.minLat) / this.resolutionX),
+      y: Math.floor((lng - this.minLng) / this.resolutionY),
+    };
   }
 
   getLatCenter(gridLatPosition: number) {
@@ -120,161 +158,148 @@ export class Grid {
       gridLatPosition * this.resolutionX + this.minLat + 0.5 * this.resolutionX
     );
   }
-  getLonCenter(gridLonPosition: number) {
+  getLngCenter(gridLngPosition: number) {
     return (
-      gridLonPosition * this.resolutionY + this.minLon + 0.5 * this.resolutionY
+      gridLngPosition * this.resolutionY + this.minLng + 0.5 * this.resolutionY
     );
   }
 
-  getCurrentItems(
+  updateCurrentBBox(
     minLat: number,
-    minLon: number,
+    minLng: number,
     maxLat: number,
-    maxLon: number,
-    withBoundingRadius: boolean
-  ) {
-    const currentCells: Cell[] = [];
-    const currentMinItems: OscarMinItem[] = [];
-    let minLonPos = this.getLonPositionInGrid(minLon);
-    let minLatPos = this.getLatPositionInGrid(minLat);
-    let maxLonPos = this.getLonPositionInGrid(maxLon);
-    let maxLatPos = this.getLatPositionInGrid(maxLat);
-    for (let i = minLatPos + 1; i < maxLatPos; i++) {
-      for (let j = minLonPos + 1; j < maxLonPos; j++) {
-        const currentCell = new Cell(
-          this.getLatCenter(i),
-          this.getLonCenter(j),
-          0
-        );
-        for (const item of this.grid[i][j]) {
-          if (
-            this.itemInside(
-              item,
-              minLat,
-              minLon,
-              maxLat,
-              maxLon,
-              withBoundingRadius
-            )
-          ) {
-            currentCell.numObjects += 1;
-            currentMinItems.push(item);
-          }
-        }
-        currentCells.push(currentCell);
-      }
-    }
-    for (let j = minLonPos; j <= maxLonPos; j++) {
-      for (const item of this.grid[minLatPos][j]) {
-        if (
-          this.itemInside(
-            item,
-            minLat,
-            minLon,
-            maxLat,
-            maxLon,
-            withBoundingRadius
-          )
-        ) {
-          currentMinItems.push(item);
-        }
-      }
-      if (minLatPos !== maxLatPos) {
-        for (const item of this.grid[maxLatPos][j]) {
-          if (
-            this.itemInside(
-              item,
-              minLat,
-              minLon,
-              maxLat,
-              maxLon,
-              withBoundingRadius
-            )
-          ) {
-            currentMinItems.push(item);
-          }
-        }
-      }
-    }
-    for (let i = minLatPos + 1; i <= maxLatPos - 1; i++) {
-      for (const item of this.grid[i][minLonPos]) {
-        if (
-          this.itemInside(
-            item,
-            minLat,
-            minLon,
-            maxLat,
-            maxLon,
-            withBoundingRadius
-          )
-        ) {
-          currentMinItems.push(item);
-        }
-      }
-      if (minLonPos !== maxLonPos) {
-        for (const item of this.grid[i][maxLonPos]) {
-          if (
-            this.itemInside(
-              item,
-              minLat,
-              minLon,
-              maxLat,
-              maxLon,
-              withBoundingRadius
-            )
-          ) {
-            currentMinItems.push(item);
-          }
-        }
-      }
-    }
+    maxLng: number
+  ): void {
+    if (minLat < this.minLat) minLat = this.minLat;
+    else if (minLat > this.maxLat) minLat = this.maxLat;
 
-    return { items: currentMinItems, cells: currentCells };
+    if (minLng < this.minLng) minLng = this.minLng;
+    else if (minLng > this.maxLng) minLng = this.maxLng;
+
+    if (maxLat > this.maxLat) maxLat = this.maxLat;
+    else if (maxLat < this.minLat) maxLat = this.minLat;
+
+    if (maxLng > this.maxLng) maxLng = this.maxLng;
+    else if (maxLng < this.minLng) maxLng = this.minLng;
+
+    this.currentMinLat = minLat;
+    this.currentMinLng = minLng;
+    this.currentMaxLat = maxLat;
+    this.currentMaxLng = maxLng;
+
+    this.currentMinLatPos = this.getLatPositionInGrid(this.currentMinLat);
+    this.currentMinLngPos = this.getLngPositionInGrid(this.currentMinLng);
+    this.currentMaxLatPos = this.getLatPositionInGrid(this.currentMaxLat);
+    this.currentMaxLngPos = this.getLngPositionInGrid(this.currentMaxLng);
   }
-  itemInside(
-    item: OscarMinItem,
-    minLat: number,
-    minLon: number,
-    maxLat: number,
-    maxLon: number,
-    withBoundingRadius: boolean
-  ) {
-    // if (item.lat == 48.805492877960205) {
-    //   console.log(
-    //     item.lat - item.boundingRadius < maxLat &&
-    //       item.lat + item.boundingRadius > minLat &&
-    //       item.lon - item.boundingRadius < maxLon &&
-    //       item.lon + item.boundingRadius > minLon
-    //   );
-    //   console.log(item, item.boundingRadius);
-    //   console.log(minLat, minLon, maxLat, maxLon);
-    // }
+
+  currentlyInsideLocalGridZone(): boolean {
     if (
-      withBoundingRadius &&
-      item.lat - item.boundingRadius < maxLat &&
-      item.lat + item.boundingRadius > minLat &&
-      item.lon - item.boundingRadius < maxLon &&
-      item.lon + item.boundingRadius > minLon
+      this.currentMaxLatPos - this.currentMinLatPos <= 10 &&
+      this.currentMaxLngPos - this.currentMinLngPos <= 10
     ) {
+      console.log("local");
       return true;
     }
-    if (
-      !withBoundingRadius &&
-      item.lat < maxLat &&
-      item.lat > minLat &&
-      item.lon < maxLon &&
-      item.lon > minLon
-    ) {
-      return true;
-    }
+    console.log("global");
     return false;
   }
-  checkBounds(minLat: number, minLon: number, maxLat: number, maxLon: number) {
+
+  getCurrentItems() {
+    const currentCells: Cell[] = [];
+    const currentMinItems: OscarMinItem[] = [];
+
+    for (let i = this.currentMinLatPos + 1; i < this.currentMaxLatPos; i++) {
+      for (let j = this.currentMinLngPos + 1; j < this.currentMaxLngPos; j++) {
+        let lats = [];
+        let lngs = [];
+        for (const item of this.grid[i][j]) {
+          lats.push(item.lat);
+          lngs.push(item.lng);
+          currentMinItems.push(item);
+        }
+        if (lats.length !== 0)
+          currentCells.push(new Cell(mean(lats), mean(lngs), lats.length));
+      }
+    }
+    for (let j = this.currentMinLngPos; j <= this.currentMaxLngPos; j++) {
+      let lats = [];
+      let lngs = [];
+      for (const item of this.grid[this.currentMinLatPos][j]) {
+        if (item !== undefined && item !== null && this.itemInside(item)) {
+          lats.push(item.lat);
+          lngs.push(item.lng);
+          currentMinItems.push(item);
+        }
+      }
+      if (lats.length !== 0)
+        currentCells.push(new Cell(mean(lats), mean(lngs), lats.length));
+
+      if (this.currentMinLatPos !== this.currentMaxLatPos) {
+        let lats = [];
+        let lngs = [];
+        for (const item of this.grid[this.currentMaxLatPos][j]) {
+          if (item !== undefined && item !== null && this.itemInside(item)) {
+            lats.push(item.lat);
+            lngs.push(item.lng);
+            currentMinItems.push(item);
+          }
+        }
+        if (lats.length !== 0)
+          currentCells.push(new Cell(mean(lats), mean(lngs), lats.length));
+      }
+    }
+    for (
+      let i = this.currentMinLatPos + 1;
+      i <= this.currentMaxLatPos - 1;
+      i++
+    ) {
+      let lats = [];
+      let lngs = [];
+      for (const item of this.grid[i][this.currentMinLngPos]) {
+        if (item !== undefined && item !== null && this.itemInside(item)) {
+          lats.push(item.lat);
+          lngs.push(item.lng);
+          currentMinItems.push(item);
+        }
+      }
+      if (lats.length !== 0)
+        currentCells.push(new Cell(mean(lats), mean(lngs), lats.length));
+
+      if (this.currentMinLngPos !== this.currentMaxLngPos) {
+        let lats = [];
+        let lngs = [];
+        for (const item of this.grid[i][this.currentMaxLngPos]) {
+          if (item !== undefined && item !== null && this.itemInside(item)) {
+            lats.push(item.lat);
+            lngs.push(item.lng);
+            currentMinItems.push(item);
+          }
+        }
+        if (lats.length !== 0)
+          currentCells.push(new Cell(mean(lats), mean(lngs), lats.length));
+      }
+    }
+    return { items: currentMinItems, cells: currentCells };
+  }
+  itemInside(item: OscarMinItem) {
+    if (
+      item.lat - item.boundingRadius < this.currentMaxLat &&
+      item.lat + item.boundingRadius > this.currentMinLat &&
+      item.lng - item.boundingRadius < this.currentMaxLng &&
+      item.lng + item.boundingRadius > this.currentMinLng
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+  checkBounds(minLat: number, minLng: number, maxLat: number, maxLng: number) {
     if (
       minLat <= this.minLat ||
-      minLon <= this.minLon ||
+      minLng <= this.minLng ||
       maxLat >= this.maxLat ||
-      maxLon >= this.maxLon
+      maxLng >= this.maxLng
     ) {
       return false;
     }
@@ -286,13 +311,13 @@ export class Grid {
     polygon.polygonNodes.forEach((node) => {
       var gridPoint = new Point();
       gridPoint.x = (node.lat - this.minLat) / this.resolutionX;
-      gridPoint.y = (node.lon - this.minLon) / this.resolutionY;
+      gridPoint.y = (node.lng - this.minLng) / this.resolutionY;
       polygonCoordinates.push(gridPoint);
     });
     polygon.polygonNodes.forEach((node) => {
       var gridPoint = new Point();
       gridPoint.x = node.lat;
-      gridPoint.y = node.lon;
+      gridPoint.y = node.lng;
       polygonTrueCoordinates.push(gridPoint);
     });
     for (let i = 0; i < this.grid.length; i++) {
@@ -326,8 +351,8 @@ export class Grid {
           let elementsOutside = [];
           for (const item of this.grid[i][j]) {
             var counter = 0;
-            const startingPoint = new Point(item.lat, item.lon);
-            const endingPoint = new Point(181, item.lon);
+            const startingPoint = new Point(item.lat, item.lng);
+            const endingPoint = new Point(181, item.lng);
             const infiniteLine = new Line(startingPoint, endingPoint);
             for (var k = 0; k < polygonTrueCoordinates.length; k++) {
               var border = new Line(

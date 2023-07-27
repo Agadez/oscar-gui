@@ -30,8 +30,8 @@ export class PreferenceComponent implements OnInit {
     this.markerThreshold = this.searchService.markerThreshold;
     this.debounceTime = this.routingService.debounceTime;
     this.polyClientCalc = this.polygonService.polyClientCalc;
-    this.gridX = this.gridService.gridX;
-    this.gridY = this.gridService.gridY;
+    this.gridX = this.gridService.globalX;
+    this.gridY = this.gridService.globalY;
   }
   updateMaxItems() {
     this.searchService.maxItems = this.maxItems;
@@ -50,10 +50,10 @@ export class PreferenceComponent implements OnInit {
     this.searchService.startSearch.next("start");
   }
   updateX() {
-    this.gridService.gridX = this.gridX;
+    this.gridService.globalX = this.gridX;
   }
   updateY() {
-    this.gridService.gridY = this.gridY;
+    this.gridService.globalY = this.gridY;
   }
   recalculateGrid() {
     this.searchService.rerender();

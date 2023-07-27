@@ -32,6 +32,7 @@
     "leaflet-heatmap": "^1.0.0",
     "leaflet-webgl-heatmap": "^0.2.7",
     "leaflet.awesome-markers": "^2.0.5",
+    "leaflet.heat": "^0.2.0",
     "lodash": "^4.17.20",
     "ngx-infinite-scroll": "^7.1.0",
     "ngx-skeleton-loader": "^2.9.1",

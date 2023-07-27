@@ -22,4 +22,17 @@ export class SideBarComponent implements OnInit {
   polygonVisible = false;
   preferencesVisible = false;
   ngOnInit() {}
+
+  // numbers = [];
+  // sort() {
+  //   this.numbers = [];
+  //   let elements = 100000000;
+  //   for (let i = 0; i < elements; i++) {
+  //     this.numbers.push(Math.floor(Math.random() * elements));
+  //   }
+  //   console.time("numbers");
+  //   this.numbers.sort((a, b) => a - b);
+  //   console.timeEnd("numbers");
+  //   console.log(this.numbers.slice(0, 100));
+  // }
 }

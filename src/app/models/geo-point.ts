@@ -1,10 +1,10 @@
 export class GeoPoint {
 
-  constructor(lat: number, lon: number) {
+  constructor(lat: number, lng: number) {
     this.lat = lat;
-    this.lon = lon;
+    this.lng = lng;
   }
 
   lat = 0;
-  lon = 0;
+  lng = 0;
 }

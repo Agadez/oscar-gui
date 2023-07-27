@@ -4,8 +4,9 @@
     "outDir": "../out-tsc/app",
     "types": []
   },
-  "files": [
-    "main.ts",
-    "polyfills.ts"
-  ]
+  "angularCompilerOptions": {
+    "strictTemplates": true,
+    "fullTemplateTypeCheck": true
+  },
+  "files": ["main.ts", "polyfills.ts"]
 }

@@ -33,7 +33,7 @@ export class RoutingService {
       } else {
         pointString += ",";
       }
-      pointString += `[${point.lat},${point.lon}]`;
+      pointString += `[${point.lat},${point.lng}]`;
     }
     pointString += "]";
     params = params.append("q", pointString);

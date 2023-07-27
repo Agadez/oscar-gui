@@ -47,10 +47,10 @@ export class QueryParamsService {
     )
       ? parseInt(params["dt"])
       : 150;
-    this.gridService.gridX = this.gridX = !isNaN(parseInt(params["gridX"]))
+    this.gridService.globalX = this.gridX = !isNaN(parseInt(params["gridX"]))
       ? parseInt(params["gridX"])
       : 100;
-    this.gridService.gridY = this.gridY = !isNaN(parseInt(params["gridY"]))
+    this.gridService.globalY = this.gridY = !isNaN(parseInt(params["gridY"]))
       ? parseInt(params["gridY"])
       : 100;
     this.lat = !isNaN(parseFloat(params["lat"]))
@@ -62,7 +62,6 @@ export class QueryParamsService {
     this.zoom = !isNaN(parseInt(params["zoom"])) ? parseInt(params["zoom"]) : 7;
     this.searchService.localSearch = this.localSearch =
       params["localSearch"] === "true";
-    console.log("localSearch", this.localSearch);
     this.polygonService.polyClientCalc = this.polyClientCalc =
       params["pCC"] === "true";
     this.queryString = params["query"] !== undefined ? params["query"] : "";
@@ -76,8 +75,22 @@ export class QueryParamsService {
     const markerThreshold = this.searchService.markerThreshold;
     const debounceTime = this.routingService.debounceTime;
     const polyClientCalc = this.polygonService.polyClientCalc;
-    const gridX = this.gridService.gridX;
-    const gridY = this.gridService.gridY;
-    return `${window.location.href}?maxItems=${maxItems}&localSearch=${localSearch}&markerThreshold=${markerThreshold}&dt=${debounceTime}&pCC=${polyClientCalc}&gridX=${gridX}&gridY=${gridY}&lat=${center.lat}&lng=${center.lng}&zoom=${zoom}&query=${inputString}`;
+    const gridX = this.gridService.globalX;
+    const gridY = this.gridService.globalY;
+
+    const uri = new URL(window.location.href);
+    uri.searchParams.set("maxItems", String(maxItems));
+    uri.searchParams.set("localSearch", String(localSearch));
+    uri.searchParams.set("markerThreshold", String(markerThreshold));
+    uri.searchParams.set("dt", String(debounceTime));
+    uri.searchParams.set("pCC", String(polyClientCalc));
+    uri.searchParams.set("gridX", String(gridX));
+    uri.searchParams.set("gridY", String(gridY));
+    uri.searchParams.set("lat", String(center.lat));
+    uri.searchParams.set("lng", String(center.lng));
+    uri.searchParams.set("zoom", String(zoom));
+    uri.searchParams.set("query", inputString);
+
+    return uri.toString();
   }
 }

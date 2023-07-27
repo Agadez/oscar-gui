@@ -11,13 +11,8 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "es2015",
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "lib": [
-      "esnext",
-      "dom"
-    ],
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["esnext", "dom"],
     "resolveJsonModule": true,
     "esModuleInterop": true
   }

@@ -19,7 +19,7 @@ export class LocalItemListComponent implements OnInit {
 
   fetchCount = 20;
   listedItems: OscarItem[] = [];
-  currentItems: number[] = [];
+  currentItems: Set<number> = new Set();
   detail = false;
   detailItem: OscarItem;
   markerId = "Selected Item";
@@ -44,7 +44,10 @@ export class LocalItemListComponent implements OnInit {
     const currentLength = this.listedItems.length;
     this.oscarService
       .getItemsInfoByIds(
-        this.currentItems.slice(currentLength, currentLength + this.fetchCount)
+        Array.from(this.currentItems).slice(
+          currentLength,
+          currentLength + this.fetchCount
+        )
       )
       .subscribe((items) => {
         this.zone.run(() => this.listedItems.push(...items));

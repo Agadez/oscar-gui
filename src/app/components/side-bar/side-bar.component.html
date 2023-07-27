@@ -26,6 +26,7 @@
       [hidden]="!routesVisible"
     ></app-routes>
     <app-polygons [hidden]="!polygonVisible"></app-polygons>
+    <!-- <button (click)="sort()"></button> -->
     <app-search-result-view
       (noResult)="noResult = $event"
       (searchLoading)="searchLoading = $event"

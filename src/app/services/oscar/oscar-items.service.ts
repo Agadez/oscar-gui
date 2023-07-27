@@ -32,7 +32,7 @@ export class OscarItemsService {
       itemList.push({
         id: returnArray[i],
         lat: this.toDoubleLat(returnArray[i + 1]),
-        lon: this.toDoubleLon(returnArray[i + 2]),
+        lng: this.toDoubleLon(returnArray[i + 2]),
         boundingRadius: this.toDoubleLat(returnArray[i + 3]),
       });
     }
@@ -99,16 +99,16 @@ export class OscarItemsService {
         `/oscar/items/isregion?q=${encodeURIComponent(query)}`
     );
   }
-  getPoint(radius: number, lat: number, lon: number) {
-    const query = `$point:${radius},${lat},${lon}`;
+  getPoint(radius: number, lat: number, lng: number) {
+    const query = `$point:${radius},${lat},${lng}`;
     return { query, items: this.getItemsBinary(query) };
   }
   private toDoubleLat(lat: number) {
     // tslint:disable-next-line:no-bitwise
     return lat / (1 << 24) - 90;
   }
-  private toDoubleLon(lon: number) {
+  private toDoubleLon(lng: number) {
     // tslint:disable-next-line:no-bitwise
-    return lon / (1 << 23) - 180;
+    return lng / (1 << 23) - 180;
   }
 }

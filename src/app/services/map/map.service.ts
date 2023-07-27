@@ -25,9 +25,10 @@ import { SelectedItemService } from "../ui/selected-item.service";
 import { ConfigService } from "src/app/config/config.service";
 import { SearchResultViewComponent } from "src/app/components/search-result-view/search-result-view.component";
 declare var L;
+import "leaflet.heat";
 import "leaflet.awesome-markers";
 import { Cell } from "src/app/models/cell/cell.model";
-import { maxBy, minBy } from "lodash";
+import { maxBy } from "lodash";
 
 @Injectable({
   providedIn: "root",
@@ -37,7 +38,7 @@ export class MapService {
   polygons = new Map<uuidv4, [L.Polygon, L.Marker[]]>();
   maxZoom = 20;
   heatmap = new L.webGLHeatmap({
-    size: 50,
+    size: 30,
     units: "px",
   });
   searchMarkerLayer = new L.LayerGroup();
@@ -87,10 +88,10 @@ export class MapService {
   }
   setMarker(geoPoint: GeoPoint, name: string): L.Marker {
     if (this.routingMarkers.has(name)) {
-      this.routingMarkers.get(name).setLatLng([geoPoint.lat, geoPoint.lon]);
+      this.routingMarkers.get(name).setLatLng([geoPoint.lat, geoPoint.lng]);
     } else {
       // @ts-ignore
-      const marker = L.marker([geoPoint.lat, geoPoint.lon]);
+      const marker = L.marker([geoPoint.lat, geoPoint.lng]);
       marker.addTo(this.routingMarkerLayer).bindPopup(name).openPopup();
       this.routingMarkers.set(name, marker);
       return marker;
@@ -152,7 +153,7 @@ export class MapService {
       var icon = new L.divIcon({
         html: `<span style= "background-color: ${node.color};${markerHtmlStyles}"></span>`,
       });
-      const marker = L.marker([node.lat, node.lon], {
+      const marker = L.marker([node.lat, node.lng], {
         icon: icon,
         draggable: true,
       });
@@ -162,7 +163,7 @@ export class MapService {
       });
       this.nodeLayer.addLayer(marker);
       nodes.push(marker);
-      polygon.addLatLng([node.lat, node.lon]);
+      polygon.addLatLng([node.lat, node.lng]);
     }
     this.polygons.set(uuid, [polygon, nodes]);
     this.polygonLayer.addLayer(polygon);
@@ -171,28 +172,36 @@ export class MapService {
     this.route.setLatLngs([]);
     const latLngs = [];
     for (const point of route) {
-      latLngs.push(L.latLng([point.lat, point.lon]));
+      latLngs.push(L.latLng([point.lat, point.lng]));
     }
     this.route.setLatLngs(latLngs);
   }
-  drawItemsHeatmap(cells: Cell[], intensity: number) {
+  drawItemsHeatmap(
+    items: OscarMinItem[],
+    cells: Cell[],
+    intensity: number,
+    diameter: number
+  ) {
+    if (cells.length === 0) return;
     const dataPoints = [];
     const max = maxBy(cells, "numObjects").numObjects;
-    const min = minBy(cells, "numObjects").numObjects;
-    let dist: number = max - min;
     for (const cell of cells) {
-      if (cell.numObjects != 0) {
-        console.log(intensity * (0.8 * ((cell.numObjects - min) / dist) + 0.2));
-        dataPoints.push([
-          cell.lat,
-          cell.lon,
-          intensity * (0.8 * ((cell.numObjects - min) / dist) + 0.2),
-        ]);
-      }
+      dataPoints.push([
+        cell.lat,
+        cell.lng,
+        intensity * (0.6 + (cell.numObjects / max) * 0.4),
+      ]);
     }
+    // for (const item of items) {
+    //   dataPoints.push([item.lat, item.lng, 1]);
+    // }
     this.clearHeatMap();
+    // this.heatmap.size = diameter;
+    // this.heatmap.unit = "m";
+
     this.heatmap.setData(dataPoints);
-    // this.heatmap.multiply(0.5);
+
+    // L.heatLayer(dataPoints).addTo(this.map);
   }
   drawItemsMarker(items: OscarMinItem[]) {
     const currentItemsIds: number[] = [];
@@ -217,10 +226,10 @@ export class MapService {
         if (insideBounding) currentItemsIds.push(item.properties.id);
       });
       if (
-        JSON.stringify(this.itemStore.currentItemsIds) !==
+        JSON.stringify([...this.itemStore.currentItemsIds]) !==
         JSON.stringify(currentItemsIds)
       ) {
-        this.itemStore.currentItemsIds = currentItemsIds;
+        this.itemStore.currentItemsIds = new Set(currentItemsIds);
       }
     });
   }
@@ -256,9 +265,7 @@ export class MapService {
         layer.on("click", (event) => {
           this.selectedItemService.subject.next(item);
           layer.options.icon.options.markerColor = "red";
-          console.log(layer);
           layer.pointToLayer = L.marker(layer.pointToLayer);
-          console.log(layer.options.icon.options.markerColor);
           layer.bindPopup(
             feature.properties.v[item.properties.k.indexOf("name")]
           );

@@ -80,7 +80,7 @@ export class PolygonServiceService {
     let newPolygon = this.polygonMapping.get(polygonUuid);
     const index = newPolygon.polygonNodes.findIndex((n) => n.uuid === nodeUuid);
     newPolygon.polygonNodes[index].lat = dragEndPosition.lat;
-    newPolygon.polygonNodes[index].lon = dragEndPosition.lng;
+    newPolygon.polygonNodes[index].lng = dragEndPosition.lng;
     newPolygon.polygonQuery = this.getQueryString(newPolygon.polygonNodes);
     newPolygon.boundingBoxString = this.getBoundingBoxString(
       newPolygon.polygonNodes
@@ -119,8 +119,8 @@ export class PolygonServiceService {
     let index = 0;
     for (const node of polygon) {
       if (index == 0) {
-        polygonString += `$poly:${node.lat},${node.lon}`;
-      } else polygonString += `,${node.lat},${node.lon}`;
+        polygonString += `$poly:${node.lat},${node.lng}`;
+      } else polygonString += `,${node.lat},${node.lng}`;
       index++;
     }
     return polygonString;
@@ -131,8 +131,8 @@ export class PolygonServiceService {
     let east = -1000;
     let north = -1000;
     for (const node of polygon) {
-      if (node.lon < west) west = node.lon;
-      if (node.lon > east) east = node.lon;
+      if (node.lng < west) west = node.lng;
+      if (node.lng > east) east = node.lng;
       if (node.lat < south) south = node.lat;
       if (node.lat > north) north = node.lat;
     }
