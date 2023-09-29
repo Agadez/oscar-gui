@@ -10,7 +10,7 @@ import { MatTabChangeEvent } from "@angular/material/tabs";
 
 import { MatTabGroup } from "@angular/material/tabs";
 import { v4 as uuidv4 } from "uuid";
-import { PolygonServiceService } from "src/app/services/polygon-service.service";
+import { PolygonService } from "src/app/services/polygon-service.service";
 
 @Component({
   selector: "app-polygons",
@@ -18,7 +18,7 @@ import { PolygonServiceService } from "src/app/services/polygon-service.service"
   styleUrls: ["./polygons.component.sass"],
 })
 export class PolygonsComponent implements OnInit {
-  constructor(public polygonService: PolygonServiceService) {}
+  constructor(public polygonService: PolygonService) {}
 
   polygonsEmpty = true;
   tabIndexToId: uuidv4[] = [];
@@ -58,7 +58,7 @@ export class PolygonsComponent implements OnInit {
     this.tabIndexToId.splice(this.tabIndexToId.indexOf(uuid), 1);
   }
 
-  /* Method that gets called by a child component polygon.component.ts 
+  /* Method that gets called by a child component polygon.component.ts
   through an Event whenever the Name of the associated Polygon is changed.
   Stores the given Uuid and Name of the Event to display the Name in the Tab.
   */

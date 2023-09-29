@@ -52,7 +52,7 @@ export class ConfigService {
   }
   getRoutingUrl(): string {
     // return  'http://localhost/oscar/routing/route';
-    return "https://routing.oscar-web.de/oscar/routing/route";
+    return this.getOscarUrl() + "/oscar/routing/route";
   }
   getIconMapping(key: string, value: string) {
     console.log(this);

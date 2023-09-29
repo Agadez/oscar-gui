@@ -17,7 +17,7 @@ import keyValueTags from "../../../assets/keyValueTags.json";
 import { SearchService } from "../../services/search/search.service";
 import { Subject } from "rxjs";
 import { MapService } from "../../services/map/map.service";
-import { PolygonServiceService } from "../../services/polygon-service.service";
+import { PolygonService } from "../../services/polygon-service.service";
 import { OscarMinItem } from "src/app/models/oscar/oscar-min-item";
 import { QueryParamsService } from "src/app/services/query-params.service";
 import { Clipboard } from "@angular/cdk/clipboard";
@@ -43,7 +43,7 @@ export class SearchComponent implements OnInit {
     public refinementStore: RefinementsService,
     private searchService: SearchService,
     private mapService: MapService,
-    private polygonService: PolygonServiceService,
+    private polygonService: PolygonService,
     private queryParams: QueryParamsService,
     private clipboard: Clipboard,
     private snackBar: MatSnackBar
@@ -287,11 +287,13 @@ export class SearchComponent implements OnInit {
   }
 
   togglePolygon() {
+    if (this.routesVisible && !this.polygonVisible) this.toggleRouting();
     this.polygonVisibleEvent.emit(!this.polygonVisible);
     this.polygonVisible = !this.polygonVisible;
   }
 
   toggleRouting() {
+    if (this.polygonVisible && !this.routesVisible) this.togglePolygon();
     this.routesVisibleEvent.emit(!this.routesVisible);
     this.routesVisible = !this.routesVisible;
     this.sideButtonClass = this.routesVisible

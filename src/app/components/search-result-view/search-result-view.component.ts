@@ -19,7 +19,7 @@ import { SearchService } from "../../services/search/search.service";
 import { forkJoin, Subject } from "rxjs";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ItemStoreService } from "src/app/services/data/item-store.service";
-import { PolygonServiceService } from "src/app/services/polygon-service.service";
+import { PolygonService } from "src/app/services/polygon-service.service";
 import { debounceTime, throttleTime } from "rxjs/operators";
 import { QueryParamsService } from "src/app/services/query-params.service";
 import { Cell } from "src/app/models/cell/cell.model";
@@ -41,7 +41,7 @@ export class SearchResultViewComponent implements OnInit {
     private searchService: SearchService,
     private snackBar: MatSnackBar,
     private itemStoreService: ItemStoreService,
-    private polygonService: PolygonServiceService,
+    private polygonService: PolygonService,
     private paramsService: QueryParamsService
   ) {}
   globalCounts = 0;
@@ -87,15 +87,9 @@ export class SearchResultViewComponent implements OnInit {
     this.searchService.queryToDraw$.subscribe(async (queryString) => {
       await this.drawQuery(queryString);
     });
-    // this.mapService.onZoom$.subscribe((event) => {
-    //   if (event !== null) {
-    //     console.log("zoom", event);
-    //     this.reDrawSearchMarkers();
-    //   }
-    // });
-    this.mapService.onMove$.pipe(debounceTime(100)).subscribe((event) => {
+    this.mapService.onMoved$.subscribe((event) => {
       if (event !== null) {
-        console.log("move", event);
+        console.log("moved", event);
         this.reDrawSearchMarkers();
       }
     });
@@ -166,12 +160,11 @@ export class SearchResultViewComponent implements OnInit {
       this.hideCounts = true;
       this.heatmapSliderVisible = false;
       this.progress = 1;
-      this.oscarItemsService
-        .getItemsBinary(queryString)
-        .subscribe((binaryItems) => {
+      this.oscarItemsService.getItemsBinary(queryString).subscribe(
+        (binaryItems) => {
           this.itemStoreService.updateItemsFromBinary(binaryItems);
           this.itemCheck(queryString);
-          this.gridService.buildGrid();
+          this.gridService.fitMaptoMinItems();
           // checking for all activated polygons
           if (this.polygonService.polyClientCalc) {
             this.polygonService.activatedPolygons.forEach((uuid) => {
@@ -182,9 +175,8 @@ export class SearchResultViewComponent implements OnInit {
           }
 
           this.reDrawSearchMarkers();
-
           if (this.sharedQuery) this.sharedQuery = false;
-          else this.mapService.fitBounds(this.gridService.globalGrid.gridBBox);
+          // else this.mapService.fitBounds(this.gridService.globalGrid.gridBBox);
 
           this.oscarItemsService
             .getParents(queryString, 0)
@@ -199,10 +191,15 @@ export class SearchResultViewComponent implements OnInit {
               this.progress += 25;
             });
           this.searchLoading.emit(false);
-        });
+        },
+        (error) => {
+          console.error("Error fetching data:", error);
+        }
+      );
     }
   }
   reDrawSearchMarkers() {
+    console.log("ReDrawing");
     this.mapService.clearSearchMarkers();
     this.mapService.clearHeatMap();
     const bounds = this.mapService.bounds;
@@ -214,7 +211,6 @@ export class SearchResultViewComponent implements OnInit {
         bounds.getEast(),
         this.mapService.zoom
       );
-
       this.currentItems = Array.from(new Set(current.items));
       this.cells = current.cells;
       this.progress += 25;
@@ -238,7 +234,7 @@ export class SearchResultViewComponent implements OnInit {
         this.currentItems,
         _.sampleSize(this.cells, 100000),
         this.heatMapIntensity,
-        this.gridService.currentGrid?.cellDiameter
+        this.gridService.currentGrid?.scale
       );
     }
     this.progress += 25;

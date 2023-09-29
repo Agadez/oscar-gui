@@ -1,4 +1,5 @@
 import { Component, OnInit, NgZone } from "@angular/core";
+import { GeoPoint } from "src/app/models/geo-point";
 import { OscarItem } from "src/app/models/oscar/oscar-item";
 import { ItemStoreService } from "src/app/services/data/item-store.service";
 import { MapService } from "src/app/services/map/map.service";
@@ -56,7 +57,10 @@ export class LocalItemListComponent implements OnInit {
   clickOnItem(item: OscarItem) {
     this.detail = true;
     this.zone.run(() => (this.detailItem = item));
-    this.mapService.setMarker(item.firstPoint, this.markerId);
+    this.mapService.setMarker(
+      new GeoPoint(item.firstPoint.lat, item.firstPoint.lon),
+      this.markerId
+    );
   }
   backButtonClick($event: MouseEvent) {
     this.detail = false;

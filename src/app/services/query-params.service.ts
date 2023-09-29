@@ -3,7 +3,7 @@ import { Subject } from "rxjs";
 import { MapService } from "./map/map.service";
 import { SearchService } from "./search/search.service";
 import { RoutingService } from "./routing/routing.service";
-import { PolygonServiceService } from "./polygon-service.service";
+import { PolygonService } from "./polygon-service.service";
 import { GridService } from "./data/grid.service";
 
 @Injectable({
@@ -27,7 +27,7 @@ export class QueryParamsService {
     private mapService: MapService,
     private searchService: SearchService,
     private routingService: RoutingService,
-    private polygonService: PolygonServiceService,
+    private polygonService: PolygonService,
     private gridService: GridService
   ) {}
 

@@ -3,6 +3,7 @@ import { OscarItem } from "src/app/models/oscar/oscar-item";
 import { ItemStoreService } from "src/app/services/data/item-store.service";
 import { OscarItemsService } from "src/app/services/oscar/oscar-items.service";
 import { MapService } from "src/app/services/map/map.service";
+import { GeoPoint } from "src/app/models/geo-point";
 
 @Component({
   selector: "app-global-item-list",
@@ -53,7 +54,10 @@ export class GlobalItemListComponent implements OnInit {
   clickOnItem(item: OscarItem) {
     this.detail = true;
     this.zone.run(() => (this.detailItem = item));
-    this.mapService.setMarker(item.firstPoint, this.markerId);
+    this.mapService.setMarker(
+      new GeoPoint(item.firstPoint.lat, item.firstPoint.lon),
+      this.markerId
+    );
   }
   backButtonClick($event: MouseEvent) {
     this.detail = false;

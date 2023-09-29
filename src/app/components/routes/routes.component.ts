@@ -1,4 +1,4 @@
-import { Component, Input, NgZone, OnInit } from "@angular/core";
+import { Component, Input, NgZone, OnInit, SimpleChanges } from "@angular/core";
 import { MatTabChangeEvent } from "@angular/material/tabs";
 import { Subject } from "rxjs";
 import { GeoPoint } from "../../models/geo-point";
@@ -33,15 +33,22 @@ export class RoutesComponent implements OnInit {
       }
     });
   }
-
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.routesVisible) {
+      if (this.routesVisible && this.routes.length === 0) {
+        this.addTab();
+      }
+    }
+  }
   addTab(initialPoint = null) {
-    this.routes.push({
+    let route = {
       active: false,
       name: "route",
       color: this.getRandomColor(),
       destroyed: false,
       initialPoint,
-    });
+    };
+    this.routes.push(route);
     routesEmpty = false;
   }
 

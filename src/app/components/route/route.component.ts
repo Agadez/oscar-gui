@@ -70,7 +70,8 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
     });
     this.mapService._route.next(true);
     this.mapService.onClick$.subscribe((event) => {
-      if (!event || !this.active || !this.routesVisible) {
+      console.log(!event, init, !this.active, !this.routesVisible);
+      if (!event || init || !this.active || !this.routesVisible) {
         return;
       }
       this.zone.run(() => {
@@ -105,7 +106,6 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
   }
   ngOnChanges(changes: SimpleChanges): void {}
   ngOnDestroy(): void {
-    this.mapService._route.next(false);
     this.clearList();
     this.active = false;
   }
@@ -188,6 +188,7 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
 
   addToSearch() {
     if (this.checkboxActive) {
+      console.log(this.routingMarkers);
       this.routingDataStoreService.routesToAdd.set(this.color, {
         geoPoints: this.routingMarkers.map((value) => value.geoPoint),
         routingType: this.routingType,
@@ -223,7 +224,6 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
         .pipe(debounceTime(this.routingService.debounceTime))
         .subscribe((event) => this.markerDragHandler(event));
       routingMarker.leafletId = marker._leaflet_id;
-      console.log(this.routingService.debounceTime);
       i++;
     }
   }

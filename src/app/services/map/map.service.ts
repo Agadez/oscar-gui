@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 import { PolygonNode } from "src/app/models/polygon/polygon-node.model";
 import { OscarItemsService } from "../oscar/oscar-items.service";
 import { RoutingMarker } from "../../models/routing-marker";
-import { PolygonServiceService } from "../polygon-service.service";
+import { PolygonService } from "../polygon-service.service";
 import {
   CircleMarker,
   LatLng,
@@ -19,16 +19,17 @@ import {
   Polygon,
   latLng,
 } from "leaflet";
+
 import { Region } from "../../models/oscar/region";
 import { OscarItem } from "../../models/oscar/oscar-item";
 import { SelectedItemService } from "../ui/selected-item.service";
 import { ConfigService } from "src/app/config/config.service";
 import { SearchResultViewComponent } from "src/app/components/search-result-view/search-result-view.component";
-declare var L;
 import "leaflet.heat";
 import "leaflet.awesome-markers";
 import { Cell } from "src/app/models/cell/cell.model";
 import { maxBy } from "lodash";
+declare var L;
 
 @Injectable({
   providedIn: "root",
@@ -38,8 +39,9 @@ export class MapService {
   polygons = new Map<uuidv4, [L.Polygon, L.Marker[]]>();
   maxZoom = 20;
   heatmap = new L.webGLHeatmap({
-    size: 30,
+    size: 18,
     units: "px",
+    alphaRange: 1,
   });
   searchMarkerLayer = new L.LayerGroup();
   routingMarkerLayer = new L.LayerGroup();
@@ -53,6 +55,8 @@ export class MapService {
   readonly onZoom$ = this._zoom.asObservable();
   private readonly _move = new BehaviorSubject<any>(null);
   readonly onMove$ = this._move.asObservable();
+  private readonly _moved = new BehaviorSubject<any>(null);
+  readonly onMoved$ = this._moved.asObservable();
   private readonly _click = new BehaviorSubject<any>(null);
   readonly onClick$ = this._click.asObservable();
   private readonly _contextMenu = new BehaviorSubject<any>(null);
@@ -72,7 +76,7 @@ export class MapService {
     private oscarItemsService: OscarItemsService,
     private selectedItemService: SelectedItemService,
     private configService: ConfigService,
-    private polygonService: PolygonServiceService
+    private polygonService: PolygonService
   ) {}
 
   setView(lat: number, lng: number, zoom: number) {
@@ -83,6 +87,9 @@ export class MapService {
     // @ts-ignore
     return this._map.getBounds();
   }
+  get pixelBounds() {
+    return this._map.getPixelBounds();
+  }
   get map() {
     return this._map;
   }
@@ -92,6 +99,7 @@ export class MapService {
     } else {
       // @ts-ignore
       const marker = L.marker([geoPoint.lat, geoPoint.lng]);
+
       marker.addTo(this.routingMarkerLayer).bindPopup(name).openPopup();
       this.routingMarkers.set(name, marker);
       return marker;
@@ -120,7 +128,10 @@ export class MapService {
       this.zoom = event.target._zoom;
       this._move.next(event);
     });
-
+    this.map.on("moveend", (event) => {
+      console.log(event);
+      this._moved.next(event);
+    });
     this.map.on("click", (event) => this._click.next(event));
     this.map.on("contextmenu", (event) => {
       this._contextMenu.next(event);
@@ -180,28 +191,30 @@ export class MapService {
     items: OscarMinItem[],
     cells: Cell[],
     intensity: number,
-    diameter: number
+    scale: number
   ) {
+    // this.map.removeLayer(this.heatmap);
     if (cells.length === 0) return;
     const dataPoints = [];
     const max = maxBy(cells, "numObjects").numObjects;
     for (const cell of cells) {
-      dataPoints.push([
-        cell.lat,
-        cell.lng,
-        intensity * (0.6 + (cell.numObjects / max) * 0.4),
-      ]);
+      if (cell.numObjects > 0) {
+        dataPoints.push([
+          cell.lat,
+          cell.lng,
+          intensity * (0.4 + (cell.numObjects / max) * 0.6),
+        ]);
+      }
     }
     // for (const item of items) {
-    //   dataPoints.push([item.lat, item.lng, 1]);
+    //   dataPoints.push([item.lat, item.lng, intensity]);
     // }
-    this.clearHeatMap();
-    // this.heatmap.size = diameter;
-    // this.heatmap.unit = "m";
+
+    // this.heatmap.size = 2 * Math.ceil(scale * Math.sqrt(2));
 
     this.heatmap.setData(dataPoints);
-
-    // L.heatLayer(dataPoints).addTo(this.map);
+    this.map.addLayer(this.heatmap);
+    // L.heatLayer(dataPoints).addTo(this.map);;
   }
   drawItemsMarker(items: OscarMinItem[]) {
     const currentItemsIds: number[] = [];
@@ -264,7 +277,7 @@ export class MapService {
       onEachFeature: (feature, layer) => {
         layer.on("click", (event) => {
           this.selectedItemService.subject.next(item);
-          layer.options.icon.options.markerColor = "red";
+          // layer.options.icon.options.markerColor = "red";
           layer.pointToLayer = L.marker(layer.pointToLayer);
           layer.bindPopup(
             feature.properties.v[item.properties.k.indexOf("name")]
@@ -295,7 +308,8 @@ export class MapService {
     this.regionLayer.clearLayers();
   }
   clearHeatMap() {
-    this.heatmap.setData([]);
+    this.heatmap.remove();
+    // this.heatmap.setData([]);
   }
   clearSearchMarkers() {
     this.searchMarkerLayer.clearLayers();

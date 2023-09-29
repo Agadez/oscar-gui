@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { SearchService } from "src/app/services/search/search.service";
-import { PolygonServiceService } from "src/app/services/polygon-service.service";
+import { PolygonService } from "src/app/services/polygon-service.service";
 import { RoutingService } from "src/app/services/routing/routing.service";
 import { GridService } from "src/app/services/data/grid.service";
 
@@ -12,7 +12,7 @@ import { GridService } from "src/app/services/data/grid.service";
 export class PreferenceComponent implements OnInit {
   constructor(
     private searchService: SearchService,
-    private polygonService: PolygonServiceService,
+    private polygonService: PolygonService,
     private routingService: RoutingService,
     private gridService: GridService
   ) {}

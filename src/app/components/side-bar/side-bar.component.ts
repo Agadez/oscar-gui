@@ -21,6 +21,7 @@ export class SideBarComponent implements OnInit {
   helpVisible = false;
   polygonVisible = false;
   preferencesVisible = false;
+  
   ngOnInit() {}
 
   // numbers = [];

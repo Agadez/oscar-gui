@@ -10,11 +10,8 @@ import { LatLng } from "leaflet";
 @Injectable({
   providedIn: "root",
 })
-export class PolygonServiceService {
-  constructor(
-    private gridService: GridService,
-    private store: ItemStoreService
-  ) {}
+export class PolygonService {
+  constructor(private store: ItemStoreService) {}
   tabClosed = new BehaviorSubject(false);
   tabChanged = new BehaviorSubject(false);
   tabActivated = new BehaviorSubject(false);
@@ -46,17 +43,16 @@ export class PolygonServiceService {
       )
     );
   }
-  removePolygon(uuid: uuidv4) {
-    this.polygonMapping.delete(uuid);
-    if (this.activatedPolygons.has(uuid)) {
-      this.gridService.deleteGrid();
-      this.store.updateItems([]);
-    }
-  }
+  // removePolygon(uuid: uuidv4) {
+  //   this.polygonMapping.delete(uuid);
+  //   if (this.activatedPolygons.has(uuid)) {
+  //     this.gridService.deleteGrid();
+  //     this.store.updateItems([]);
+  //   }
+  // }
   clearPolygon(uuid: uuidv4) {
     this.polygonMapping.set(uuid, new Polygon([], "", ""));
     if (this.activatedPolygons.has(uuid)) {
-      this.gridService.deleteGrid();
       this.store.updateItems([]);
     }
   }

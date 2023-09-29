@@ -10,7 +10,8 @@ import {
 import { MapService } from "src/app/services/map/map.service";
 import { PolygonNode } from "src/app/models/polygon/polygon-node.model";
 import { v4 as uuidv4 } from "uuid";
-import { PolygonServiceService } from "../../services/polygon-service.service";
+import { PolygonService } from "../../services/polygon-service.service";
+import { GridService } from "../../services/data/grid.service";
 
 declare var L;
 
@@ -22,7 +23,8 @@ declare var L;
 export class PolygonComponent implements OnInit, OnDestroy {
   constructor(
     private mapService: MapService,
-    public polygonService: PolygonServiceService
+    public polygonService: PolygonService,
+    private gridService: GridService
   ) {}
 
   showNameForm = false;
@@ -49,9 +51,7 @@ export class PolygonComponent implements OnInit, OnDestroy {
 
     // Allows the User to create a Polygon by adding a Node when clicking the map
     this.mapService.onClick$.subscribe((event) => {
-      console.log(this.isActive);
       if (!event || init || this.routeActivated || !this.isActive) {
-        console.log(!event, init, this.routeActivated, !this.isActive);
         return;
       }
       this.polygonService.addNode(
@@ -146,5 +146,6 @@ export class PolygonComponent implements OnInit, OnDestroy {
   clearList() {
     this.polygonService.clearPolygon(this.uuid);
     this.mapService.clearPolygon(this.uuid);
+    this.gridService.deleteGrid();
   }
 }

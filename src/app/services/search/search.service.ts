@@ -3,7 +3,7 @@ import { BehaviorSubject, Observable, Subject } from "rxjs";
 import { RefinementsService } from "../data/refinements.service";
 import { MapService } from "../map/map.service";
 import { OscarItemsService } from "../oscar/oscar-items.service";
-import { PolygonServiceService } from "../polygon-service.service";
+import { PolygonService } from "../polygon-service.service";
 import { RefinementType } from "../../models/gui/refinement";
 import { TextUtil } from "../../util/text-util";
 import { OscarItem } from "src/app/models/oscar/oscar-item";
@@ -20,7 +20,7 @@ export class SearchService {
   constructor(
     private mapService: MapService,
     private oscarService: OscarItemsService,
-    private polygonService: PolygonServiceService,
+    private polygonService: PolygonService,
     private refinementStore: RefinementsService,
     private routingDataStoreService: RoutingDataStoreService,
     private routingService: RoutingService,
@@ -200,6 +200,7 @@ export class SearchService {
     let returnString = "";
     const routes = [];
     for (const route of this.routingDataStoreService.routesToAdd.values()) {
+      console.log(route);
       routes.push(route);
     }
     if (!routes) {
@@ -220,7 +221,7 @@ export class SearchService {
       }
       returnString += " $route(0," + routingTypeIndicator;
       for (const point of route.geoPoints) {
-        returnString += `,${point.lat},${point.lon}`;
+        returnString += `,${point.lat},${point.lng}`;
       }
       returnString += ")";
     }
