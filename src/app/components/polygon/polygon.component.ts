@@ -32,7 +32,7 @@ export class PolygonComponent implements OnInit, OnDestroy {
   @Output() newNameEvent = new EventEmitter<[uuidv4, string]>();
 
   @Input()
-  polygonVisible = false;
+  polygonVisible;
   @Input()
   uuid = uuidv4();
   id = "";
@@ -51,7 +51,7 @@ export class PolygonComponent implements OnInit, OnDestroy {
 
     // Allows the User to create a Polygon by adding a Node when clicking the map
     this.mapService.onClick$.subscribe((event) => {
-      if (!event || init || this.routeActivated || !this.isActive) {
+      if (!event || init || !this.polygonVisible || !this.isActive) {
         return;
       }
       this.polygonService.addNode(

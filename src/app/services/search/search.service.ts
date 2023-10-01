@@ -145,20 +145,25 @@ export class SearchService {
         }
       );
     }
+    // if (activatedPolygons.size === 0) {
+    //   newQueryString = "";
+    // }
     return newQueryString;
   }
   createQueryString(inputString: string, clientRenderingMode: boolean) {
+    let polygonString = this.mapPolygonName(inputString, clientRenderingMode);
+    let routeString = this.getRouteQueryString(polygonString);
     this.fullQueryString =
       this.idPrependix +
       ") " +
       this.keyPrependix +
       this.keyValuePrependix +
       this.parentPrependix +
-      this.mapPolygonName(inputString, clientRenderingMode) +
+      // polygonString +
       this.keyAppendix +
       this.parentAppendix +
       this.keyValueAppendix +
-      this.routeQueryString;
+      routeString;
     return this.fullQueryString;
   }
   searchForRegions(inputString: string, regions: OscarItem[]) {
@@ -196,36 +201,18 @@ export class SearchService {
     }
     return false;
   }
-  getRouteQueryString() {
-    let returnString = "";
-    const routes = [];
-    for (const route of this.routingDataStoreService.routesToAdd.values()) {
-      console.log(route);
-      routes.push(route);
-    }
-    if (!routes) {
-      return returnString;
-    }
-    for (const route of routes) {
+  getRouteQueryString(inputString) {
+    let newQueryString = inputString.replace(/\$route:(\w+)/g, (_, id) => {
+      let route = this.routingDataStoreService.routesToAdd.get(id);
       let routingTypeIndicator = 0;
-      switch (route.routingType) {
-        case RoutingType.Car:
-          routingTypeIndicator = 0;
-          break;
-        case RoutingType.Bike:
-          routingTypeIndicator = 1;
-          break;
-        case RoutingType.Foot:
-          routingTypeIndicator = 2;
-          break;
-      }
-      returnString += " $route(0," + routingTypeIndicator;
+      let routeString = "$route(0," + routingTypeIndicator;
       for (const point of route.geoPoints) {
-        returnString += `,${point.lat},${point.lng}`;
+        routeString += `,${point.lat},${point.lng}`;
       }
-      returnString += ")";
-    }
-    return returnString;
+      routeString += ")";
+      return routeString;
+    });
+    return newQueryString;
   }
   queryStringForLocalSearch(inputString: string, clientRenderingMode: boolean) {
     this.createQueryString(inputString, clientRenderingMode);
@@ -245,6 +232,5 @@ export class SearchService {
         this.idPrependix += "$cell:" + cellId;
       }
     }
-    this.routeQueryString = this.getRouteQueryString();
   }
 }

@@ -11,7 +11,7 @@ import { MapService } from "../../services/map/map.service";
 import { MatMenuTrigger } from "@angular/material/menu";
 import { radiusSearchTrigger } from "../search-result-view/search-result-view.component";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { addRoutingPointEvent } from "../routes/routes.component";
+import { RoutingService } from "src/app/services/routing/routing.service";
 import { GeoPoint } from "../../models/geo-point";
 import { OscarItemsService } from "src/app/services/oscar/oscar-items.service";
 import { QueryParamsService } from "src/app/services/query-params.service";
@@ -47,7 +47,8 @@ export class MapComponent implements OnInit {
     private itemStore: ItemStoreService,
     private mapService: MapService,
     private snackBar: MatSnackBar,
-    private queryParams: QueryParamsService
+    private queryParams: QueryParamsService,
+    private routingService: RoutingService
   ) {}
 
   ngOnInit() {
@@ -95,7 +96,7 @@ export class MapComponent implements OnInit {
     });
   }
   addToRouting() {
-    addRoutingPointEvent.next({
+    this.routingService.addRoutingPointEvent.next({
       point: new GeoPoint(
         this.contextMenuLatLng.lat,
         this.contextMenuLatLng.lng

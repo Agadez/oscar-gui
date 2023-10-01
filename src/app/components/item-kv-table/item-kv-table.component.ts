@@ -7,7 +7,7 @@ import {
 } from "@angular/core";
 import { OscarItem } from "../../models/oscar/oscar-item";
 import { GeoPoint } from "../../models/geo-point";
-import { addRoutingPointEvent } from "../routes/routes.component";
+import { RoutingService } from "src/app/services/routing/routing.service";
 
 @Component({
   selector: "app-item-kv-table",
@@ -17,7 +17,7 @@ import { addRoutingPointEvent } from "../routes/routes.component";
 export class ItemKvTableComponent implements OnInit, OnChanges {
   @Input() oscarItem: OscarItem;
   keyValues = [];
-  constructor() {}
+  constructor(private routingService: RoutingService) {}
   lat: number;
   lon: number;
   ngOnInit() {
@@ -55,7 +55,7 @@ export class ItemKvTableComponent implements OnInit, OnChanges {
   }
 
   addToRoute() {
-    addRoutingPointEvent.next({
+    this.routingService.addRoutingPointEvent.next({
       point: new GeoPoint(
         this.oscarItem.firstPoint.lat,
         this.oscarItem.firstPoint.lon

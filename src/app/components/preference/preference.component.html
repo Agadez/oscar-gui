@@ -15,40 +15,6 @@
       (ngModelChange)="updatePolygonCalculation()"
     ></mat-slide-toggle>
   </div>
-  <div class="bg-white mt-2 rounded px-3 py-2 d-flex flex-column w-100">
-    <span class="flex-fill">Amount of Cells in Grid</span>
-    <div
-      class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between w-100"
-    >
-      <mat-form-field style="width: 8ch">
-        <mat-label>X Cells</mat-label>
-        <input
-          matInput
-          [(ngModel)]="gridX"
-          type="number"
-          (ngModelChange)="updateX()"
-        />
-      </mat-form-field>
-      <mat-form-field style="width: 8ch">
-        <mat-label>Y Cells</mat-label>
-        <input
-          matInput
-          [(ngModel)]="gridY"
-          type="number"
-          (ngModelChange)="updateY()"
-        />
-      </mat-form-field>
-
-      <button
-        style="width: 100px; height: 40px"
-        mat-raised-button
-        color="primary"
-        (click)="recalculateGrid()"
-      >
-        Rerender
-      </button>
-    </div>
-  </div>
 
   <div class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between">
     <span>Max Items in Result</span>

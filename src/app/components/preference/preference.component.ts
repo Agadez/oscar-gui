@@ -22,16 +22,12 @@ export class PreferenceComponent implements OnInit {
   markerThreshold: number;
   debounceTime: number;
   polyClientCalc: boolean;
-  gridX: number;
-  gridY: number;
   ngOnInit(): void {
     this.maxItems = this.searchService.maxItems;
     this.localSearch = this.searchService.localSearch;
     this.markerThreshold = this.searchService.markerThreshold;
     this.debounceTime = this.routingService.debounceTime;
     this.polyClientCalc = this.polygonService.polyClientCalc;
-    this.gridX = this.gridService.globalX;
-    this.gridY = this.gridService.globalY;
   }
   updateMaxItems() {
     this.searchService.maxItems = this.maxItems;
@@ -48,12 +44,6 @@ export class PreferenceComponent implements OnInit {
   updatePolygonCalculation() {
     this.polygonService.polyClientCalc = this.polyClientCalc;
     this.searchService.startSearch.next("start");
-  }
-  updateX() {
-    this.gridService.globalX = this.gridX;
-  }
-  updateY() {
-    this.gridService.globalY = this.gridY;
   }
   recalculateGrid() {
     this.searchService.rerender();

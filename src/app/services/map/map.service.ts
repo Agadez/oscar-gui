@@ -28,7 +28,7 @@ import { SearchResultViewComponent } from "src/app/components/search-result-view
 import "leaflet.heat";
 import "leaflet.awesome-markers";
 import { Cell } from "src/app/models/cell/cell.model";
-import { maxBy } from "lodash";
+import { maxBy, meanBy } from "lodash";
 declare var L;
 
 @Injectable({
@@ -39,7 +39,7 @@ export class MapService {
   polygons = new Map<uuidv4, [L.Polygon, L.Marker[]]>();
   maxZoom = 20;
   heatmap = new L.webGLHeatmap({
-    size: 18,
+    size: 20,
     units: "px",
     alphaRange: 1,
   });
@@ -129,7 +129,6 @@ export class MapService {
       this._move.next(event);
     });
     this.map.on("moveend", (event) => {
-      console.log(event);
       this._moved.next(event);
     });
     this.map.on("click", (event) => this._click.next(event));
@@ -191,30 +190,30 @@ export class MapService {
     items: OscarMinItem[],
     cells: Cell[],
     intensity: number,
+    pixel: number,
     scale: number
   ) {
-    // this.map.removeLayer(this.heatmap);
     if (cells.length === 0) return;
     const dataPoints = [];
     const max = maxBy(cells, "numObjects").numObjects;
+    const mean = Math.round(meanBy(cells, "numObjects"));
+    console.log("mean", mean);
+    console.log("max", max);
     for (const cell of cells) {
+      const intensityFactor =
+        cell.numObjects / mean < 1
+          ? 0.5 * (cell.numObjects / mean)
+          : 0.5 + (cell.numObjects / max) * 0.5;
       if (cell.numObjects > 0) {
-        dataPoints.push([
-          cell.lat,
-          cell.lng,
-          intensity * (0.4 + (cell.numObjects / max) * 0.6),
-        ]);
+        dataPoints.push([cell.lat, cell.lng, intensity * intensityFactor]);
       }
     }
     // for (const item of items) {
     //   dataPoints.push([item.lat, item.lng, intensity]);
     // }
 
-    // this.heatmap.size = 2 * Math.ceil(scale * Math.sqrt(2));
-
+    this.heatmap.size = pixel;
     this.heatmap.setData(dataPoints);
-    this.map.addLayer(this.heatmap);
-    // L.heatLayer(dataPoints).addTo(this.map);;
   }
   drawItemsMarker(items: OscarMinItem[]) {
     const currentItemsIds: number[] = [];
@@ -308,8 +307,7 @@ export class MapService {
     this.regionLayer.clearLayers();
   }
   clearHeatMap() {
-    this.heatmap.remove();
-    // this.heatmap.setData([]);
+    this.heatmap.setData([]);
   }
   clearSearchMarkers() {
     this.searchMarkerLayer.clearLayers();

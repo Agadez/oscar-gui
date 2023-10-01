@@ -4,6 +4,7 @@ import {
   Output,
   OnInit,
   NgZone,
+  SimpleChanges,
   ViewChild,
 } from "@angular/core";
 import { MatTabChangeEvent } from "@angular/material/tabs";
@@ -19,14 +20,21 @@ import { PolygonService } from "src/app/services/polygon-service.service";
 })
 export class PolygonsComponent implements OnInit {
   constructor(public polygonService: PolygonService) {}
-
+  @Input()
+  polygonVisible;
   polygonsEmpty = true;
   tabIndexToId: uuidv4[] = [];
   uuidToName = new Map();
 
   @ViewChild("tabs", { static: false }) activeTab: MatTabGroup;
   ngOnInit(): void {}
-
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.polygonVisible) {
+      if (this.polygonVisible && this.polygonsEmpty) {
+        this.addTab();
+      }
+    }
+  }
   // Adds a Tab to the Polygon TabGroup, adds a new Polygon to the Dataset and assures that the Tab and therefor Polygon is selected.
   addTab() {
     const uuid = uuidv4();

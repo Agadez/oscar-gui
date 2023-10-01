@@ -7,7 +7,7 @@ import { Grid } from "src/app/models/grid/grid.model";
 import { Polygon } from "src/app/models/polygon/polygon.model";
 import { Cell } from "src/app/models/cell/cell.model";
 import { MapService } from "../map/map.service";
-import { exhaust } from "rxjs/operators";
+import { PolygonService } from "../polygon-service.service";
 declare var L;
 
 @Injectable({
@@ -16,19 +16,13 @@ declare var L;
 export class GridService {
   globalGrid: Grid;
   localGrid: Grid;
-
-  globalX = 100;
-  globalY = 100;
-
-  localX = 100;
-  localY = 100;
-
   currentGrid: Grid;
   currentCells: Cell[];
   currentItems: OscarMinItem[];
   constructor(
     private itemStoreService: ItemStoreService,
-    private mapService: MapService
+    private mapService: MapService,
+    private polygonService: PolygonService
   ) {}
 
   /**
@@ -43,6 +37,12 @@ export class GridService {
     // problematic
     this.mapService._map.once("moveend", (event) => {
       this.buildGrid();
+      // checking for all activated polygons
+      if (this.polygonService.polyClientCalc) {
+        this.polygonService.activatedPolygons.forEach((uuid) => {
+          this.getPolygonItems(this.polygonService.polygonMapping.get(uuid));
+        });
+      }
     });
 
     for (const item of this.itemStoreService.items) {
@@ -58,12 +58,19 @@ export class GridService {
       if (item.lng + item.boundingRadius > maxLng)
         maxLng = item.lng + item.boundingRadius;
     }
-
-    let gridBBox = new L.latLngBounds(
-      L.latLng(minLat, minLng),
-      L.latLng(maxLat, maxLng)
-    );
-    this.mapService.fitBounds(gridBBox);
+    if (
+      minLat !== Infinity &&
+      minLng !== Infinity &&
+      maxLat !== -Infinity &&
+      maxLng !== -Infinity
+    ) {
+      let gridBBox = new L.latLngBounds(
+        L.latLng(minLat, minLng),
+        L.latLng(maxLat, maxLng)
+      );
+      console.log(gridBBox);
+      this.mapService.fitBounds(gridBBox);
+    }
   }
 
   buildGrid() {
@@ -96,58 +103,15 @@ export class GridService {
     if (!this.globalGrid) return { items: [], cells: [] };
     this.mapService.clearHeatMap();
     this.globalGrid.updateCurrentBBox(south, west, north, east);
-    if (zoom > this.currentGrid.zoom) {
-      this.localGrid = new Grid(
-        this.currentGrid.getCurrentItems().items,
-        this.mapService._map
-        // (zoom - this.globalGrid.zoom) * 2
-      );
-      this.localGrid.buildProjectedGrid();
-      this.currentGrid = this.localGrid;
-      return this.localGrid.getCurrentItems();
-    } else if (zoom > this.globalGrid.zoom) {
+    if (zoom != this.globalGrid.zoom) {
       this.localGrid = new Grid(
         this.globalGrid.getCurrentItems().items,
         this.mapService._map
-        // (zoom - this.globalGrid.zoom) * 2
       );
       this.localGrid.buildProjectedGrid();
       this.currentGrid = this.localGrid;
       return this.localGrid.getCurrentItems();
     } else this.currentGrid = this.globalGrid;
-    // if (this.globalGrid.currentlyInsideLocalGridZone()) {
-    // let insideLocalGrid = this.localGrid?.checkBounds(
-    //   minLat,
-    //   minLng,
-    //   maxLat,
-    //   maxLng
-    // );
-    //
-    // if (currentGlobalItems.items.length == 1)
-    //   return this.globalGrid.getCurrentItems();
-    // if (!insideLocalGrid || !this.localGrid) {
-    //   this.localGrid = new Grid(
-    //     currentGlobalItems.items,
-    //     this.localX,
-    //     this.localY,
-    //     this.mapService._map
-    //   );
-    // } else if (this.localGrid.getCurrentItems().items.length <= 10) {
-    //   return this.localGrid.getCurrentItems();
-    // } else {
-    // this.globalGrid = new Grid(
-    //   currentGlobalItems.items,
-    //   this.localX,
-    //   this.localY,
-    //   this.mapService._map
-    // );
-    // }
-    // this.globalGrid.updateCurrentBBox(south, west, north, east);
-    // this.localGrid.updateCurrentBBox(south, west, north, east);
-    // this.currentGrid = this.localGrid;
-
-    // return this.localGrid.getCurrentItems();
-    // }
     return this.currentGrid.getCurrentItems();
   }
   getPolygonItems(polygon: Polygon) {

@@ -79,12 +79,10 @@ export class SearchComponent implements OnInit {
   panelClosed() {
     setTimeout(() => {
       this.inAutocompletePanel = false;
-      console.log(this.inAutocompletePanel);
     }, 100);
   }
   panelOpened() {
     this.inAutocompletePanel = true;
-    console.log(this.inAutocompletePanel);
   }
   abort() {
     this.inputString = "";
@@ -166,7 +164,6 @@ export class SearchComponent implements OnInit {
   }
 
   startRequest(fullQueryString) {
-    console.log(fullQueryString);
     this.request = this.oscarItemService
       .getRegion(fullQueryString)
       .subscribe((regions) => {

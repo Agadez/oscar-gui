@@ -1,10 +1,12 @@
 import {
   Component,
+  EventEmitter,
   Input,
   NgZone,
   OnChanges,
   OnDestroy,
   OnInit,
+  Output,
   SimpleChanges,
 } from "@angular/core";
 import { MapService } from "../../services/map/map.service";
@@ -18,14 +20,13 @@ import {
 import { GeoPoint } from "../../models/geo-point";
 import { RoutingDataStoreService } from "../../services/data/routing-data-store.service";
 import { Subject } from "rxjs";
-import { addRoutingPointEvent } from "../routes/routes.component";
 import { LeafletEvent } from "leaflet";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { debounceTime } from "rxjs/operators";
 
 declare var L;
 
-export const removeRoutingPointEvent = new Subject<GeoPoint>();
+// export const removeRoutingPointEvent = new Subject<GeoPoint>();
 
 @Component({
   selector: "app-route",
@@ -40,6 +41,8 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
     private routingDataStoreService: RoutingDataStoreService,
     private snackBar: MatSnackBar
   ) {}
+  @Input()
+  id: string;
   @Input()
   active = true;
   @Input()
@@ -60,6 +63,35 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
   @Input()
   routesVisible = false;
 
+  deprecatedId: string = "";
+  showIdForm = false;
+  @Output()
+  needIdEvent = new EventEmitter<{
+    deprecatedId: string;
+    currentId: string;
+  }>();
+
+  setId() {
+    if (this.deprecatedId == this.id) return;
+    if (this.id == undefined) return;
+    if (!this.routingDataStoreService.routesToAdd.has(this.id)) {
+      this.routingDataStoreService.routesToAdd.set(this.id, {
+        geoPoints: this.routingMarkers.map((value) => value.geoPoint),
+        routingType: this.routingType,
+      });
+      if (this.routingDataStoreService.routesToAdd.has(this.deprecatedId))
+        this.routingDataStoreService.routesToAdd.delete(this.deprecatedId);
+      this.toggleIdForm();
+      this.needIdEvent.emit({
+        deprecatedId: this.deprecatedId,
+        currentId: this.id,
+      });
+      this.deprecatedId = this.id;
+    }
+  }
+  toggleIdForm() {
+    this.showIdForm = !this.showIdForm;
+  }
   ngOnInit(): void {
     let init = true;
     this.polyLine = L.polyline([], {
@@ -70,7 +102,6 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
     });
     this.mapService._route.next(true);
     this.mapService.onClick$.subscribe((event) => {
-      console.log(!event, init, !this.active, !this.routesVisible);
       if (!event || init || !this.active || !this.routesVisible) {
         return;
       }
@@ -84,16 +115,18 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
     if (this.initialPoint) {
       this.addRoutingPoint(this.initialPoint);
     }
-    addRoutingPointEvent.asObservable().subscribe((point) => {
-      if (init) {
-        return;
-      }
-      if (!this.active) {
-        return;
-      }
+    this.routingService.addRoutingPointEvent
+      .asObservable()
+      .subscribe((point) => {
+        if (init) {
+          return;
+        }
+        if (!this.active) {
+          return;
+        }
 
-      this.addRoutingPoint(point);
-    });
+        this.addRoutingPoint(point);
+      });
 
     this.mapService.onMapReady$.subscribe((mapReady) => {
       if (mapReady) {
@@ -187,8 +220,16 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   addToSearch() {
+    if (this.id !== undefined) {
+      this.routingDataStoreService.routesToAdd.set(this.id, {
+        geoPoints: this.routingMarkers.map((value) => value.geoPoint),
+        routingType: this.routingType,
+      });
+    }
+  }
+
+  addToSearchCheckbox() {
     if (this.checkboxActive) {
-      console.log(this.routingMarkers);
       this.routingDataStoreService.routesToAdd.set(this.color, {
         geoPoints: this.routingMarkers.map((value) => value.geoPoint),
         routingType: this.routingType,
@@ -244,6 +285,7 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
     this.updateRoute();
   }
   toHHMMSS(secNum: number) {
+    console.log(secNum);
     let hours = Math.floor(secNum / 3600);
     let minutes = Math.floor((secNum - hours * 3600) / 60);
     let seconds = secNum - hours * 3600 - minutes * 60;

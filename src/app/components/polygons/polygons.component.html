@@ -4,12 +4,12 @@
   color="primary"
   (click)="addTab()"
 >
-  Add Polygon
+  Polygon hinzufügen
 </button>
 <mat-tab-group
+  mat-stretch-tabs
   #tabs
   [hidden]="polygonsEmpty"
-  mat-stretch-tabs
   style="margin-top: 10px; border-radius: 3px"
   class="polygon-tabs"
   (selectedTabChange)="changeTab($event)"
@@ -27,6 +27,10 @@
         class="fas fa-times ml-4"
       ></i>
     </ng-template>
-    <app-polygon (newNameEvent)="addName($event)" [uuid]="uuid"></app-polygon>
+    <app-polygon
+      [polygonVisible]="polygonVisible"
+      (newNameEvent)="addName($event)"
+      [uuid]="uuid"
+    ></app-polygon>
   </mat-tab>
 </mat-tab-group>

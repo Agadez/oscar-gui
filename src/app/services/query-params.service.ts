@@ -47,12 +47,7 @@ export class QueryParamsService {
     )
       ? parseInt(params["dt"])
       : 150;
-    this.gridService.globalX = this.gridX = !isNaN(parseInt(params["gridX"]))
-      ? parseInt(params["gridX"])
-      : 100;
-    this.gridService.globalY = this.gridY = !isNaN(parseInt(params["gridY"]))
-      ? parseInt(params["gridY"])
-      : 100;
+
     this.lat = !isNaN(parseFloat(params["lat"]))
       ? parseFloat(params["lat"])
       : 48.43379;
@@ -75,8 +70,6 @@ export class QueryParamsService {
     const markerThreshold = this.searchService.markerThreshold;
     const debounceTime = this.routingService.debounceTime;
     const polyClientCalc = this.polygonService.polyClientCalc;
-    const gridX = this.gridService.globalX;
-    const gridY = this.gridService.globalY;
 
     const uri = new URL(window.location.href);
     uri.searchParams.set("maxItems", String(maxItems));
@@ -84,8 +77,6 @@ export class QueryParamsService {
     uri.searchParams.set("markerThreshold", String(markerThreshold));
     uri.searchParams.set("dt", String(debounceTime));
     uri.searchParams.set("pCC", String(polyClientCalc));
-    uri.searchParams.set("gridX", String(gridX));
-    uri.searchParams.set("gridY", String(gridY));
     uri.searchParams.set("lat", String(center.lat));
     uri.searchParams.set("lng", String(center.lng));
     uri.searchParams.set("zoom", String(zoom));

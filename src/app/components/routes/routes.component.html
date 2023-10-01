@@ -4,18 +4,26 @@
   color="primary"
   (click)="addTab()"
 >
-  Neue Route hinzufügen.
+  Route hinzufügen.
 </button>
 
 <mat-tab-group
   mat-stretch-tabs
+  #tabs
   style="margin-top: 10px; border-radius: 3px"
   class="route-tabs"
   (selectedTabChange)="changeTab($event)"
 >
-  <mat-tab *ngFor="let route of routes">
+  <mat-tab *ngFor="let route of this.routes">
     <ng-template class="w-100 d-flex justify-content-between" mat-tab-label>
-      <i class="fas fa-route" [style.color]="route.color"></i>
+      <i
+        class="fas fa-route"
+        [hidden]="route.id !== ''"
+        [style.color]="route.color"
+      ></i>
+      <h6 [hidden]="route.id === ''" [style.color]="route.color">
+        {{ route.id }}
+      </h6>
       <i
         style="cursor: pointer"
         (click)="closeTab(route)"
@@ -23,6 +31,8 @@
       ></i>
     </ng-template>
     <app-route
+      (needIdEvent)="emit($event)"
+      [id]=""
       [routesVisible]="routesVisible"
       [destroy]="route.destroyed"
       [active]="route.active"

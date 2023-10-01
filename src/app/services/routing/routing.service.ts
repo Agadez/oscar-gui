@@ -3,8 +3,8 @@ import { ConfigService } from "../../config/config.service";
 import { GeoPoint } from "../../models/geo-point";
 import { RoutingPath } from "../../models/routing/routing";
 import { HttpClient, HttpParams } from "@angular/common/http";
-import { Observable } from "rxjs";
-import { min } from "rxjs/operators";
+import { Observable, Subject } from "rxjs";
+import { Route } from "src/app/models/routing/route.model";
 
 export enum RoutingType {
   Car = "car",
@@ -17,7 +17,11 @@ export enum RoutingType {
 export class RoutingService {
   currentRoute: RoutingPath;
   debounceTime: number = 150;
-
+  routesEmpty = true;
+  addRoutingPointEvent = new Subject<{
+    point: GeoPoint;
+    name: string;
+  }>();
   constructor(private configService: ConfigService, private http: HttpClient) {}
   getRoute(
     points: GeoPoint[],

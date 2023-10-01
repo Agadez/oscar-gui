@@ -23,6 +23,7 @@ import { PolygonService } from "src/app/services/polygon-service.service";
 import { debounceTime, throttleTime } from "rxjs/operators";
 import { QueryParamsService } from "src/app/services/query-params.service";
 import { Cell } from "src/app/models/cell/cell.model";
+import { debounce } from "lodash";
 
 export const clearItems = new Subject<string>();
 export const radiusSearchTrigger = new Subject<L.LatLng>();
@@ -51,6 +52,7 @@ export class SearchResultViewComponent implements OnInit {
   facetRefinements: FacetRefinements;
   heatmapSliderVisible = false;
   heatMapIntensity = 1;
+  heatMapPixel = 20;
   showGlobal = true;
   showLocal = false;
   showParents = false;
@@ -87,11 +89,13 @@ export class SearchResultViewComponent implements OnInit {
     this.searchService.queryToDraw$.subscribe(async (queryString) => {
       await this.drawQuery(queryString);
     });
-    this.mapService.onMoved$.subscribe((event) => {
+    this.mapService.onMoved$.pipe(debounceTime(100)).subscribe((event) => {
       if (event !== null) {
-        console.log("moved", event);
         this.reDrawSearchMarkers();
       }
+    });
+    this.mapService.onZoom$.subscribe(() => {
+      this.mapService.clearHeatMap();
     });
     this.searchService.clearItems.asObservable().subscribe((value) => {
       if (value) {
@@ -131,7 +135,6 @@ export class SearchResultViewComponent implements OnInit {
       const oscarMin =
         this.oscarItemsService.binaryItemsToOscarMin(binaryItems);
       if (oscarMin.length > 0) {
-        console.log(binaryItems);
         await this.drawQuery(query);
         foundSomething = true;
         break;
@@ -165,14 +168,6 @@ export class SearchResultViewComponent implements OnInit {
           this.itemStoreService.updateItemsFromBinary(binaryItems);
           this.itemCheck(queryString);
           this.gridService.fitMaptoMinItems();
-          // checking for all activated polygons
-          if (this.polygonService.polyClientCalc) {
-            this.polygonService.activatedPolygons.forEach((uuid) => {
-              this.gridService.getPolygonItems(
-                this.polygonService.polygonMapping.get(uuid)
-              );
-            });
-          }
 
           this.reDrawSearchMarkers();
           if (this.sharedQuery) this.sharedQuery = false;
@@ -199,7 +194,6 @@ export class SearchResultViewComponent implements OnInit {
     }
   }
   reDrawSearchMarkers() {
-    console.log("ReDrawing");
     this.mapService.clearSearchMarkers();
     this.mapService.clearHeatMap();
     const bounds = this.mapService.bounds;
@@ -234,6 +228,7 @@ export class SearchResultViewComponent implements OnInit {
         this.currentItems,
         _.sampleSize(this.cells, 100000),
         this.heatMapIntensity,
+        this.heatMapPixel,
         this.gridService.currentGrid?.scale
       );
     }

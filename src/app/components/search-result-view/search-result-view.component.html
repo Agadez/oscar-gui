@@ -10,6 +10,18 @@
   [(value)]="heatMapIntensity"
   (change)="intensityChange()"
 ></mat-slider>
+<mat-slider
+  title="datapoint size"
+  class="pixel-slider"
+  *ngIf="heatmapSliderVisible"
+  vertical
+  thumbLabel
+  min="10"
+  max="100"
+  step="1"
+  [(value)]="heatMapPixel"
+  (change)="intensityChange()"
+></mat-slider>
 <div class="my-chip-list" aria-label="Item Count">
   <app-item-count
     [active]="showGlobal"
