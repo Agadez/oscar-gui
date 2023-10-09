@@ -39,7 +39,7 @@
       ></i>
     </div>
 
-    <button mat-stroked-button (click)="clearList()">Löschen</button>
+    <button mat-stroked-button (click)="clearList()">Clear</button>
   </div>
   <div
     style="margin-top: 5px; width: 95%; text-align: left; margin-left: 3%"
@@ -88,6 +88,6 @@
     style="text-align: center; width: 100%; margin-top: 50px"
     *ngIf="polygonService.polygonMapping.get(uuid).polygonNodes.length === 0"
   >
-    Polygon spannen durch Klicks auf die Karte.
+    Add point to span the polygon.
   </div>
 </div>
