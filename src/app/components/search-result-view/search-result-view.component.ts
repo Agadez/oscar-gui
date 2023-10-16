@@ -67,11 +67,11 @@ export class SearchResultViewComponent implements OnInit {
   @Input()
   routesVisible = false;
   drawing = false;
-  sharedQuery = false;
 
   ngOnInit(): void {
     this.paramsService.setQuery.subscribe((set) => {
-      if (set && this.paramsService.queryString != "") this.sharedQuery = true;
+      if (set && this.paramsService.queryString != "") this.mapService.shared = true;
+      else this.mapService.shared = false;
     });
     this.itemStoreService.items$.subscribe((items) => {
       if (items.length == 0) {
@@ -170,8 +170,6 @@ export class SearchResultViewComponent implements OnInit {
           this.gridService.fitMaptoMinItems();
 
           this.reDrawSearchMarkers();
-          if (this.sharedQuery) this.sharedQuery = false;
-          // else this.mapService.fitBounds(this.gridService.globalGrid.gridBBox);
 
           this.oscarItemsService
             .getParents(queryString, 0)

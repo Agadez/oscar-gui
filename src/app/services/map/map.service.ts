@@ -35,6 +35,10 @@ declare var L;
   providedIn: "root",
 })
 export class MapService {
+  lat: number;
+  lng: number;
+  sharedZoom:number;
+  shared:boolean = false;
   routingMarkers = new Map<string, L.Marker>();
   polygons = new Map<uuidv4, [L.Polygon, L.Marker[]]>();
   maxZoom = 20;
@@ -92,6 +96,12 @@ export class MapService {
   }
   get map() {
     return this._map;
+  }
+  setSharedState(lat,lng,zoom) {
+    this.lat = lat;
+    this.lng = lng;
+    this.sharedZoom = zoom;
+    this.shared = true;
   }
   setMarker(geoPoint: GeoPoint, name: string): L.Marker {
     if (this.routingMarkers.has(name)) {
@@ -214,6 +224,10 @@ export class MapService {
 
     this.heatmap.size = pixel;
     this.heatmap.setData(dataPoints);
+    if(this.shared){
+      this._map.setView([this.lat,this.lng], this.sharedZoom);
+      this.shared = false;
+    }
   }
   drawItemsMarker(items: OscarMinItem[]) {
     const currentItemsIds: number[] = [];
@@ -234,6 +248,7 @@ export class MapService {
             });
           }
         }
+      
         const insideBounding = this.drawGeoJSON(item);
         if (insideBounding) currentItemsIds.push(item.properties.id);
       });

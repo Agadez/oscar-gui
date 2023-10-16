@@ -27,6 +27,7 @@ export class MapComponent implements OnInit {
   lat = 48.43379;
   lng = 9.00203;
   zoom = 7;
+  sharedState :boolean = false;
   data = {
     data: [],
   };
@@ -54,9 +55,12 @@ export class MapComponent implements OnInit {
   ngOnInit() {
     this.queryParams.setMap.subscribe((set) => {
       if (set) {
-        this.lat = this.queryParams.lat;
-        this.lng = this.queryParams.lng;
-        this.zoom = this.queryParams.zoom;
+        this.mapService.setSharedState(this.queryParams.lat,
+          this.queryParams.lng,
+          this.queryParams.zoom)
+        // this.lat = this.queryParams.lat;
+        // this.lng = this.queryParams.lng;
+        // this.zoom = this.queryParams.zoom;
         this.mapService._map.setView(latLng([this.lat, this.lng]), this.zoom);
         this.queryParams.setQuery.next(true);
       }
