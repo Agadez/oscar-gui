@@ -65,6 +65,8 @@ import { GlobalItemListComponent } from "./components/item-lists/global-item-lis
 import { LocalItemListComponent } from "./components/item-lists/local-item-list/local-item-list.component";
 import { PreferenceComponent } from "./components/preference/preference.component";
 import { BlurOnEnterDirective } from "./directives/blur-on-enter.directive";
+import { DialogComponent } from "./components/dialog/dialog.component";
+import { MatDialogModule } from "@angular/material/dialog";
 
 const routes: Routes = [{ path: "**", redirectTo: "", pathMatch: "full" }];
 
@@ -104,8 +106,10 @@ const routes: Routes = [{ path: "**", redirectTo: "", pathMatch: "full" }];
     LocalItemListComponent,
     PreferenceComponent,
     BlurOnEnterDirective,
+    DialogComponent,
   ],
   imports: [
+    MatDialogModule,
     RouterModule.forRoot(routes),
     BrowserModule,
     FormsModule,

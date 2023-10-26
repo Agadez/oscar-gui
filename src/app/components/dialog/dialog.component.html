@@ -1,0 +1,11 @@
+<h1 mat-dialog-title>Maximum of items exceeded</h1>
+<div mat-dialog-content>
+  <p>Your Query returns more items than you declared in the max items preference.</p>
+  <p>Do you want to proceed with {{data.returnedItems}} instead of your maximum of {{data.maxItems}} or abort the inquiry?</p>
+</div>
+<div mat-dialog-actions>
+  <button mat-raised-button
+  color="oscar-gui-primary" (click)="abort()">Abort</button>
+  <button mat-raised-button
+  color="oscar-gui-primary" [mat-dialog-close]="true" cdkFocusInitial>Proceed</button>
+</div>

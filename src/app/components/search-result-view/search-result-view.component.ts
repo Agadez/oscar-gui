@@ -70,7 +70,8 @@ export class SearchResultViewComponent implements OnInit {
 
   ngOnInit(): void {
     this.paramsService.setQuery.subscribe((set) => {
-      if (set && this.paramsService.queryString != "") this.mapService.shared = true;
+      if (set && this.paramsService.queryString != "")
+        this.mapService.shared = true;
       else this.mapService.shared = false;
     });
     this.itemStoreService.items$.subscribe((items) => {
@@ -214,6 +215,7 @@ export class SearchResultViewComponent implements OnInit {
       this.mapService.zoom >= 14
     ) {
       this.heatmapSliderVisible = false;
+      console.log(this.currentItems.length, "length: ");
       this.mapService.drawItemsMarker(this.currentItems);
     } else {
       const currentItemsIds = new Set<number>();

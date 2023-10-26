@@ -37,8 +37,8 @@ declare var L;
 export class MapService {
   lat: number;
   lng: number;
-  sharedZoom:number;
-  shared:boolean = false;
+  sharedZoom: number;
+  shared: boolean = false;
   routingMarkers = new Map<string, L.Marker>();
   polygons = new Map<uuidv4, [L.Polygon, L.Marker[]]>();
   maxZoom = 20;
@@ -97,7 +97,7 @@ export class MapService {
   get map() {
     return this._map;
   }
-  setSharedState(lat,lng,zoom) {
+  setSharedState(lat, lng, zoom) {
     this.lat = lat;
     this.lng = lng;
     this.sharedZoom = zoom;
@@ -204,16 +204,21 @@ export class MapService {
     scale: number
   ) {
     if (cells.length === 0) return;
+    let base = 1.7;
     const dataPoints = [];
     const max = maxBy(cells, "numObjects").numObjects;
-    const mean = Math.round(meanBy(cells, "numObjects"));
+    const mean = meanBy(cells, "numObjects");
+
+    const maxLog = this.getBaseLog(base, max);
+    console.log(maxLog);
     console.log("mean", mean);
     console.log("max", max);
     for (const cell of cells) {
-      const intensityFactor =
-        cell.numObjects / mean < 1
-          ? 0.5 * (cell.numObjects / mean)
-          : 0.5 + (cell.numObjects / max) * 0.5;
+      // const intensityFactor =
+      //   cell.numObjects / mean < 1
+      //     ? 0.5 * (cell.numObjects / mean)
+      //     : 0.5 + (cell.numObjects / max) * 0.5;
+      const intensityFactor = this.getBaseLog(base, cell.numObjects) / maxLog;
       if (cell.numObjects > 0) {
         dataPoints.push([cell.lat, cell.lng, intensity * intensityFactor]);
       }
@@ -224,8 +229,8 @@ export class MapService {
 
     this.heatmap.size = pixel;
     this.heatmap.setData(dataPoints);
-    if(this.shared){
-      this._map.setView([this.lat,this.lng], this.sharedZoom);
+    if (this.shared) {
+      this._map.setView([this.lat, this.lng], this.sharedZoom);
       this.shared = false;
     }
   }
@@ -248,7 +253,7 @@ export class MapService {
             });
           }
         }
-      
+
         const insideBounding = this.drawGeoJSON(item);
         if (insideBounding) currentItemsIds.push(item.properties.id);
       });
@@ -303,6 +308,7 @@ export class MapService {
       },
       style: { color: "blue", stroke: true, fill: false, opacity: 0.7 },
     });
+
     if (this.bounds.intersects(shape.getBounds())) {
       shape.addTo(this.searchMarkerLayer);
       return true;
@@ -377,5 +383,8 @@ export class MapService {
   }
   get ready() {
     return this._mapReady.value;
+  }
+  getBaseLog(x, y) {
+    return Math.log(y) / Math.log(x);
   }
 }

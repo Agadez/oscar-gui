@@ -134,10 +134,11 @@ export class SearchComponent implements OnInit {
     this.searchService.addRoute();
     let fullQueryString = "";
     if (this.polygonService.polyClientCalc) {
-      fullQueryString = this.searchService.createQueryString(
-        this.inputString,
-        true
-      );
+      this.searchService.itemsOfPolygon(this.inputString);
+      // fullQueryString = this.searchService.createQueryString(
+      //   this.inputString,
+      //   true
+      // );
     } else {
       fullQueryString = this.searchService.createQueryString(
         this.inputString,
@@ -177,10 +178,15 @@ export class SearchComponent implements OnInit {
         } else {
           this.oscarItemService
             .getApxItemCount(fullQueryString)
-            .subscribe((apxStats) => {
-              if (!this.searchService.getItems(apxStats)) {
-                this.error = true;
-                this.loading = false;
+            .subscribe(async (apxStats) => {
+              try {
+                const result = await this.searchService.getItems(apxStats);
+                if (!result) {
+                  this.error = true;
+                  this.loading = false;
+                }
+              } catch (error) {
+                console.log(error);
               }
             });
         }

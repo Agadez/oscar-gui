@@ -12,7 +12,8 @@ import { RoutingService, RoutingType } from "../routing/routing.service";
 import { OscarApxstats } from "src/app/models/oscar/oscar-apxstats";
 import { GridService } from "../data/grid.service";
 import { ItemStoreService } from "../data/item-store.service";
-
+import { MatDialog } from "@angular/material/dialog";
+import { DialogComponent } from "src/app/components/dialog/dialog.component";
 @Injectable({
   providedIn: "root",
 })
@@ -25,7 +26,8 @@ export class SearchService {
     private routingDataStoreService: RoutingDataStoreService,
     private routingService: RoutingService,
     private gridService: GridService,
-    private store: ItemStoreService
+    private store: ItemStoreService,
+    public dialog: MatDialog
   ) {
     this.subscribeRefinements();
   }
@@ -120,10 +122,32 @@ export class SearchService {
       this.startSearch.next("start");
     });
   }
+
+  itemsOfPolygon(inputString: string) {
+    const polygonMapping = this.polygonService.polygonMapping;
+    const nameMapping = this.polygonService.idUuidMap;
+    this.polygonService.activatedPolygons = new Map();
+    let activatedPolygons = this.polygonService.activatedPolygons;
+    let newQueryString = "";
+    newQueryString = inputString.replace(
+      /\$polygon:(\w+)/,
+      function (_, p1, p2) {
+        console.log(_);
+        console.log(p1);
+        console.log(p2);
+        const uuid = nameMapping.get(p2);
+        activatedPolygons.set(uuid, "");
+        newQueryString = p1 + polygonMapping.get(uuid).boundingBoxString;
+        console.log(newQueryString);
+        console.log(p1);
+        return newQueryString;
+      }
+    );
+  }
   mapPolygonName(inputString: string, clientRenderingMode: boolean) {
     const polygonMapping = this.polygonService.polygonMapping;
     const nameMapping = this.polygonService.idUuidMap;
-    this.polygonService.activatedPolygons = new Set();
+    this.polygonService.activatedPolygons = new Map();
     let activatedPolygons = this.polygonService.activatedPolygons;
     let newQueryString = "";
     if (clientRenderingMode) {
@@ -131,8 +155,9 @@ export class SearchService {
         /\$polygon:(\w+)/g,
         function (_, p1) {
           const uuid = nameMapping.get(p1);
-          activatedPolygons.add(uuid);
+          activatedPolygons.set(uuid, "");
           return polygonMapping.get(uuid).boundingBoxString;
+          // return polygonMapping.get(uuid).polygonQuery;
         }
       );
     } else {
@@ -140,7 +165,7 @@ export class SearchService {
         /\$polygon:(\w+)/g,
         function (_, p1) {
           const uuid = nameMapping.get(p1);
-          activatedPolygons.add(uuid);
+          activatedPolygons.set(uuid, "");
           return polygonMapping.get(uuid).polygonQuery;
         }
       );
@@ -164,6 +189,7 @@ export class SearchService {
       this.parentAppendix +
       this.keyValueAppendix +
       routeString;
+    console.log(this.fullQueryString, routeString);
     return this.fullQueryString;
   }
   searchForRegions(inputString: string, regions: OscarItem[]) {
@@ -192,14 +218,27 @@ export class SearchService {
   rerender() {
     this.queryToDraw.next(this.fullQueryString);
   }
-  getItems(apxStats: OscarApxstats): boolean {
+  getItems(apxStats: OscarApxstats): Promise<boolean> {
     this.displayRegion.next(null);
     this.mapService.clearRegions();
-    if (apxStats.items < this.maxItems) {
-      this.queryToDraw.next(this.fullQueryString);
-      return true;
-    }
-    return false;
+    return new Promise<boolean>((resolve) => {
+      if (apxStats.items <= this.maxItems) {
+        this.queryToDraw.next(this.fullQueryString);
+        resolve(true);
+      }
+      if (apxStats.items > this.maxItems) {
+        const dialogRef = this.dialog.open(DialogComponent, {
+          width: "500px",
+          data: { maxItems: this.maxItems, returnedItems: apxStats.items },
+        });
+        dialogRef.afterClosed().subscribe((result) => {
+          if (result) {
+            this.queryToDraw.next(this.fullQueryString);
+            resolve(true);
+          } else resolve(false);
+        });
+      }
+    });
   }
   getRouteQueryString(inputString) {
     let newQueryString = inputString.replace(/\$route:(\w+)/g, (_, id) => {

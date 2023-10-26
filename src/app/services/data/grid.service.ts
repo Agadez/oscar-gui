@@ -29,22 +29,24 @@ export class GridService {
    * Build the grid
    */
   fitMaptoMinItems() {
+    if (this.polygonService.polyClientCalc) {
+      this.buildGrid();
+      this.polygonService.activatedPolygons.forEach((uuid) => {
+        this.getPolygonItems(this.polygonService.polygonMapping.get(uuid));
+      });
+    } else {
+      this.mapService._map.once("moveend", (event) => {
+        this.buildGrid();
+      });
+    }
+    const bBox = this.getBoundingBox();
+    if (bBox != null) this.mapService.fitBounds(bBox);
+  }
+  getBoundingBox(): L.LatLngBounds {
     let minLat = Infinity;
     let maxLat = -Infinity;
     let minLng = Infinity;
     let maxLng = -Infinity;
-
-    // problematic
-    this.mapService._map.once("moveend", (event) => {
-      this.buildGrid();
-      // checking for all activated polygons
-      if (this.polygonService.polyClientCalc) {
-        this.polygonService.activatedPolygons.forEach((uuid) => {
-          this.getPolygonItems(this.polygonService.polygonMapping.get(uuid));
-        });
-      }
-    });
-
     for (const item of this.itemStoreService.items) {
       if (item.lat - item.boundingRadius < minLat)
         minLat = item.lat - item.boundingRadius;
@@ -64,13 +66,12 @@ export class GridService {
       maxLat !== -Infinity &&
       maxLng !== -Infinity
     ) {
-      let gridBBox = new L.latLngBounds(
+      return new L.latLngBounds(
         L.latLng(minLat, minLng),
         L.latLng(maxLat, maxLng)
       );
-      console.log(gridBBox);
-      this.mapService.fitBounds(gridBBox);
     }
+    return null;
   }
 
   buildGrid() {

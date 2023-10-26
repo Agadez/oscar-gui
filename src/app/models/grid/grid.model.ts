@@ -232,11 +232,13 @@ export class Grid {
     const currentCells: Cell[] = [];
     const currentMinItems: OscarMinItem[] = [];
 
+    console.log(this.currentMinXPos, this.currentMaxXPos);
     for (let i = this.currentMinXPos + 1; i < this.currentMaxXPos; i++) {
       for (let j = this.currentMinYPos + 1; j < this.currentMaxYPos; j++) {
         let lats = [];
         let lngs = [];
         for (const item of this.grid[i][j]) {
+          Cell;
           lats.push(item.lat);
           lngs.push(item.lng);
           currentMinItems.push(item);
@@ -271,6 +273,7 @@ export class Grid {
         //     lats.length
         //   )
         // );
+        currentCells.push();
         currentCells.push(new Cell(mean(lats), mean(lngs), lats.length));
       }
 
