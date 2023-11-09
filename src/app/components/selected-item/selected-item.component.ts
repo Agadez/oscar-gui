@@ -26,6 +26,7 @@ export class SelectedItemComponent implements OnInit {
   item?: OscarItem;
   ngOnInit(): void {}
   close() {
+    this.item = null;
     this.selectedItemService.subject.next(null);
   }
   addToRoute() {
