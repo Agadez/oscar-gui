@@ -117,7 +117,7 @@ export class SearchService {
             refinement.excluding === true
         )
         .forEach((refinement) => {
-          this.parentAppendix += `-"${refinement}" `;
+          this.parentAppendix += `-"${refinement.value}" `;
         });
       this.startSearch.next("start");
     });
@@ -184,12 +184,10 @@ export class SearchService {
       this.keyPrependix +
       this.keyValuePrependix +
       this.parentPrependix +
-      // polygonString +
+      routeString +
       this.keyAppendix +
       this.parentAppendix +
-      this.keyValueAppendix +
-      routeString;
-    console.log(this.fullQueryString, routeString);
+      this.keyValueAppendix;
     return this.fullQueryString;
   }
   searchForRegions(inputString: string, regions: OscarItem[]) {
