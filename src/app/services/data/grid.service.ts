@@ -104,14 +104,16 @@ export class GridService {
     if (!this.globalGrid) return { items: [], cells: [] };
     this.mapService.clearHeatMap();
     this.globalGrid.updateCurrentBBox(south, west, north, east);
-    if (zoom != this.globalGrid.zoom) {
+    if (zoom >= this.globalGrid.zoom) {
+      if (!this.currentGrid.boundsInside(south, west, north, east)) {
+        this.currentGrid = this.globalGrid;
+      }
       this.localGrid = new Grid(
-        this.globalGrid.getCurrentItems().items,
+        this.currentGrid.getCurrentItems().items,
         this.mapService._map
       );
       this.localGrid.buildProjectedGrid();
       this.currentGrid = this.localGrid;
-      return this.localGrid.getCurrentItems();
     } else this.currentGrid = this.globalGrid;
     return this.currentGrid.getCurrentItems();
   }
