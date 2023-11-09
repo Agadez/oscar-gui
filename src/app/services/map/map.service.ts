@@ -2,7 +2,7 @@ import { Injectable, NgZone } from "@angular/core";
 import { ItemStoreService } from "../data/item-store.service";
 import { OscarMinItem } from "../../models/oscar/oscar-min-item";
 import { GeoPoint } from "../../models/geo-point";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, forkJoin } from "rxjs";
 import "../../../../node_modules/leaflet-webgl-heatmap/src/webgl-heatmap/webgl-heatmap";
 import { v4 as uuidv4 } from "uuid";
 import { PolygonNode } from "src/app/models/polygon/polygon-node.model";
@@ -43,7 +43,7 @@ export class MapService {
   polygons = new Map<uuidv4, [L.Polygon, L.Marker[]]>();
   maxZoom = 20;
   heatmap = new L.webGLHeatmap({
-    size: 20,
+    size: 10,
     units: "px",
     alphaRange: 1,
   });
@@ -204,29 +204,20 @@ export class MapService {
     scale: number
   ) {
     if (cells.length === 0) return;
-    let base = 1.7;
+    let base = 1.2;
     const dataPoints = [];
     const max = maxBy(cells, "numObjects").numObjects;
-    const mean = meanBy(cells, "numObjects");
-
     const maxLog = this.getBaseLog(base, max);
-    console.log(maxLog);
-    console.log("mean", mean);
-    console.log("max", max);
     for (const cell of cells) {
-      // const intensityFactor =
-      //   cell.numObjects / mean < 1
-      //     ? 0.5 * (cell.numObjects / mean)
-      //     : 0.5 + (cell.numObjects / max) * 0.5;
-      const intensityFactor = this.getBaseLog(base, cell.numObjects) / maxLog;
+      let logValue =
+        this.getBaseLog(base, cell.numObjects) < 1
+          ? 1
+          : this.getBaseLog(base, cell.numObjects);
+      const intensityFactor = 0.2 + 0.8 * (logValue / maxLog);
       if (cell.numObjects > 0) {
         dataPoints.push([cell.lat, cell.lng, intensity * intensityFactor]);
       }
     }
-    // for (const item of items) {
-    //   dataPoints.push([item.lat, item.lng, intensity]);
-    // }
-
     this.heatmap.size = pixel;
     this.heatmap.setData(dataPoints);
     if (this.shared) {
@@ -234,11 +225,28 @@ export class MapService {
       this.shared = false;
     }
   }
+  chunkItems(items: OscarMinItem[], chunkSize: number): OscarMinItem[][] {
+    const chunks = [];
+    for (let i = 0; i < items.length; i += chunkSize) {
+      const chunk = items.slice(i, i + chunkSize);
+      chunks.push(chunk);
+    }
+    return chunks;
+  }
   drawItemsMarker(items: OscarMinItem[]) {
     const currentItemsIds: number[] = [];
+    const chunks = this.chunkItems(items, 2000);
+    const observables = [];
+    for (const chunk of chunks) {
+      const obs = this.oscarItemsService.getMultipleItems(chunk);
+      observables.push(obs);
+    }
     this.searchMarkerLayer.clearLayers();
-    this.oscarItemsService.getMultipleItems(items).subscribe((data) => {
-      const itemFeatures = data.features;
+    forkJoin(observables).subscribe((dataArray: any) => {
+      let itemFeatures = [];
+      dataArray.forEach((data) => {
+        itemFeatures = [...itemFeatures, ...data.features];
+      });
       // draw markers
       itemFeatures.forEach((item) => {
         if (item.geometry.type === "LineString") {
@@ -384,7 +392,7 @@ export class MapService {
   get ready() {
     return this._mapReady.value;
   }
-  getBaseLog(x, y) {
-    return Math.log(y) / Math.log(x);
+  getBaseLog(base, value) {
+    return Math.log(value) / Math.log(base);
   }
 }
