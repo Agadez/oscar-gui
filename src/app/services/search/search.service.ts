@@ -249,7 +249,7 @@ export class SearchService {
       routeString += ")";
       return routeString;
     });
-    return newQueryString;
+    return newQueryString + " ";
   }
   queryStringForLocalSearch(inputString: string, clientRenderingMode: boolean) {
     this.createQueryString(inputString, clientRenderingMode);

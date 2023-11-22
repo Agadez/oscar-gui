@@ -212,7 +212,6 @@ export class SearchResultViewComponent implements OnInit {
       this.current = current;
       this.progress += 25;
     });
-    console.log(this.current.ids.length);
     if (
       (this.current.ids.length < this.searchService.markerThreshold ||
         this.mapService.zoom === this.mapService.maxZoom) &&

@@ -67,6 +67,12 @@ export class OscarItemsService {
     return this.http.get<OscarItem[]>(queryString);
   }
   getParents(query: string, queryId: number): Observable<ParentRefinements> {
+    console.log(
+      this.configService.getOscarUrl() +
+        `/oscar/kvclustering/get?queryId=${queryId}&q=${encodeURIComponent(
+          query
+        )}+&rf=admin_level&type=p&maxRefinements=20`
+    );
     return this.http.get<ParentRefinements>(
       this.configService.getOscarUrl() +
         `/oscar/kvclustering/get?queryId=${queryId}&q=${encodeURIComponent(
@@ -75,6 +81,12 @@ export class OscarItemsService {
     );
   }
   getFacets(query: string, queryId: number): Observable<FacetRefinements> {
+    console.log(
+      this.configService.getOscarUrl() +
+        `/oscar/kvclustering/get?queryId=${queryId}&q=${encodeURIComponent(
+          query
+        )}+&rf=admin_level&type=f&maxRefinements=20&exceptions=%5B%5D&debug=true&keyExceptions=%5B%22wheelchair%22%2C+%22addr%22%2C+%22level%22%2C+%22toilets%3Awheelchair%22%2C+%22building%22%2C+%22source%22%2C+%22roof%22%5D&facetSizes=%5B%5D&defaultFacetSize=10`
+    );
     return this.http.get<FacetRefinements>(
       this.configService.getOscarUrl() +
         `/oscar/kvclustering/get?queryId=${queryId}&q=${encodeURIComponent(
@@ -82,11 +94,9 @@ export class OscarItemsService {
         )}+&rf=admin_level&type=f&maxRefinements=20&exceptions=%5B%5D&debug=true&keyExceptions=%5B%22wheelchair%22%2C+%22addr%22%2C+%22level%22%2C+%22toilets%3Awheelchair%22%2C+%22building%22%2C+%22source%22%2C+%22roof%22%5D&facetSizes=%5B%5D&defaultFacetSize=10`
     );
   }
-  getMultipleItems(items: OscarMinItem[]): any {
-    const ids = new Array<number>();
-    items.forEach((item) => ids.push(item.id));
+  getMultipleItems(itemIds: number[]): any {
     const formdata = new FormData();
-    formdata.append("which", JSON.stringify(ids));
+    formdata.append("which", JSON.stringify(itemIds));
     formdata.append("format", "geojson");
     formdata.append("shape", "true");
     const queryString =

@@ -6,6 +6,7 @@ export class ParentRefinements {
 
 export class Parent {
   name: string;
+  itemCount: number;
 }
 
 export class FacetRefinements {

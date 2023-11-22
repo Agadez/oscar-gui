@@ -119,7 +119,6 @@ export class Grid {
     this.helperArray[this.gridX * this.gridY] = offset;
     this.grid = [];
     this.items = [];
-    console.log(this.maxBoundingRadius);
     // const bounds = this.itemsWithRadius(item);
     // for (let xPos = bounds.minXPos; xPos <= bounds.maxXPos; xPos++) {
     //   for (let yPos = bounds.minYPos; yPos <= bounds.maxYPos; yPos++) {
@@ -421,7 +420,6 @@ export class Grid {
   }
 
   getVisualization() {
-    console.log("jojo");
     const currentCells: Cell[] = [];
     // improvement with only index?
     // const currentMinItems: OscarMinItem[] = [];
@@ -542,7 +540,6 @@ export class Grid {
         }
       }
     }
-    console.log(currentOscarIDs.length);
     return { ids: currentOscarIDs, cells: currentCells };
   }
 

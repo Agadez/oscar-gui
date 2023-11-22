@@ -206,13 +206,10 @@ export class MapService {
     let base = 1.7;
     const dataPoints = [];
     const max = maxBy(cells, "numObjects").numObjects;
-    const maxLog = this.getBaseLog(base, max);
+    const maxLog = Math.max(1, this.getBaseLog(base, max));
     for (const cell of cells) {
-      let logValue =
-        this.getBaseLog(base, cell.numObjects) < 1
-          ? 1
-          : this.getBaseLog(base, cell.numObjects);
-      const intensityFactor = 0.2 + 0.8 * ((logValue - 1) / (maxLog - 1));
+      let logValue = Math.max(1, this.getBaseLog(base, cell.numObjects));
+      const intensityFactor = 0.2 + 0.8 * (logValue / maxLog);
       if (cell.numObjects > 0) {
         dataPoints.push([cell.lat, cell.lng, intensity * intensityFactor]);
       }
