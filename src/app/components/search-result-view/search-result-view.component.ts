@@ -58,7 +58,11 @@ export class SearchResultViewComponent implements OnInit {
   showParents = false;
   showFacets = false;
   progress = 0;
-  currentItems: OscarMinItem[] = [];
+  current: {
+    ids: number[];
+    cells: Cell[];
+  };
+  // currentItems: OscarMinItem[] = [];
   cells: Cell[] = [];
   @Output()
   searchLoading = new EventEmitter<boolean>();
@@ -78,13 +82,14 @@ export class SearchResultViewComponent implements OnInit {
       if (items.length == 0) {
         this.hideCounts = true;
       } else {
+        this.gridService.fitMaptoMinItems(items);
         this.hideCounts = false;
         this.zone.run(() => (this.globalCounts = items.length));
       }
     });
     this.itemStoreService.currentItemsIds$.subscribe((currentItemsIds) => {
       this.zone.run(() => {
-        this.localCounts = currentItemsIds.size;
+        this.localCounts = currentItemsIds.length;
       });
     });
     this.searchService.queryToDraw$.subscribe(async (queryString) => {
@@ -147,15 +152,15 @@ export class SearchResultViewComponent implements OnInit {
       });
     }
   }
-  itemCheck(queryString: string) {
-    if (this.itemStoreService.items.length === 0 && queryString !== "() ") {
-      this.noResult.emit(true);
-      this.searchLoading.emit(false);
-      return;
-    }
-    this.noResult.emit(false);
-    this.searchLoading.emit(false);
-  }
+  // itemCheck(queryString: string) {
+  //   if (this.itemStoreService.items.length === 0 && queryString !== "() ") {
+  //     this.noResult.emit(true);
+  //     this.searchLoading.emit(false);
+  //     return;
+  //   }
+  //   this.noResult.emit(false);
+  //   this.searchLoading.emit(false);
+  // }
   async drawQuery(queryString: string) {
     if (queryString) {
       this.noResult.emit(false);
@@ -167,8 +172,7 @@ export class SearchResultViewComponent implements OnInit {
       this.oscarItemsService.getItemsBinary(queryString).subscribe(
         (binaryItems) => {
           this.itemStoreService.updateItemsFromBinary(binaryItems);
-          this.itemCheck(queryString);
-          this.gridService.fitMaptoMinItems();
+          // this.itemCheck(queryString);
 
           this.reDrawSearchMarkers();
 
@@ -204,29 +208,23 @@ export class SearchResultViewComponent implements OnInit {
         bounds.getEast(),
         this.mapService.zoom
       );
-      this.currentItems = Array.from(new Set(current.items));
-      this.cells = current.cells;
+      this.itemStoreService.currentItemsIds = current.ids;
+      this.current = current;
       this.progress += 25;
     });
-
+    console.log(this.current.ids.length);
     if (
-      (this.currentItems.length < this.searchService.markerThreshold ||
+      (this.current.ids.length < this.searchService.markerThreshold ||
         this.mapService.zoom === this.mapService.maxZoom) &&
       this.mapService.zoom >= 14
     ) {
       this.heatmapSliderVisible = false;
-      console.log(this.currentItems.length, "length: ");
-      this.mapService.drawItemsMarker(this.currentItems);
+      this.mapService.drawItemsMarker(this.current.ids);
     } else {
-      const currentItemsIds = new Set<number>();
-      this.currentItems.forEach((item) => {
-        currentItemsIds.add(item.id);
-      });
       this.heatmapSliderVisible = true;
-      this.itemStoreService.currentItemsIds = currentItemsIds;
+
       this.mapService.drawItemsHeatmap(
-        this.currentItems,
-        _.sampleSize(this.cells, 100000),
+        _.sampleSize(this.current.cells, 100000),
         this.heatMapIntensity,
         this.heatMapPixel,
         this.gridService.currentGrid?.scale
@@ -270,7 +268,6 @@ export class SearchResultViewComponent implements OnInit {
   clearItems() {
     this.mapService.clearAllLayers();
     this.gridService.deleteGrid();
-    this.currentItems = [];
     this.parentRefinements = null;
     this.facetRefinements = null;
   }

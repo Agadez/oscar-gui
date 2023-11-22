@@ -49,6 +49,7 @@ export class Grid {
 
   scale: number = 10;
 
+  maxBoundingRadius = 0;
   constructor(items: OscarMinItem[], map: LeafletMap) {
     this.items = items;
     this.map = map;
@@ -65,10 +66,20 @@ export class Grid {
     this.lats[itemIndex] = item.lat;
     this.lngs[itemIndex] = item.lng;
     this.boundingRadius[itemIndex] = item.boundingRadius;
+    if (item.boundingRadius > this.maxBoundingRadius)
+      this.maxBoundingRadius = item.boundingRadius;
   }
   buildProjectedGrid() {
     let size = this.map.getSize();
     this.zoom = this.map.getZoom();
+
+    //temporary
+    let bounds = this.map.getBounds();
+    this.currentMinLat = bounds.getNorth();
+    this.currentMaxLat = bounds.getSouth();
+    this.currentMinLng = bounds.getWest();
+    this.currentMaxLng = bounds.getEast();
+
     this.viewBound = this.map.getPixelBounds();
     this.viewBound.min.x = Math.round(this.viewBound.min.x);
     this.viewBound.min.y = Math.round(this.viewBound.min.y);
@@ -108,6 +119,7 @@ export class Grid {
     this.helperArray[this.gridX * this.gridY] = offset;
     this.grid = [];
     this.items = [];
+    console.log(this.maxBoundingRadius);
     // const bounds = this.itemsWithRadius(item);
     // for (let xPos = bounds.minXPos; xPos <= bounds.maxXPos; xPos++) {
     //   for (let yPos = bounds.minYPos; yPos <= bounds.maxYPos; yPos++) {
@@ -226,10 +238,18 @@ export class Grid {
       L.latLng(south, east),
       this.zoom
     );
-    this.currentMinXPos = this.getXPositionInGrid(northWest.x);
-    this.currentMinYPos = this.getYPositionInGrid(northWest.y);
-    this.currentMaxXPos = this.getXPositionInGrid(southEast.x);
-    this.currentMaxYPos = this.getYPositionInGrid(southEast.y);
+    this.currentMinXPos = this.getXPositionInGrid(
+      Math.floor(northWest.x - this.maxBoundingRadius)
+    );
+    this.currentMinYPos = this.getYPositionInGrid(
+      Math.floor(northWest.y - this.maxBoundingRadius)
+    );
+    this.currentMaxXPos = this.getXPositionInGrid(
+      Math.ceil(southEast.x + this.maxBoundingRadius)
+    );
+    this.currentMaxYPos = this.getYPositionInGrid(
+      Math.ceil(southEast.y + this.maxBoundingRadius)
+    );
     this.adjustPositions();
   }
   adjustPositions() {
@@ -288,19 +308,124 @@ export class Grid {
   }
 
   getCurrentItems() {
-    const currentCells: Cell[] = [];
-    console.log(
-      this.currentMinXPos,
-      this.currentMaxXPos,
-      this.currentMinYPos,
-      this.currentMaxYPos,
-      this.currentMinLat,
-      this.currentMaxLat,
-      this.currentMinLng,
-      this.currentMaxLng
-    );
-    // improvement with only index?
     const currentMinItems: OscarMinItem[] = [];
+    for (let i = this.currentMinXPos + 1; i < this.currentMaxXPos; i++) {
+      for (let j = this.currentMinYPos + 1; j < this.currentMaxYPos; j++) {
+        let firstItemIndex = this.helperArray[j * this.gridX + i];
+        let offset = this.helperArray[j * this.gridX + i + 1] - firstItemIndex;
+        for (let k = 0; k < offset; k++) {
+          let itemIndex = firstItemIndex + k;
+          currentMinItems.push(
+            new OscarMinItem(
+              this.ids[itemIndex],
+              this.lngs[itemIndex],
+              this.lats[itemIndex],
+              this.boundingRadius[itemIndex]
+            )
+          );
+        }
+      }
+    }
+    for (let j = this.currentMinYPos; j <= this.currentMaxYPos; j++) {
+      let firstItemIndex =
+        this.helperArray[j * this.gridX + this.currentMinXPos];
+      let offset =
+        this.helperArray[j * this.gridX + this.currentMinXPos + 1] -
+        firstItemIndex;
+      for (let k = 0; k < offset; k++) {
+        let itemIndex = firstItemIndex + k;
+        let lat = this.lats[itemIndex];
+        let lng = this.lngs[itemIndex];
+        if (this.itemInside(lat, lng, this.boundingRadius[itemIndex])) {
+          currentMinItems.push(
+            new OscarMinItem(
+              this.ids[itemIndex],
+              this.lngs[itemIndex],
+              this.lats[itemIndex],
+              this.boundingRadius[itemIndex]
+            )
+          );
+        }
+      }
+
+      if (this.currentMinXPos !== this.currentMaxXPos) {
+        let firstItemIndex =
+          this.helperArray[j * this.gridX + this.currentMaxXPos];
+        let offset =
+          this.helperArray[j * this.gridX + this.currentMaxXPos + 1] -
+          firstItemIndex;
+        for (let k = 0; k < offset; k++) {
+          let itemIndex = firstItemIndex + k;
+          let lat = this.lats[itemIndex];
+          let lng = this.lngs[itemIndex];
+          if (this.itemInside(lat, lng, this.boundingRadius[itemIndex])) {
+            currentMinItems.push(
+              new OscarMinItem(
+                this.ids[itemIndex],
+                this.lngs[itemIndex],
+                this.lats[itemIndex],
+                this.boundingRadius[itemIndex]
+              )
+            );
+          }
+        }
+      }
+    }
+    for (let i = this.currentMinXPos; i <= this.currentMaxXPos; i++) {
+      let firstItemIndex =
+        this.helperArray[this.currentMinYPos * this.gridX + i];
+      let offset =
+        this.helperArray[this.currentMinYPos * this.gridX + i + 1] -
+        firstItemIndex;
+      for (let k = 0; k < offset; k++) {
+        let itemIndex = firstItemIndex + k;
+        let lat = this.lats[itemIndex];
+        let lng = this.lngs[itemIndex];
+        if (this.itemInside(lat, lng, this.boundingRadius[itemIndex])) {
+          currentMinItems.push(
+            new OscarMinItem(
+              this.ids[itemIndex],
+              this.lngs[itemIndex],
+              this.lats[itemIndex],
+              this.boundingRadius[itemIndex]
+            )
+          );
+        }
+      }
+
+      if (this.currentMinYPos !== this.currentMaxYPos) {
+        let firstItemIndex =
+          this.helperArray[this.currentMaxYPos * this.gridX + i];
+        let offset =
+          this.helperArray[this.currentMaxYPos * this.gridX + i + 1] -
+          firstItemIndex;
+        for (let k = 0; k < offset; k++) {
+          let itemIndex = firstItemIndex + k;
+          let lat = this.lats[itemIndex];
+          let lng = this.lngs[itemIndex];
+          if (this.itemInside(lat, lng, this.boundingRadius[itemIndex])) {
+            currentMinItems.push(
+              new OscarMinItem(
+                this.ids[itemIndex],
+                this.lngs[itemIndex],
+                this.lats[itemIndex],
+                this.boundingRadius[itemIndex]
+              )
+            );
+          }
+        }
+      }
+    }
+
+    return currentMinItems;
+  }
+
+  getVisualization() {
+    console.log("jojo");
+    const currentCells: Cell[] = [];
+    // improvement with only index?
+    // const currentMinItems: OscarMinItem[] = [];
+    const currentOscarIDs: number[] = [];
 
     for (let i = this.currentMinXPos + 1; i < this.currentMaxXPos; i++) {
       for (let j = this.currentMinYPos + 1; j < this.currentMaxYPos; j++) {
@@ -312,14 +437,15 @@ export class Grid {
           let itemIndex = firstItemIndex + k;
           lats.push(this.lats[itemIndex]);
           lngs.push(this.lngs[itemIndex]);
-          currentMinItems.push(
-            new OscarMinItem(
-              this.ids[itemIndex],
-              this.lngs[itemIndex],
-              this.lats[itemIndex],
-              this.boundingRadius[itemIndex]
-            )
-          );
+          currentOscarIDs.push(this.ids[itemIndex]);
+          // currentMinItems.push(
+          //   new OscarMinItem(
+          //     this.ids[itemIndex],
+          //     this.lngs[itemIndex],
+          //     this.lats[itemIndex],
+          //     this.boundingRadius[itemIndex]
+          //   )
+          // );
         }
         if (lats.length !== 0) {
           currentCells.push(new Cell(mean(lats), mean(lngs), lats.length));
@@ -341,14 +467,7 @@ export class Grid {
         if (this.itemInside(lat, lng, this.boundingRadius[itemIndex])) {
           lats.push(lat);
           lngs.push(lng);
-          currentMinItems.push(
-            new OscarMinItem(
-              this.ids[itemIndex],
-              this.lngs[itemIndex],
-              this.lats[itemIndex],
-              this.boundingRadius[itemIndex]
-            )
-          );
+          currentOscarIDs.push(this.ids[itemIndex]);
         }
       }
       if (lats.length !== 0) {
@@ -370,14 +489,7 @@ export class Grid {
           if (this.itemInside(lat, lng, this.boundingRadius[itemIndex])) {
             lats.push(lat);
             lngs.push(lng);
-            currentMinItems.push(
-              new OscarMinItem(
-                this.ids[itemIndex],
-                this.lngs[itemIndex],
-                this.lats[itemIndex],
-                this.boundingRadius[itemIndex]
-              )
-            );
+            currentOscarIDs.push(this.ids[itemIndex]);
           }
         }
         if (lats.length !== 0) {
@@ -400,14 +512,7 @@ export class Grid {
         if (this.itemInside(lat, lng, this.boundingRadius[itemIndex])) {
           lats.push(lat);
           lngs.push(lng);
-          currentMinItems.push(
-            new OscarMinItem(
-              this.ids[itemIndex],
-              this.lngs[itemIndex],
-              this.lats[itemIndex],
-              this.boundingRadius[itemIndex]
-            )
-          );
+          currentOscarIDs.push(this.ids[itemIndex]);
         }
       }
       if (lats.length !== 0) {
@@ -429,14 +534,7 @@ export class Grid {
           if (this.itemInside(lat, lng, this.boundingRadius[itemIndex])) {
             lats.push(lat);
             lngs.push(lng);
-            currentMinItems.push(
-              new OscarMinItem(
-                this.ids[itemIndex],
-                this.lngs[itemIndex],
-                this.lats[itemIndex],
-                this.boundingRadius[itemIndex]
-              )
-            );
+            currentOscarIDs.push(this.ids[itemIndex]);
           }
         }
         if (lats.length !== 0) {
@@ -444,20 +542,20 @@ export class Grid {
         }
       }
     }
-    console.log(currentMinItems.length);
-    return { items: currentMinItems, cells: currentCells };
+    console.log(currentOscarIDs.length);
+    return { ids: currentOscarIDs, cells: currentCells };
   }
+
   itemInside(lat: number, lng: number, boundingRadius: number) {
     if (
-      lat - boundingRadius <= this.currentMaxLat &&
-      lat + boundingRadius >= this.currentMinLat &&
-      lng - boundingRadius <= this.currentMaxLng &&
+      lat - boundingRadius <= this.currentMaxLat ||
+      lat + boundingRadius >= this.currentMinLat ||
+      lng - boundingRadius <= this.currentMaxLng ||
       lng + boundingRadius >= this.currentMinLng
     ) {
       return true;
     }
-
-    return true;
+    return false;
   }
   checkInside(polygon: Polygon) {
     var polygonCoordinates: Point[] = [];

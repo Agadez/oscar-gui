@@ -20,7 +20,7 @@ export class LocalItemListComponent implements OnInit {
 
   fetchCount = 20;
   listedItems: OscarItem[] = [];
-  currentItems: Set<number> = new Set();
+  currentItems: number[] = [];
   detail = false;
   detailItem: OscarItem;
   markerId = "Selected Item";

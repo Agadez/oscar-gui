@@ -197,14 +197,13 @@ export class MapService {
     this.route.setLatLngs(latLngs);
   }
   drawItemsHeatmap(
-    items: OscarMinItem[],
     cells: Cell[],
     intensity: number,
     pixel: number,
     scale: number
   ) {
     if (cells.length === 0) return;
-    let base = 1.2;
+    let base = 1.7;
     const dataPoints = [];
     const max = maxBy(cells, "numObjects").numObjects;
     const maxLog = this.getBaseLog(base, max);
@@ -213,7 +212,7 @@ export class MapService {
         this.getBaseLog(base, cell.numObjects) < 1
           ? 1
           : this.getBaseLog(base, cell.numObjects);
-      const intensityFactor = 0.2 + 0.8 * (logValue / maxLog);
+      const intensityFactor = 0.2 + 0.8 * ((logValue - 1) / (maxLog - 1));
       if (cell.numObjects > 0) {
         dataPoints.push([cell.lat, cell.lng, intensity * intensityFactor]);
       }
@@ -225,7 +224,7 @@ export class MapService {
       this.shared = false;
     }
   }
-  chunkItems(items: OscarMinItem[], chunkSize: number): OscarMinItem[][] {
+  chunkItems(items: number[], chunkSize: number): number[][] {
     const chunks = [];
     for (let i = 0; i < items.length; i += chunkSize) {
       const chunk = items.slice(i, i + chunkSize);
@@ -233,9 +232,9 @@ export class MapService {
     }
     return chunks;
   }
-  drawItemsMarker(items: OscarMinItem[]) {
+  drawItemsMarker(itemIds: number[]) {
     const currentItemsIds: number[] = [];
-    const chunks = this.chunkItems(items, 2000);
+    const chunks = this.chunkItems(itemIds, 2000);
     const observables = [];
     for (const chunk of chunks) {
       const obs = this.oscarItemsService.getMultipleItems(chunk);
@@ -269,7 +268,7 @@ export class MapService {
         JSON.stringify([...this.itemStore.currentItemsIds]) !==
         JSON.stringify(currentItemsIds)
       ) {
-        this.itemStore.currentItemsIds = new Set(currentItemsIds);
+        this.itemStore.currentItemsIds = currentItemsIds;
       }
     });
   }
@@ -316,7 +315,6 @@ export class MapService {
       },
       style: { color: "blue", stroke: true, fill: false, opacity: 0.7 },
     });
-
     if (this.bounds.intersects(shape.getBounds())) {
       shape.addTo(this.searchMarkerLayer);
       return true;
