@@ -77,8 +77,8 @@ export class GridService {
   }
 
   buildGrid(items) {
-    this.globalGrid = new Grid(items, this.mapService._map);
-    this.globalGrid.buildProjectedGrid();
+    this.globalGrid = new Grid(this.mapService._map);
+    this.globalGrid.buildProjectedGrid(items);
     this.currentGrid = this.globalGrid;
     if (this.localGrid) delete this.localGrid;
   }
@@ -100,20 +100,18 @@ export class GridService {
     zoom: number
   ): { ids: number[]; cells: Cell[] } {
     if (!this.globalGrid) return { ids: [], cells: [] };
-    if (!this.currentGrid.boundsInside(south, west, north, east)) {
+    if (!this.currentGrid.isInsideBounds(south, west, north, east)) {
       this.currentGrid = this.globalGrid;
     }
     this.currentGrid.updateCurrentBBox(south, west, north, east);
     if (zoom > this.globalGrid.zoom) {
-      this.localGrid = new Grid(
-        this.currentGrid.getCurrentItems(),
-        this.mapService._map
-      );
-      this.localGrid.buildProjectedGrid();
+      this.localGrid = new Grid(this.mapService._map);
+      this.localGrid.buildProjectedGrid(this.currentGrid.getItemsForNewGrid());
       this.currentGrid = this.localGrid;
+      this.currentGrid.updateCurrentBBox(south, west, north, east);
     } else this.currentGrid = this.globalGrid;
-    this.mapService.clearHeatMap();
-    return this.currentGrid.getVisualization();
+    // this.mapService.clearHeatMap();
+    return this.currentGrid.getItemsForVisualization();
   }
   getPolygonItems(polygon: Polygon) {
     this.itemStoreService.updateItems(this.globalGrid.checkInside(polygon));

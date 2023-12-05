@@ -34,11 +34,12 @@ export class ItemStoreService {
     this.itemsIds.next(itemIds);
   }
   updateItemsFromBinary(binaryItems) {
-    this._items.next(this.oscarItemsService.binaryItemsToOscarMin(binaryItems));
+    let items = this.oscarItemsService.binaryItemsToOscarMin(binaryItems);
+    this._items.next(items);
     const itemIds: number[] = [];
-    // this._items.value.forEach((item) => {
-    //   itemIds.push(item.id);
-    // });
+    items.forEach((item) => {
+      itemIds.push(item.id);
+    });
     this.itemsIds.next(itemIds);
   }
   get currentItemsIds() {
