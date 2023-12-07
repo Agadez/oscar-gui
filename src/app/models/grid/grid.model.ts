@@ -16,7 +16,6 @@ export class Grid {
   boundingRadius: Float32Array;
   helperArray: Int32Array;
 
-  grid: OscarMinItem[][][];
   gridBBox: LatLngBounds;
   gridX: number;
   gridY: number;
@@ -206,15 +205,15 @@ export class Grid {
       this.getYPositionInGrid(Math.floor(southEastOverflow.y))
     );
 
-    this.currentMinXPos = this.getXPositionInGrid(Math.floor(northWest.x));
-    this.currentMinYPos = this.getYPositionInGrid(Math.floor(northWest.y));
-    this.currentMaxXPos = this.getXPositionInGrid(Math.floor(southEast.x));
-    this.currentMaxYPos = this.getYPositionInGrid(Math.floor(southEast.y));
+    this.currentMinXPos = this.getXPositionInGrid(Math.round(northWest.x));
+    this.currentMinYPos = this.getYPositionInGrid(Math.round(northWest.y));
+    this.currentMaxXPos = this.getXPositionInGrid(Math.round(southEast.x));
+    this.currentMaxYPos = this.getYPositionInGrid(Math.round(southEast.y));
 
-    this.currentMinXOffset = Math.abs(this.currentMinXPos - minXOverflow);
-    this.currentMinYOffset = Math.abs(this.currentMinYPos - minYOverflow);
-    this.currentMaxXOffset = Math.abs(maxXOverflow - this.currentMaxXPos);
-    this.currentMaxYOffset = Math.abs(maxYOverflow - this.currentMaxYPos);
+    this.currentMinXOffset = Math.max(0, this.currentMinXPos - minXOverflow);
+    this.currentMinYOffset = Math.max(0, this.currentMinYPos - minYOverflow);
+    this.currentMaxXOffset = Math.max(0, maxXOverflow - this.currentMaxXPos);
+    this.currentMaxYOffset = Math.max(0, maxYOverflow - this.currentMaxYPos);
   }
 
   isInsideBounds(south: number, west: number, north: number, east: number) {
@@ -241,11 +240,14 @@ export class Grid {
     xMax: number,
     yMin: number,
     yMax: number,
-    cellsWanted: boolean,
-    checkPosition: boolean
+    cellsWanted: boolean
   ) {
     const cells = new Set<Cell>();
     const itemIndexes = new Set<number>();
+    xMin = Math.max(0, xMin);
+    xMax = Math.min(this.gridX - 1, xMax);
+    yMin = Math.max(0, yMin);
+    yMax = Math.min(this.gridY - 1, yMax);
     for (let i = xMin; i <= xMax; i++) {
       for (let j = yMin; j <= yMax; j++) {
         let firstItemIndex = this.helperArray[j * this.gridX + i];
@@ -258,20 +260,9 @@ export class Grid {
             lats.push(this.lats[itemIndex]);
             lngs.push(this.lngs[itemIndex]);
           }
-          if (!checkPosition) {
-            itemIndexes.add(itemIndex);
-          }
-          if (checkPosition) {
-            let respectingRadius = this.isRadiusInside(
-              this.lats[itemIndex],
-              this.lngs[itemIndex],
-              this.boundingRadius[itemIndex]
-            );
-            if (respectingRadius.xPos > -1) {
-              itemIndexes.add(itemIndex);
-            }
-          }
+          itemIndexes.add(itemIndex);
         }
+
         if (lats.length !== 0) {
           cells.add(new Cell(mean(lats), mean(lngs), lats.length));
         }
@@ -285,7 +276,6 @@ export class Grid {
       this.currentMaxXPos + this.currentMaxXOffset,
       this.currentMinYPos - this.currentMinYOffset,
       this.currentMaxYPos + this.currentMaxYOffset,
-      false,
       false
     ).indexes;
     const currentMinItems: OscarMinItem[] = [];
@@ -304,66 +294,20 @@ export class Grid {
 
   getItemsForVisualization() {
     const mainBounds = this.getItems(
-      this.currentMinXPos + 1,
-      this.currentMaxXPos - 1,
-      this.currentMinYPos + 1,
-      this.currentMaxXPos - 1,
-      true,
-      false
-    );
-    const westBounds = this.getItems(
-      this.currentMinXPos - this.currentMinXOffset,
       this.currentMinXPos,
-      this.currentMinYPos - this.currentMinYOffset,
-      this.currentMaxYPos + this.currentMaxYOffset,
-      true,
-      true
-    );
-    const eastBounds = this.getItems(
       this.currentMaxXPos,
-      this.currentMaxXPos + this.currentMaxXOffset,
-      this.currentMinYPos - this.currentMinYOffset,
-      this.currentMaxYPos + this.currentMaxYOffset,
-      true,
-      true
-    );
-    const northBounds = this.getItems(
-      this.currentMinXPos - this.currentMinXOffset,
-      this.currentMaxXPos + this.currentMaxXOffset,
-      this.currentMinYPos - this.currentMaxYOffset,
       this.currentMinYPos,
-      true,
+      this.currentMaxXPos,
       true
     );
-    const southBounds = this.getItems(
-      this.currentMinXPos - this.currentMinXOffset,
-      this.currentMaxXPos + this.currentMaxXOffset,
-      this.currentMaxYPos,
-      this.currentMaxYPos + this.currentMaxYOffset,
-      true,
-      true
-    );
-    const currentCells: Cell[] = [
-      ...mainBounds.cells,
-      ...westBounds.cells,
-      ...eastBounds.cells,
-      ...northBounds.cells,
-      ...southBounds.cells,
-    ];
+    const currentCells: Cell[] = [...mainBounds.cells];
 
-    const indexes = [
-      ...mainBounds.indexes,
-      ...westBounds.indexes,
-      ...eastBounds.indexes,
-      ...northBounds.indexes,
-      ...southBounds.indexes,
-    ];
-    const currentOscarIDs: number[] = [];
-
+    const indexes = [...mainBounds.indexes];
+    const currentOscarIDs = new Set<number>();
     for (const itemIndex of indexes) {
-      currentOscarIDs.push(this.ids[itemIndex]);
+      currentOscarIDs.add(this.ids[itemIndex]);
     }
-    return { ids: currentOscarIDs, cells: currentCells };
+    return { ids: Array.from(currentOscarIDs), cells: currentCells };
   }
 
   isRadiusInside(
@@ -419,9 +363,13 @@ export class Grid {
     }
     return { xPos: -1, yPos: -1 };
   }
-  checkInside(polygon: Polygon) {
+  refineGrid(polygon: Polygon) {
     var polygonCoordinates: Point[] = [];
     var polygonTrueCoordinates: Point[] = [];
+    const grid = Array.from({ length: this.gridX }, () =>
+      Array.from({ length: this.gridY }, () => [])
+    );
+    let amountItemsInGrid = 0;
     polygon.polygonNodes.forEach((node) => {
       const gridPoint = L.CRS.EPSG3857.latLngToPoint(
         L.latLng(node.lat, node.lng),
@@ -437,8 +385,8 @@ export class Grid {
       gridPoint.y = node.lng;
       polygonTrueCoordinates.push(gridPoint);
     });
-    for (let i = 0; i < this.grid.length; i++) {
-      for (let j = 0; j < this.grid[i].length; j++) {
+    for (let i = 0; i < this.gridX; i++) {
+      for (let j = 0; j < this.gridY; j++) {
         let cornerInside = 0;
         for (let a = i; a <= i + 1; a++) {
           for (let b = j; b <= j + 1; b++) {
@@ -456,25 +404,30 @@ export class Grid {
                 counter++;
               }
             }
-
             if (counter % 2 == 1) {
               cornerInside++;
             }
           }
         }
         if (cornerInside == 0) {
-          this.grid[i][j] = [];
+          grid[i][j] = [];
         } else if (cornerInside < 4) {
-          let elementsOutside = [];
-          for (const item of this.grid[i][j]) {
+          let firstItemIndex = this.helperArray[j * this.gridX + i];
+          let offset =
+            this.helperArray[j * this.gridX + i + 1] - firstItemIndex;
+          for (let k = 0; k < offset; k++) {
+            let itemIndex = firstItemIndex + k;
             var counter = 0;
-            const startingPoint = new Point(item.lat, item.lng);
-            const endingPoint = new Point(10000, item.lng);
+            const startingPoint = new Point(
+              this.lats[itemIndex],
+              this.lngs[itemIndex]
+            );
+            const endingPoint = new Point(10000, this.lngs[itemIndex]);
             const infiniteLine = new Line(startingPoint, endingPoint);
-            for (var k = 0; k < polygonTrueCoordinates.length; k++) {
+            for (let l = 0; l < polygonTrueCoordinates.length; l++) {
               var border = new Line(
-                polygonTrueCoordinates[k],
-                polygonTrueCoordinates[(k + 1) % polygonTrueCoordinates.length]
+                polygonTrueCoordinates[l],
+                polygonTrueCoordinates[(l + 1) % polygonTrueCoordinates.length]
               );
 
               if (this.checkIntersect(infiniteLine, border)) {
@@ -482,25 +435,23 @@ export class Grid {
               }
             }
 
-            if (counter % 2 == 0) {
-              elementsOutside.push(item);
+            if (counter % 2 !== 0) {
+              grid[i][j].push(
+                new OscarMinItem(
+                  this.ids[itemIndex],
+                  this.lngs[itemIndex],
+                  this.lats[itemIndex],
+                  this.boundingRadius[itemIndex]
+                )
+              );
+              amountItemsInGrid++;
             }
           }
-          this.grid[i][j] = this.grid[i][j].filter(
-            (el) => !elementsOutside.includes(el)
-          );
         }
       }
     }
-    let itemsInGrid: OscarMinItem[] = [];
-    for (let i = 0; i < this.grid.length; i++) {
-      for (let j = 0; j < this.grid[i].length; j++) {
-        for (let k = 0; k < this.grid[i][j].length; k++) {
-          itemsInGrid.push(this.grid[i][j][k]);
-        }
-      }
-    }
-    return itemsInGrid;
+    this.setArraySizes(amountItemsInGrid);
+    this.buildOffsetArray(grid);
   }
   checkIntersect(infiniteLine: Line, border: Line) {
     let dir1 = this.orientation(

@@ -45,6 +45,8 @@ export class SearchService {
 
   maxItems = 1000000;
 
+  displayHeatmap = false;
+
   localSearch = false;
 
   fullQueryString = "";
@@ -122,28 +124,6 @@ export class SearchService {
       this.startSearch.next("start");
     });
   }
-
-  itemsOfPolygon(inputString: string) {
-    const polygonMapping = this.polygonService.polygonMapping;
-    const nameMapping = this.polygonService.idUuidMap;
-    this.polygonService.activatedPolygons = new Map();
-    let activatedPolygons = this.polygonService.activatedPolygons;
-    let newQueryString = "";
-    newQueryString = inputString.replace(
-      /\$polygon:(\w+)/,
-      function (_, p1, p2) {
-        console.log(_);
-        console.log(p1);
-        console.log(p2);
-        const uuid = nameMapping.get(p2);
-        activatedPolygons.set(uuid, "");
-        newQueryString = p1 + polygonMapping.get(uuid).boundingBoxString;
-        console.log(newQueryString);
-        console.log(p1);
-        return newQueryString;
-      }
-    );
-  }
   mapPolygonName(inputString: string, clientRenderingMode: boolean) {
     const polygonMapping = this.polygonService.polygonMapping;
     const nameMapping = this.polygonService.idUuidMap;
@@ -151,15 +131,11 @@ export class SearchService {
     let activatedPolygons = this.polygonService.activatedPolygons;
     let newQueryString = "";
     if (clientRenderingMode) {
-      newQueryString = inputString.replace(
-        /\$polygon:(\w+)/g,
-        function (_, p1) {
-          const uuid = nameMapping.get(p1);
-          activatedPolygons.set(uuid, "");
-          return polygonMapping.get(uuid).boundingBoxString;
-          // return polygonMapping.get(uuid).polygonQuery;
-        }
-      );
+      newQueryString = inputString.replace(/\$polygon:(\w+)/g, (_, p1) => {
+        const uuid = this.polygonService.idUuidMap.get(p1);
+        this.polygonService.activatedPolygons.set(uuid, "");
+        return this.polygonService.polygonMapping.get(uuid).boundingBoxString;
+      });
     } else {
       newQueryString = inputString.replace(
         /\$polygon:(\w+)/g,
@@ -170,9 +146,6 @@ export class SearchService {
         }
       );
     }
-    // if (activatedPolygons.size === 0) {
-    //   newQueryString = "";
-    // }
     return newQueryString;
   }
   createQueryString(inputString: string, clientRenderingMode: boolean) {
@@ -188,6 +161,7 @@ export class SearchService {
       this.keyAppendix +
       this.parentAppendix +
       this.keyValueAppendix;
+    console.log(this.fullQueryString);
     return this.fullQueryString;
   }
   searchForRegions(inputString: string, regions: OscarItem[]) {
@@ -249,7 +223,7 @@ export class SearchService {
       routeString += ")";
       return routeString;
     });
-    return newQueryString + " ";
+    return "(" + newQueryString + ")";
   }
   queryStringForLocalSearch(inputString: string, clientRenderingMode: boolean) {
     this.createQueryString(inputString, clientRenderingMode);

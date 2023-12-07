@@ -8,13 +8,21 @@
     ></mat-slide-toggle>
   </div>
   <div class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between">
+    <span>Only display Heatmap</span>
+    <mat-slide-toggle
+      color="primary"
+      [(ngModel)]="displayHeatmap"
+      (ngModelChange)="updateDisplay()"
+    ></mat-slide-toggle>
+  </div>
+  <!-- <div class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between">
     <span>Increase Polygon accuracy (refine on Client)</span>
     <mat-slide-toggle
       color="primary"
       [(ngModel)]="polyClientCalc"
       (ngModelChange)="updatePolygonCalculation()"
     ></mat-slide-toggle>
-  </div>
+  </div> -->
 
   <div class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between">
     <span>Max Items in Result</span>

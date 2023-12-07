@@ -1,6 +1,5 @@
 import { Injectable, NgZone } from "@angular/core";
 import { ItemStoreService } from "../data/item-store.service";
-import { OscarMinItem } from "../../models/oscar/oscar-min-item";
 import { GeoPoint } from "../../models/geo-point";
 import { BehaviorSubject, forkJoin } from "rxjs";
 import "../../../../node_modules/leaflet-webgl-heatmap/src/webgl-heatmap/webgl-heatmap";
@@ -9,26 +8,13 @@ import { PolygonNode } from "src/app/models/polygon/polygon-node.model";
 import { OscarItemsService } from "../oscar/oscar-items.service";
 import { RoutingMarker } from "../../models/routing-marker";
 import { PolygonService } from "../polygon-service.service";
-import {
-  CircleMarker,
-  LatLng,
-  LatLngBounds,
-  LayerGroup,
-  Map as LeafletMap,
-  Marker,
-  Polygon,
-  latLng,
-} from "leaflet";
-
-import { Region } from "../../models/oscar/region";
+import { LatLng, LatLngBounds, Map as LeafletMap } from "leaflet";
 import { OscarItem } from "../../models/oscar/oscar-item";
 import { SelectedItemService } from "../ui/selected-item.service";
 import { ConfigService } from "src/app/config/config.service";
-import { SearchResultViewComponent } from "src/app/components/search-result-view/search-result-view.component";
-import "leaflet.heat";
 import "leaflet.awesome-markers";
 import { Cell } from "src/app/models/cell/cell.model";
-import { maxBy, meanBy } from "lodash";
+import { maxBy } from "lodash";
 declare var L;
 
 @Injectable({
@@ -43,7 +29,7 @@ export class MapService {
   polygons = new Map<uuidv4, [L.Polygon, L.Marker[]]>();
   maxZoom = 20;
   heatmap = new L.webGLHeatmap({
-    size: 10,
+    size: 15,
     units: "px",
     alphaRange: 1,
   });

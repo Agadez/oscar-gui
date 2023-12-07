@@ -215,7 +215,7 @@ export class SearchResultViewComponent implements OnInit {
     if (
       (this.current.ids.length < this.searchService.markerThreshold ||
         this.mapService.zoom === this.mapService.maxZoom) &&
-      this.mapService.zoom >= 14
+      !this.searchService.displayHeatmap
     ) {
       this.heatmapSliderVisible = false;
       this.mapService.drawItemsMarker(this.current.ids);

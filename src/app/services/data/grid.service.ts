@@ -33,8 +33,8 @@ export class GridService {
     // issues here
     if (this.polygonService.polyClientCalc) {
       this.buildGrid(items);
-      this.polygonService.activatedPolygons.forEach((uuid) => {
-        this.getPolygonItems(this.polygonService.polygonMapping.get(uuid));
+      this.polygonService.activatedPolygons.forEach((v, k) => {
+        this.globalGrid.refineGrid(this.polygonService.polygonMapping.get(k));
       });
     } else {
       this.mapService._map.once("moveend", (event) => {
@@ -113,9 +113,9 @@ export class GridService {
     // this.mapService.clearHeatMap();
     return this.currentGrid.getItemsForVisualization();
   }
-  getPolygonItems(polygon: Polygon) {
-    this.itemStoreService.updateItems(this.globalGrid.checkInside(polygon));
-  }
+  // getPolygonItems(polygon: Polygon) {
+  //   this.itemStoreService.updateItems(this.globalGrid.refineGrid(polygon));
+  // }
   deleteGrid() {
     delete this.currentGrid;
     delete this.globalGrid;

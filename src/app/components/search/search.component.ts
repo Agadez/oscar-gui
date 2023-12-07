@@ -134,11 +134,11 @@ export class SearchComponent implements OnInit {
     this.searchService.addRoute();
     let fullQueryString = "";
     if (this.polygonService.polyClientCalc) {
-      this.searchService.itemsOfPolygon(this.inputString);
-      // fullQueryString = this.searchService.createQueryString(
-      //   this.inputString,
-      //   true
-      // );
+      // this.searchService.itemsOfPolygon(this.inputString);
+      fullQueryString = this.searchService.createQueryString(
+        this.inputString,
+        true
+      );
     } else {
       fullQueryString = this.searchService.createQueryString(
         this.inputString,
