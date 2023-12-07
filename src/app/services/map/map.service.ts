@@ -274,7 +274,7 @@ export class MapService {
       icon: icon,
       prefix: "fa",
       iconColor: "white",
-      markerColor: "green",
+      markerColor: "blue",
     });
     const shape = L.geoJSON(item, {
       title: `${item.properties.id}`,

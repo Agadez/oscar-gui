@@ -11,6 +11,7 @@ export class ConfigService {
       hospital: "hospital-o",
       doctors: "user-md",
       fast_food: "cutlery",
+      fuel: "gas-pump",
       restaurant: "cutlery",
       post_box: "envelope-o",
       post_office: "envelope-o",

@@ -41,7 +41,7 @@ export class SearchService {
 
   startSearch = new Subject<string>();
 
-  markerThreshold = 200;
+  markerThreshold = 2000;
 
   maxItems = 1000000;
 

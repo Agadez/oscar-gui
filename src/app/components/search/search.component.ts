@@ -74,6 +74,7 @@ export class SearchComponent implements OnInit {
 
   enterKey() {
     if (this.inAutocompletePanel) return;
+    this.refinementStore.clearRefinements();
     this.search();
   }
   panelClosed() {
@@ -87,6 +88,7 @@ export class SearchComponent implements OnInit {
   abort() {
     this.inputString = "";
     this.searchService.clearItems.next("clear");
+    this.refinementStore.clearRefinements();
     this.polygonService.activatedPolygons.clear();
     this.itemStore.updateItems([]);
     if (this.loading) {
