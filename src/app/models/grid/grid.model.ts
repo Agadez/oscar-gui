@@ -170,17 +170,18 @@ export class Grid {
     this.currentMaxLat = north;
     this.currentMaxLng = east;
 
-    let northWestOverflow = L.CRS.EPSG3857.latLngToPoint(
-      L.latLng(north - this.maxBoundingRadius, west - this.maxBoundingRadius),
-      this.zoom
-    );
-    let southEastOverflow = L.CRS.EPSG3857.latLngToPoint(
-      L.latLng(south + this.maxBoundingRadius, east + this.maxBoundingRadius),
-      this.zoom
-    );
+    
 
     let northWest = L.CRS.EPSG3857.latLngToPoint(
       L.latLng(north, west),
+      this.zoom
+    );
+    let northEast = L.CRS.EPSG3857.latLngToPoint(
+      L.latLng(north, east),
+      this.zoom
+    );
+    let southWest = L.CRS.EPSG3857.latLngToPoint(
+      L.latLng(south, west),
       this.zoom
     );
     let southEast = L.CRS.EPSG3857.latLngToPoint(
@@ -188,32 +189,48 @@ export class Grid {
       this.zoom
     );
 
-    let minXOverflow = Math.max(
-      0,
-      this.getXPositionInGrid(Math.floor(northWestOverflow.x))
+    this.currentMinXPos = this.getXPositionInGrid(Math.min(northWest.x, northEast.x));
+    this.currentMinYPos = this.getYPositionInGrid(Math.min(northWest.y,southWest.y));
+    this.currentMaxXPos = this.getXPositionInGrid(Math.max(southWest.x,southEast.x));
+    this.currentMaxYPos = this.getYPositionInGrid(Math.max(northEast.y,southEast.y));
+
+    let northWestOverflow = L.CRS.EPSG3857.latLngToPoint(
+      L.latLng(north + this.maxBoundingRadius, west - this.maxBoundingRadius),
+      this.zoom
     );
-    let minYOverflow = Math.max(
-      0,
-      this.getYPositionInGrid(Math.floor(northWestOverflow.y))
+    let northEastOverflow = L.CRS.EPSG3857.latLngToPoint(
+      L.latLng(north + this.maxBoundingRadius, east + this.maxBoundingRadius),
+      this.zoom
     );
-    let maxXOverflow = Math.min(
+    let southWestOverflow = L.CRS.EPSG3857.latLngToPoint(
+      L.latLng(south - this.maxBoundingRadius, west - this.maxBoundingRadius),
+      this.zoom
+    );
+    let southEastOverflow = L.CRS.EPSG3857.latLngToPoint(
+      L.latLng(south - this.maxBoundingRadius, east + this.maxBoundingRadius),
+      this.zoom
+    );
+
+
+    this.currentMinXOffset = Math.max(
+      0,
+      this.getXPositionInGrid(Math.min(northWestOverflow.x, northEastOverflow.x))
+    );
+    this.currentMinYOffset = Math.max(
+      0,
+      this.getYPositionInGrid(Math.min(northWestOverflow.y, southWestOverflow.y))
+    );
+    this.currentMaxXOffset = Math.min(
       this.gridX - 1,
-      this.getXPositionInGrid(Math.floor(southEastOverflow.x))
+      this.getXPositionInGrid(Math.max(southWestOverflow.x, southEastOverflow.x))
     );
-    let maxYOverflow = Math.min(
+    this.currentMaxYOffset = Math.min(
       this.gridY - 1,
-      this.getYPositionInGrid(Math.floor(southEastOverflow.y))
+      this.getYPositionInGrid(Math.max(northEastOverflow.y,southEastOverflow.y))
     );
-
-    this.currentMinXPos = this.getXPositionInGrid(Math.round(northWest.x));
-    this.currentMinYPos = this.getYPositionInGrid(Math.round(northWest.y));
-    this.currentMaxXPos = this.getXPositionInGrid(Math.round(southEast.x));
-    this.currentMaxYPos = this.getYPositionInGrid(Math.round(southEast.y));
-
-    this.currentMinXOffset = Math.max(0, this.currentMinXPos - minXOverflow);
-    this.currentMinYOffset = Math.max(0, this.currentMinYPos - minYOverflow);
-    this.currentMaxXOffset = Math.max(0, maxXOverflow - this.currentMaxXPos);
-    this.currentMaxYOffset = Math.max(0, maxYOverflow - this.currentMaxYPos);
+    console.log(this.map.getPixelBounds(), this.pixelBounds);
+    console.log(this.currentMinXPos, this.currentMaxXPos);
+    
   }
 
   isInsideBounds(south: number, west: number, north: number, east: number) {
@@ -272,10 +289,10 @@ export class Grid {
   }
   getItemsForNewGrid() {
     const itemIndexes = this.getItems(
-      this.currentMinXPos - this.currentMinXOffset,
-      this.currentMaxXPos + this.currentMaxXOffset,
-      this.currentMinYPos - this.currentMinYOffset,
-      this.currentMaxYPos + this.currentMaxYOffset,
+      this.currentMinXOffset,
+      this.currentMaxXOffset,
+      this.currentMinYOffset,
+      this.currentMaxYOffset,
       false
     ).indexes;
     const currentMinItems: OscarMinItem[] = [];
