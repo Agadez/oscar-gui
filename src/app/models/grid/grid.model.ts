@@ -314,7 +314,7 @@ export class Grid {
       this.currentMinXPos,
       this.currentMaxXPos,
       this.currentMinYPos,
-      this.currentMaxXPos,
+      this.currentMaxYPos,
       true
     );
     const currentCells: Cell[] = [...mainBounds.cells];
