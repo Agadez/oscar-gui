@@ -32,20 +32,20 @@
       </tr>
       <tr>
         <td>
-          <a class="example-query-string"> @waterway:waterfall germany </a>
+          <a class="example-query-string"> &#64;waterway:waterfall germany </a>
         </td>
         <td>List all waterfalls in Germany</td>
       </tr>
       <tr>
         <td>
-          <a class="example-query-string">"Yosemite National Park" @highway</a>
+          <a class="example-query-string">"Yosemite National Park" &#64;highway</a>
         </td>
         <td>List all higways in Yosemite National Park</td>
       </tr>
       <tr>
         <td>
           <a class="example-query-string">
-            @amenity:restaurant + @amenity:fast_food miami
+            &#64;amenity:restaurant + &#64;amenity:fast_food miami
           </a>
         </td>
         <td>List all restaurants and fast-food places in Miami</td>
@@ -53,7 +53,7 @@
       <tr>
         <td>
           <a class="example-query-string">
-            @tourism:hotel &quot;new york&quot;
+            &#64;tourism:hotel &quot;new york&quot;
           </a>
         </td>
         <td>List all hotels in New York</td>
@@ -61,7 +61,7 @@
       <tr>
         <td>
           <a class="example-query-string">
-            @amenity:restaurant (@cuisine:italian + @cuisine:french) munich
+            &#64;amenity:restaurant (&#64;cuisine:italian + &#64;cuisine:french) munich
           </a>
         </td>
         <td>List all restaurants with italian or french cuisine in Munich</td>
@@ -69,7 +69,7 @@
       <tr>
         <td>
           <a class="example-query-string">
-            @amenity:fast_food munich - (burger? ?king) - (mc? ?donald?)
+            &#64;amenity:fast_food munich - (burger? ?king) - (mc? ?donald?)
           </a>
         </td>
         <td>
@@ -81,7 +81,7 @@
       <tr>
         <td>
           <a class="example-query-string">
-            &#37;1&#37;&#37; @amenity:school @amenity:kindergarten
+            &#37;1&#37;&#37; &#64;amenity:school &#64;amenity:kindergarten
           </a>
         </td>
         <td>List all kindergarten that have a school nearby.</td>
@@ -89,8 +89,8 @@
       <tr>
         <td>
           <a class="example-query-string">
-            @shop:supermarket (&#37;@amenity:atm &#37;@amenity:pharmacy
-            &#37;@shop:car_repair)
+            &#64;shop:supermarket (&#37;&#64;amenity:atm &#37;&#64;amenity:pharmacy
+            &#37;&#64;shop:car_repair)
           </a>
         </td>
         <td>
@@ -101,7 +101,7 @@
       <tr>
         <td>
           <a class="example-query-string">
-            @tourism:hotel :north-of (eiffel tour france @tourism:attraction)
+            &#64;tourism:hotel :north-of (eiffel tour france &#64;tourism:attraction)
           </a>
         </td>
         <td>List hotels north of the Eiffel Tour in Paris.</td>
@@ -109,7 +109,7 @@
       <tr>
         <td>
           <a class="example-query-string">
-            @shop:supermarket :north-of &#35;Munich
+            &#64;shop:supermarket :north-of &#35;Munich
           </a>
         </td>
         <td>List supermarkets north of Munich</td>
@@ -117,7 +117,7 @@
       <tr>
         <td>
           <a class="example-query-string">
-            @tourism:hotel (&quot;Frankfurt am Main&quot; &lt;-&gt;
+            &#64;tourism:hotel (&quot;Frankfurt am Main&quot; &lt;-&gt;
             &quot;Munich&quot;)
           </a>
         </td>
@@ -126,8 +126,8 @@
       <tr>
         <td>
           <a class="example-query-string">
-            &#37;5&#37;&#37; (@waterway:river &quot;Donau&quot;)
-            @tourism:camp_site
+            &#37;5&#37;&#37; (&#64;waterway:river &quot;Donau&quot;)
+            &#64;tourism:camp_site
           </a>
         </td>
         <td>
@@ -153,10 +153,10 @@
       </tr>
       <tr>
         <td>Tags</td>
-        <td>@key:value</td>
+        <td>&#64;key:value</td>
         <td>
-          You can search for tags with the special prefix @key:value. i.e.
-          @waterway:waterfall
+          You can search for tags with the special prefix &#64;key:value. i.e.
+          &#64;waterway:waterfall
         </td>
       </tr>
       <tr>

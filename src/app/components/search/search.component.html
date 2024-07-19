@@ -20,7 +20,7 @@
         <mat-option
           *ngFor="let option of normalSuggestions"
           [value]="inputWithoutCurrentWord(inputString, option)"
-          >@{{ option.k }}:{{ option.v }}</mat-option
+          >&#64;{{ option.k }}:{{ option.v }}</mat-option
         >
       </mat-autocomplete>
     </form>

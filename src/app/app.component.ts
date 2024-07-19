@@ -10,6 +10,7 @@ import { MapService } from "./services/map/map.service";
 import { RefinementType } from "./models/gui/refinement";
 import { ActivatedRoute } from "@angular/router";
 import { QueryParamsService } from "./services/query-params.service";
+import { isEmpty } from "lodash";
 declare var L;
 
 @Component({
@@ -38,7 +39,7 @@ export class AppComponent implements OnInit {
     });
     this.refinementService.refinements$.subscribe(() => this.changeUrl());
     this.route.queryParams.subscribe((params) => {
-      if (params.length == 0) return;
+      if (isEmpty(params)) return;
       this.queryParams.paramsFromQuery(params);
       this.location.replaceState("/");
     });
