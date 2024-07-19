@@ -21,7 +21,7 @@ import { PolygonService } from "../../services/polygon-service.service";
 import { OscarMinItem } from "src/app/models/oscar/oscar-min-item";
 import { QueryParamsService } from "src/app/services/query-params.service";
 import { Clipboard } from "@angular/cdk/clipboard";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 declare function getOscarQuery(input);
 

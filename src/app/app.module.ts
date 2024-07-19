@@ -1,4 +1,4 @@
-import { MatProgressBarModule } from "@angular/material/progress-bar";
+
 
 declare var L;
 import { RouterModule, Routes } from "@angular/router";
@@ -28,6 +28,7 @@ import { FacetsComponent } from "./components/refinements/facets/facets.componen
 import { FacetsDetailComponent } from "./components/refinements/facets/facets-detail/facets-detail.component";
 import { ParentsComponent } from "./components/refinements/parents/parents.component";
 import { ParentsDetailComponent } from "./components/refinements/parents/parents-detail/parents-detail.component";
+import { MatProgressBarModule } from "@angular/material/progress-bar";
 import { DragDropModule } from "@angular/cdk/drag-drop";
 import { OverlayModule } from "@angular/cdk/overlay";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
@@ -47,11 +48,11 @@ import { MatExpansionModule } from "@angular/material/expansion";
 import { MatRadioModule } from "@angular/material/radio";
 import { MatTooltipModule } from "@angular/material/tooltip";
 
-import { MatSlideToggleModule } from "@angular/material/slide-toggle";
+import {MatSlideToggleModule} from '@angular/material/slide-toggle'; 
 import { RegionComponent } from "./components/region/region.component";
 import { MatMenuModule } from "@angular/material/menu";
 import { ClipboardModule } from "@angular/cdk/clipboard";
-import { MatSnackBarModule } from "@angular/material/snack-bar";
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { NgxSkeletonLoaderModule } from "ngx-skeleton-loader";
 import { MatIconModule } from "@angular/material/icon";
 import { MatButtonToggleModule } from "@angular/material/button-toggle";

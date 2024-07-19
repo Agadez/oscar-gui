@@ -2,14 +2,12 @@
   title="point intensity"
   class="intensity-slider"
   *ngIf="heatmapSliderVisible"
-  vertical
-  thumbLabel
   min="0"
   max="1"
   step="0.01"
-  [(value)]="heatMapIntensity"
+  discrete
   (change)="intensityChange()"
-></mat-slider>
+><input matSliderThumb  [(value)]="heatMapIntensity"></mat-slider>
 <mat-slider
   title="datapoint size"
   class="pixel-slider"
@@ -17,11 +15,11 @@
   vertical
   thumbLabel
   min="10"
+  discrete
   max="100"
   step="1"
-  [(value)]="heatMapPixel"
   (change)="intensityChange()"
-></mat-slider>
+><input matSliderThumb [(value)]="heatMapPixel"></mat-slider>
 <div class="my-chip-list" aria-label="Item Count">
   <app-item-count
     [active]="showGlobal"

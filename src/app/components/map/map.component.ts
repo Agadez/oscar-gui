@@ -34,7 +34,7 @@ export class MapComponent implements OnInit {
   options = {
     layers: [
       tileLayer("https://tiles.fmi.uni-stuttgart.de/{z}/{x}/{y}.png", {
-        maxZoom: this.mapService.maxZoom,
+        maxZoom: 20,
         attribution: "...",
       }),
     ],

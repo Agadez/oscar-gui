@@ -21,7 +21,7 @@ import { GeoPoint } from "../../models/geo-point";
 import { RoutingDataStoreService } from "../../services/data/routing-data-store.service";
 import { Subject } from "rxjs";
 import { LeafletEvent } from "leaflet";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import {MatSnackBar } from "@angular/material/snack-bar";
 import { debounceTime } from "rxjs/operators";
 
 declare var L;

@@ -6,7 +6,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from "@angular/core";
-import { MatTabChangeEvent } from "@angular/material/tabs";
+import {  MatTabChangeEvent } from "@angular/material/tabs";
 import { Subject } from "rxjs";
 import { GeoPoint } from "../../models/geo-point";
 import { activateRouting } from "../search/search.component";
