@@ -115,7 +115,7 @@ const routes: Routes = [{ path: "**", redirectTo: "", pathMatch: "full" }];
     BrowserModule,
     FormsModule,
     HttpClientModule,
-    LeafletModule.forRoot(),
+    LeafletModule,
     BrowserAnimationsModule,
     InfiniteScrollModule,
     DragDropModule,

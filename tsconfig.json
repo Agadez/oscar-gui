@@ -15,9 +15,8 @@
     "lib": ["es2022", "dom"],
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "strict": false,
+    "strict": false
   },
-  "files": [],
   "angularCompilerOptions": {
     "strictTemplates": true
   }
