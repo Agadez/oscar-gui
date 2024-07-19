@@ -10,7 +10,7 @@ import {
 import { OscarItemsService } from "../../services/oscar/oscar-items.service";
 import { ItemStoreService } from "../../services/data/item-store.service";
 import { RefinementsService } from "../../services/data/refinements.service";
-import { FormControl } from "@angular/forms";
+import { UntypedFormControl } from "@angular/forms";
 import { ColorTag } from "../../models/natural-language/color-tag";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import keyValueTags from "../../../assets/keyValueTags.json";
@@ -64,7 +64,7 @@ export class SearchComponent implements OnInit {
   suggestions = [];
   naturalPrefix = [];
   waitTime = 200;
-  myControl = new FormControl();
+  myControl = new UntypedFormControl();
   options: string[] = ["One", "Two", "Three"];
   normalSuggestions = [];
   oscarQuery = true;
