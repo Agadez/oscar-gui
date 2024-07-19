@@ -11,7 +11,7 @@ import {
 } from "@angular/core";
 import { MapService } from "../../services/map/map.service";
 import { RoutingMarker } from "../../models/routing-marker";
-import { CdkDragDrop } from "@angular/cdk/drag-drop/drag-events";
+import { CdkDragDrop } from "@angular/cdk/drag-drop";
 import { moveItemInArray } from "@angular/cdk/drag-drop";
 import {
   RoutingService,

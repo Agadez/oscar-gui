@@ -1,5 +1,6 @@
 FROM node:lts-bullseye AS builder
-RUN mkdir -p /oscar-gui/src && mkdir -p /oscar-gui/e2e
+# RUN mkdir -p /oscar-gui/src && mkdir -p /oscar-gui/e2e+
+RUN mkdir -p /oscar-gui/src
 COPY src /oscar-gui/src/
 # COPY e2e /oscar-gui/e2e/
 COPY package.json ts*.json angular.json /oscar-gui/
