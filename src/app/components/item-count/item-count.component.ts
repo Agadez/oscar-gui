@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
-import {isWhitespace} from 'codelyzer/angular/styles/chars';
 
 @Component({
   selector: 'app-item-count',
