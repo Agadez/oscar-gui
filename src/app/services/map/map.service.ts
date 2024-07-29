@@ -6,7 +6,6 @@ import '../../../../node_modules/leaflet-webgl-heatmap/src/webgl-heatmap/webgl-h
 import { v4 as uuidv4 } from 'uuid';
 import { PolygonNode } from 'src/app/models/polygon/polygon-node.model';
 import { OscarItemsService } from '../oscar/oscar-items.service';
-import { RoutingMarker } from '../../models/routing-marker';
 import { PolygonService } from '../polygon-service.service';
 import { LatLng, LatLngBounds, Map as LeafletMap } from 'leaflet';
 import { OscarItem } from '../../models/oscar/oscar-item';
@@ -15,7 +14,7 @@ import { ConfigService } from 'src/app/config/config.service';
 import 'leaflet.awesome-markers';
 import { Cell } from 'src/app/models/cell/cell.model';
 import { maxBy } from 'lodash';
-declare var L;
+declare let L;
 
 @Injectable({
   providedIn: 'root',
@@ -70,11 +69,9 @@ export class MapService {
   ) {}
 
   setView(lat: number, lng: number, zoom: number) {
-    // @ts-ignore
     this._map.setView([lat, lng], zoom);
   }
   get bounds() {
-    // @ts-ignore
     return this._map.getBounds();
   }
   get pixelBounds() {
@@ -93,7 +90,6 @@ export class MapService {
     if (this.routingMarkers.has(name)) {
       this.routingMarkers.get(name).setLatLng([geoPoint.lat, geoPoint.lng]);
     } else {
-      // @ts-ignore
       const marker = L.marker([geoPoint.lat, geoPoint.lng]);
 
       marker.addTo(this.routingMarkerLayer).bindPopup(name).openPopup();
@@ -102,7 +98,6 @@ export class MapService {
     }
   }
   setMapReady(condition: boolean) {
-    // @ts-ignore
     this.route.addTo(this.map);
     // this.heatmapLayer.addTo(this.map);
     this._mapReady.next(condition);
@@ -140,13 +135,13 @@ export class MapService {
         this.nodeLayer.removeLayer(node);
       });
     }
-    let polygon = L.polygon([], {
+    const polygon = L.polygon([], {
       color: color,
       weight: 4,
       opacity: 1,
       smoothFactor: 1,
     });
-    let nodes: L.Marker[] = [];
+    const nodes: L.Marker[] = [];
     const markerHtmlStyles = `
     width: 1.5rem;
     height: 1.5rem;
@@ -156,7 +151,7 @@ export class MapService {
     position: relative;
     border-radius: 50%`;
     for (const node of polygonNodes) {
-      var icon = new L.divIcon({
+      const icon = new L.divIcon({
         html: `<span style= "background-color: ${node.color};${markerHtmlStyles}"></span>`,
       });
       const marker = L.marker([node.lat, node.lng], {
@@ -191,12 +186,12 @@ export class MapService {
     this.clearSearchMarkers();
     this.clearHeatMap();
     if (cells.length === 0) return;
-    let base = 1.7;
+    const base = 1.7;
     const dataPoints = [];
     const max = maxBy(cells, 'numObjects').numObjects;
     const maxLog = Math.max(1, this.getBaseLog(base, max));
     for (const cell of cells) {
-      let logValue = Math.max(1, this.getBaseLog(base, cell.numObjects));
+      const logValue = Math.max(1, this.getBaseLog(base, cell.numObjects));
       const intensityFactor = 0.2 + 0.8 * (logValue / maxLog);
       if (cell.numObjects > 0) {
         dataPoints.push([cell.lat, cell.lng, intensity * intensityFactor]);
@@ -257,7 +252,7 @@ export class MapService {
       ) {
         this.itemStore.currentItemsIds = currentItemsIds;
       }
-      var i = 0;
+      let i = 0;
       this.searchMarkerLayer.eachLayer(marker => {
         if (i == toRemove) {
           return;
@@ -269,10 +264,10 @@ export class MapService {
   }
 
   private getCorrespondingIcon(item) {
-    for (var i = 0; i < item.properties.k.length; i++) {
-      var key = item.properties.k[i];
+    for (let i = 0; i < item.properties.k.length; i++) {
+      const key = item.properties.k[i];
       if (this.configService.iconMapping[key] !== undefined) {
-        var value = item.properties.v[i];
+        const value = item.properties.v[i];
         if (this.configService.iconMapping[key][value] !== undefined) {
           return this.configService.iconMapping[key][value];
         }
@@ -281,7 +276,7 @@ export class MapService {
     return undefined;
   }
   private drawGeoJSON(item): boolean {
-    var icon = this.getCorrespondingIcon(item);
+    const icon = this.getCorrespondingIcon(item);
     const smallIcon = L.AwesomeMarkers.icon({
       icon: icon,
       prefix: 'fa',
@@ -296,7 +291,7 @@ export class MapService {
         });
       },
       onEachFeature: (feature, layer) => {
-        layer.on('click', event => {
+        layer.on('click', () => {
           this.selectedItemService.subject.next(item);
           // layer.options.icon.options.markerColor = "red";
           layer.pointToLayer = L.marker(layer.pointToLayer);
@@ -304,7 +299,7 @@ export class MapService {
             feature.properties.v[item.properties.k.indexOf('name')]
           );
         });
-        layer.on('mouseover', event => {
+        layer.on('mouseover', () => {
           layer.bindPopup('');
         });
       },
@@ -322,9 +317,6 @@ export class MapService {
     this.fitBounds(feature.getBounds());
   }
 
-  drawRoutingMarker(routingMarkers: RoutingMarker[]) {
-    // Creates a red marker with the coffee icon
-  }
   clearRegions() {
     this.regionLayer.clearLayers();
   }
@@ -369,7 +361,7 @@ export class MapService {
     weight: number,
     hover: string
   ) {
-    const rect = L.rectangle(bounds, { color, weight })
+    L.rectangle(bounds, { color, weight })
       .bindTooltip(hover)
       .addTo(this.rectLayer);
   }

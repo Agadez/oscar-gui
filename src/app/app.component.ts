@@ -11,7 +11,6 @@ import { RefinementType } from './models/gui/refinement';
 import { ActivatedRoute } from '@angular/router';
 import { QueryParamsService } from './services/query-params.service';
 import { isEmpty } from 'lodash';
-declare var L;
 
 @Component({
   selector: 'app-root',
@@ -34,7 +33,7 @@ export class AppComponent implements OnInit {
     private queryParams: QueryParamsService
   ) {}
   ngOnInit(): void {
-    this.mapState.bounds$.subscribe(b => {
+    this.mapState.bounds$.subscribe(() => {
       this.changeUrl();
     });
     this.refinementService.refinements$.subscribe(() => this.changeUrl());
@@ -136,7 +135,7 @@ export class AppComponent implements OnInit {
             exKeyValueRefinement.value +
             ',')
       );
-    let urlString = `?q=${encodeURIComponent(
+    const urlString = `?q=${encodeURIComponent(
       this.query
     )}&b=${latLong.toBBoxString()}&${keyRefinementsString}&${exKeyRefinementsString}&${keyValueRefinementsString}&${exKeyValueRefinementsString}&${parentRefinementsString}&${exParentRefinementsString}`;
     this.location.go(urlString);

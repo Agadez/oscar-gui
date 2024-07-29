@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { OscarItemsService } from '../../services/oscar/oscar-items.service';
 
 @Component({
@@ -14,7 +14,9 @@ export class AddressInputComponent implements OnInit {
   @Input()
   output: string;
   constructor(private oscarItemsService: OscarItemsService) {}
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // No initialization needed
+  }
   change() {
     const query = `@addr:street:${this.street} @addr:housenumber:${this.houseNumber} @addr:country:${this.country} @addr:postcode:${this.postcode}`;
     this.oscarItemsService

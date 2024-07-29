@@ -57,7 +57,7 @@ export class ConfigService {
   }
   getIconMapping(key: string, value: string) {
     if (this.iconMapping[key] !== undefined) {
-      let icon = this.iconMapping[key][value];
+      const icon = this.iconMapping[key][value];
       return icon;
     }
     return '';

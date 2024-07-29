@@ -34,7 +34,7 @@ export class ItemStoreService {
     this.itemsIds.next(itemIds);
   }
   updateItemsFromBinary(binaryItems) {
-    let items = this.oscarItemsService.binaryItemsToOscarMin(binaryItems);
+    const items = this.oscarItemsService.binaryItemsToOscarMin(binaryItems);
     this._items.next(items);
     const itemIds: number[] = [];
     items.forEach(item => {

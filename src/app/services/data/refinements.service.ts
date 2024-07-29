@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { TagSuggestion } from '../../models/osm/tag-suggestion';
 import { ActiveRefinement } from '../../models/gui/refinement';
 import * as _ from 'lodash';
 

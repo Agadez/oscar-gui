@@ -7,7 +7,7 @@ import { Cell } from 'src/app/models/cell/cell.model';
 import { indexOf, maxBy, mean, minBy } from 'lodash';
 import { Map as LeafletMap } from 'leaflet';
 
-declare var L;
+declare let L;
 
 export class Grid {
   ids: Uint32Array;
@@ -51,7 +51,7 @@ export class Grid {
   }
   buildProjectedGrid(items: OscarMinItem[]) {
     // possible issues with 4k monitors
-    let size = this.map.getSize();
+    const size = this.map.getSize();
     this.gridX = Math.ceil(size.x / this.scale);
     this.gridY = Math.ceil(size.y / this.scale);
     this.currentMinXPos = 0;
@@ -66,7 +66,7 @@ export class Grid {
       if (
         !this.isInsideCurrentView(potentialCoords.xPos, potentialCoords.yPos)
       ) {
-        let respectingRadius = this.isRadiusInside(
+        const respectingRadius = this.isRadiusInside(
           item.lat,
           item.lng,
           item.boundingRadius
@@ -170,19 +170,19 @@ export class Grid {
     this.currentMaxLat = north;
     this.currentMaxLng = east;
 
-    let northWest = L.CRS.EPSG3857.latLngToPoint(
+    const northWest = L.CRS.EPSG3857.latLngToPoint(
       L.latLng(north, west),
       this.zoom
     );
-    let northEast = L.CRS.EPSG3857.latLngToPoint(
+    const northEast = L.CRS.EPSG3857.latLngToPoint(
       L.latLng(north, east),
       this.zoom
     );
-    let southWest = L.CRS.EPSG3857.latLngToPoint(
+    const southWest = L.CRS.EPSG3857.latLngToPoint(
       L.latLng(south, west),
       this.zoom
     );
-    let southEast = L.CRS.EPSG3857.latLngToPoint(
+    const southEast = L.CRS.EPSG3857.latLngToPoint(
       L.latLng(south, east),
       this.zoom
     );
@@ -200,19 +200,19 @@ export class Grid {
       Math.max(northEast.y, southEast.y)
     );
 
-    let northWestOverflow = L.CRS.EPSG3857.latLngToPoint(
+    const northWestOverflow = L.CRS.EPSG3857.latLngToPoint(
       L.latLng(north + this.maxBoundingRadius, west - this.maxBoundingRadius),
       this.zoom
     );
-    let northEastOverflow = L.CRS.EPSG3857.latLngToPoint(
+    const northEastOverflow = L.CRS.EPSG3857.latLngToPoint(
       L.latLng(north + this.maxBoundingRadius, east + this.maxBoundingRadius),
       this.zoom
     );
-    let southWestOverflow = L.CRS.EPSG3857.latLngToPoint(
+    const southWestOverflow = L.CRS.EPSG3857.latLngToPoint(
       L.latLng(south - this.maxBoundingRadius, west - this.maxBoundingRadius),
       this.zoom
     );
-    let southEastOverflow = L.CRS.EPSG3857.latLngToPoint(
+    const southEastOverflow = L.CRS.EPSG3857.latLngToPoint(
       L.latLng(south - this.maxBoundingRadius, east + this.maxBoundingRadius),
       this.zoom
     );
@@ -244,11 +244,11 @@ export class Grid {
   }
 
   isInsideBounds(south: number, west: number, north: number, east: number) {
-    let northWest = L.CRS.EPSG3857.latLngToPoint(
+    const northWest = L.CRS.EPSG3857.latLngToPoint(
       L.latLng(north, west),
       this.zoom
     );
-    let southEast = L.CRS.EPSG3857.latLngToPoint(
+    const southEast = L.CRS.EPSG3857.latLngToPoint(
       L.latLng(south, east),
       this.zoom
     );
@@ -277,12 +277,13 @@ export class Grid {
     yMax = Math.min(this.gridY - 1, yMax);
     for (let i = xMin; i <= xMax; i++) {
       for (let j = yMin; j <= yMax; j++) {
-        let firstItemIndex = this.helperArray[j * this.gridX + i];
-        let offset = this.helperArray[j * this.gridX + i + 1] - firstItemIndex;
-        let lats = [];
-        let lngs = [];
+        const firstItemIndex = this.helperArray[j * this.gridX + i];
+        const offset =
+          this.helperArray[j * this.gridX + i + 1] - firstItemIndex;
+        const lats = [];
+        const lngs = [];
         for (let k = 0; k < offset; k++) {
-          let itemIndex = firstItemIndex + k;
+          const itemIndex = firstItemIndex + k;
           if (cellsWanted) {
             lats.push(this.lats[itemIndex]);
             lngs.push(this.lngs[itemIndex]);
@@ -358,25 +359,25 @@ export class Grid {
       lat + boundingRadius,
       lng + boundingRadius
     );
-    let minX = Math.min(
+    const minX = Math.min(
       minXminY.xPos,
       minXmaxY.xPos,
       maxXminY.xPos,
       maxXMaxY.xPos
     );
-    let maxX = Math.max(
+    const maxX = Math.max(
       minXminY.xPos,
       minXmaxY.xPos,
       maxXminY.xPos,
       maxXMaxY.xPos
     );
-    let minY = Math.min(
+    const minY = Math.min(
       minXminY.yPos,
       minXmaxY.yPos,
       maxXminY.yPos,
       maxXMaxY.yPos
     );
-    let maxY = Math.max(
+    const maxY = Math.max(
       minXminY.yPos,
       minXmaxY.yPos,
       maxXminY.yPos,
@@ -391,8 +392,8 @@ export class Grid {
     return { xPos: -1, yPos: -1 };
   }
   refineGrid(polygon: Polygon) {
-    var polygonCoordinates: Point[] = [];
-    var polygonTrueCoordinates: Point[] = [];
+    const polygonCoordinates: Point[] = [];
+    const polygonTrueCoordinates: Point[] = [];
     const grid = Array.from({ length: this.gridX }, () =>
       Array.from({ length: this.gridY }, () => [])
     );
@@ -417,12 +418,12 @@ export class Grid {
         let cornerInside = 0;
         for (let a = i; a <= i + 1; a++) {
           for (let b = j; b <= j + 1; b++) {
-            var counter = 0;
+            let counter = 0;
             const startingPoint = new Point(a, b);
             const endingPoint = new Point(this.gridX + 1, b);
             const infiniteLine = new Line(startingPoint, endingPoint);
-            for (var k = 0; k < polygonCoordinates.length; k++) {
-              var border = new Line(
+            for (let k = 0; k < polygonCoordinates.length; k++) {
+              const border = new Line(
                 polygonCoordinates[k],
                 polygonCoordinates[(k + 1) % polygonCoordinates.length]
               );
@@ -439,12 +440,12 @@ export class Grid {
         if (cornerInside == 0) {
           grid[i][j] = [];
         } else if (cornerInside < 4) {
-          let firstItemIndex = this.helperArray[j * this.gridX + i];
-          let offset =
+          const firstItemIndex = this.helperArray[j * this.gridX + i];
+          const offset =
             this.helperArray[j * this.gridX + i + 1] - firstItemIndex;
           for (let k = 0; k < offset; k++) {
-            let itemIndex = firstItemIndex + k;
-            var counter = 0;
+            const itemIndex = firstItemIndex + k;
+            let counter = 0;
             const startingPoint = new Point(
               this.lats[itemIndex],
               this.lngs[itemIndex]
@@ -452,7 +453,7 @@ export class Grid {
             const endingPoint = new Point(10000, this.lngs[itemIndex]);
             const infiniteLine = new Line(startingPoint, endingPoint);
             for (let l = 0; l < polygonTrueCoordinates.length; l++) {
-              var border = new Line(
+              const border = new Line(
                 polygonTrueCoordinates[l],
                 polygonTrueCoordinates[(l + 1) % polygonTrueCoordinates.length]
               );
@@ -481,22 +482,22 @@ export class Grid {
     this.buildOffsetArray(grid);
   }
   checkIntersect(infiniteLine: Line, border: Line) {
-    let dir1 = this.orientation(
+    const dir1 = this.orientation(
       infiniteLine.startingPoint,
       infiniteLine.endingPoint,
       border.startingPoint
     );
-    let dir2 = this.orientation(
+    const dir2 = this.orientation(
       infiniteLine.startingPoint,
       infiniteLine.endingPoint,
       border.endingPoint
     );
-    let dir3 = this.orientation(
+    const dir3 = this.orientation(
       border.startingPoint,
       border.endingPoint,
       infiniteLine.startingPoint
     );
-    let dir4 = this.orientation(
+    const dir4 = this.orientation(
       border.startingPoint,
       border.endingPoint,
       infiniteLine.endingPoint
@@ -522,7 +523,7 @@ export class Grid {
     return false;
   }
   orientation(a, b, c) {
-    var val = (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y);
+    const val = (b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y);
 
     if (val == 0) return 0;
     return val > 0 ? 1 : 2;

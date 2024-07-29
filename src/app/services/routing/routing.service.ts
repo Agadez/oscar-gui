@@ -4,7 +4,6 @@ import { GeoPoint } from '../../models/geo-point';
 import { RoutingPath } from '../../models/routing/routing';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
-import { Route } from 'src/app/models/routing/route.model';
 
 export enum RoutingType {
   Car = 'car',

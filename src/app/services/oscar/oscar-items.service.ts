@@ -106,7 +106,7 @@ export class OscarItemsService {
       this.configService.getOscarUrl() + `/oscar/itemdb/multiple`;
     return this.http.post(queryString, formdata);
   }
-  getRegion(query: string, queryId: number = 0): Observable<OscarItem[]> {
+  getRegion(query: string): Observable<OscarItem[]> {
     return this.http.get<OscarItem[]>(
       this.configService.getOscarUrl() +
         `/oscar/items/isregion?q=${encodeURIComponent(query)}`

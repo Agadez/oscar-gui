@@ -39,7 +39,7 @@
     },
 
     createIcon: function () {
-      var div = document.createElement('div'),
+      let div = document.createElement('div'),
         options = this.options;
 
       if (options.icon) {
@@ -56,7 +56,7 @@
     },
 
     _createInner: function () {
-      var iconClass,
+      let iconClass,
         iconSpinClass = '',
         iconColorClass = '',
         iconColorStyle = '',
@@ -101,7 +101,7 @@
     },
 
     _setIconStyles: function (img, name) {
-      var options = this.options,
+      let options = this.options,
         size = L.point(options[name === 'shadow' ? 'shadowSize' : 'iconSize']),
         anchor;
 
@@ -129,7 +129,7 @@
     },
 
     createShadow: function () {
-      var div = document.createElement('div');
+      let div = document.createElement('div');
 
       this._setIconStyles(div, 'shadow');
       return div;

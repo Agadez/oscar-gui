@@ -1,5 +1,4 @@
 import { GeoPoint } from '../geo-point';
-import { RoutingMarker } from '../routing-marker';
 
 export class Route {
   active: boolean;

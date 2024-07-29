@@ -13,7 +13,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { PolygonService } from '../../services/polygon-service.service';
 import { GridService } from '../../services/data/grid.service';
 
-declare var L;
+declare let L;
 
 @Component({
   selector: 'app-polygon',

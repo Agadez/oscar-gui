@@ -1,4 +1,4 @@
-declare var L;
+declare let L;
 export class Region {
   regionId: number;
   name: string;

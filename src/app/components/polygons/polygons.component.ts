@@ -4,6 +4,7 @@ import {
   Output,
   OnInit,
   NgZone,
+  OnChanges,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -18,7 +19,7 @@ import { PolygonService } from 'src/app/services/polygon-service.service';
   templateUrl: './polygons.component.html',
   styleUrls: ['./polygons.component.sass'],
 })
-export class PolygonsComponent implements OnInit {
+export class PolygonsComponent implements OnInit, OnChanges {
   constructor(public polygonService: PolygonService) {}
   @Input()
   polygonVisible;
@@ -52,7 +53,7 @@ export class PolygonsComponent implements OnInit {
 
   // Method that assures that the selected Tab is activated and can therefor be modified.
   changeTab($event: MatTabChangeEvent) {
-    let index = $event.index;
+    const index = $event.index;
     if (this.polygonsEmpty) {
       return;
     }

@@ -1,15 +1,7 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  NgZone,
-  OnInit,
-  Output,
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { OscarItem } from '../../models/oscar/oscar-item';
 import { ItemStoreService } from '../../services/data/item-store.service';
 import { MapService } from '../../services/map/map.service';
-import { OscarMinItem } from '../../models/oscar/oscar-min-item';
 import { LocationService } from '../../services/location.service';
 import { GeoPoint } from '../../models/geo-point';
 import { RoutingService } from 'src/app/services/routing/routing.service';
@@ -64,7 +56,7 @@ export class ItemDetailComponent implements OnInit {
     });
   }
 
-  handleClick(event: MouseEvent) {
+  handleClick(_event: MouseEvent) {
     this.itemClick.emit(this.oscarItem);
   }
 }

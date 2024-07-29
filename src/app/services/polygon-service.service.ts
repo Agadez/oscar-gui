@@ -3,7 +3,6 @@ import { BehaviorSubject, Subject } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { PolygonNode } from '../models/polygon/polygon-node.model';
 import { Polygon } from '../models/polygon/polygon.model';
-import { GridService } from './data/grid.service';
 import { ItemStoreService } from './data/item-store.service';
 import { LatLng } from 'leaflet';
 
@@ -57,7 +56,7 @@ export class PolygonService {
     }
   }
   addNode(polygonUuid: uuidv4, polygonNode: PolygonNode) {
-    let polygon = this.polygonMapping.get(polygonUuid).polygonNodes;
+    const polygon = this.polygonMapping.get(polygonUuid).polygonNodes;
     polygon.push(polygonNode);
     this.polygonMapping.set(
       polygonUuid,
@@ -73,7 +72,7 @@ export class PolygonService {
   }
 
   dragNode(polygonUuid: uuidv4, nodeUuid: uuidv4, dragEndPosition: LatLng) {
-    let newPolygon = this.polygonMapping.get(polygonUuid);
+    const newPolygon = this.polygonMapping.get(polygonUuid);
     const index = newPolygon.polygonNodes.findIndex(n => n.uuid === nodeUuid);
     newPolygon.polygonNodes[index].lat = dragEndPosition.lat;
     newPolygon.polygonNodes[index].lng = dragEndPosition.lng;

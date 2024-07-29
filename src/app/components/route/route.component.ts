@@ -24,7 +24,7 @@ import { LeafletEvent } from 'leaflet';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { debounceTime } from 'rxjs/operators';
 
-declare var L;
+declare let L;
 
 // export const removeRoutingPointEvent = new Subject<GeoPoint>();
 
@@ -281,23 +281,20 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
   }
   toHHMMSS(secNum: number) {
     console.log(secNum);
-    let hours = Math.floor(secNum / 3600);
-    let minutes = Math.floor((secNum - hours * 3600) / 60);
-    let seconds = secNum - hours * 3600 - minutes * 60;
+    const hours = Math.floor(secNum / 3600);
+    const minutes = Math.floor((secNum - hours * 3600) / 60);
+    const seconds = secNum - hours * 3600 - minutes * 60;
 
-    if (hours < 10) {
-      // @ts-ignore
-      hours = '0' + hours;
-    }
+    let result: string = '';
+
+    result += hours + 'h ';
     if (minutes < 10) {
-      // @ts-ignore
-      minutes = '0' + minutes;
-    }
+      result += '0' + minutes + 'm ';
+    } else result += minutes + 'm ';
     if (seconds < 10) {
-      // @ts-ignore
-      seconds = '0' + seconds;
-    }
-    return hours + 'h ' + minutes + 'm';
+      result += '0' + seconds + 's';
+    } else result += seconds + 's';
+    return result;
   }
   formatLabel(value: number) {
     return Math.round(value) + 'km';

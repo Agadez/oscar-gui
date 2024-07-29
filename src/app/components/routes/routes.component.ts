@@ -5,6 +5,7 @@ import {
   OnInit,
   SimpleChanges,
   ViewChild,
+  OnChanges,
 } from '@angular/core';
 import { MatTabChangeEvent } from '@angular/material/tabs';
 import { activateRouting } from '../search/search.component';
@@ -18,7 +19,7 @@ import { MatTabGroup } from '@angular/material/tabs';
   templateUrl: './routes.component.html',
   styleUrls: ['./routes.component.sass'],
 })
-export class RoutesComponent implements OnInit {
+export class RoutesComponent implements OnInit, OnChanges {
   @ViewChild('tabs', { static: false }) activeTab: MatTabGroup;
   @Input()
   routesVisible = false;

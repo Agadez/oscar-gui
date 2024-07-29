@@ -6,8 +6,6 @@ import { environment } from './environments/environment';
 import '../node_modules/leaflet-webgl-heatmap/dist/leaflet-webgl-heatmap.min';
 import '../src/vendor/leaflet-vector-markers.min.js';
 
-declare var L;
-
 if (environment.production) {
   enableProdMode();
 }
