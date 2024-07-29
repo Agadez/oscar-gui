@@ -92,7 +92,7 @@ export class MapService {
     } else {
       const marker = L.marker([geoPoint.lat, geoPoint.lng]);
 
-      marker.addTo(this.routingMarkerLayer).bindPopup(name).openPopup();
+      marker.addTo(this.routingMarkerLayer).bindPopup(name);
       this.routingMarkers.set(name, marker);
       return marker;
     }

@@ -22,8 +22,9 @@ $back: #efedf1;
 //   @include mat.all-component-themes($my-app-theme);
 
 // }
-
-$base-color: #007884;
+.bg-primary {
+  background-color: $primary-color;
+}
 * {
   margin: 0;
 }
