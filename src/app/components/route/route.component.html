@@ -21,7 +21,7 @@
     </mat-button-toggle-group>-->
     <div class="wrapper-route-props">
       <div class="wrapper-id-set">
-        <span>Identification:</span>
+        <h2 style="margin: 0">Identification:</h2>
         <input
           [(ngModel)]="id"
           style="
@@ -35,8 +35,10 @@
           appBlurOnEnter />
       </div>
       <div class="wrapper-id-set">
-        <p>Distance:</p>
-        <span *ngIf="distance > 0">{{ distance | number }} km</span>
+        <h2 style="margin: 0">Distance:</h2>
+        <h3 style="margin: 0" *ngIf="distance > 0">
+          {{ distance | number }} km
+        </h3>
       </div>
       <!-- <div class="wrapper-id-set">
         <p>Time needed:</p>
