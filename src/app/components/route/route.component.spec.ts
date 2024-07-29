@@ -8,9 +8,8 @@ describe('RoutingProgressBarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ RouteComponent ]
-    })
-    .compileComponents();
+      declarations: [RouteComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

@@ -1,14 +1,14 @@
-import { Injectable } from "@angular/core";
-import { BehaviorSubject, Subject } from "rxjs";
-import { v4 as uuidv4 } from "uuid";
-import { PolygonNode } from "../models/polygon/polygon-node.model";
-import { Polygon } from "../models/polygon/polygon.model";
-import { GridService } from "./data/grid.service";
-import { ItemStoreService } from "./data/item-store.service";
-import { LatLng } from "leaflet";
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { v4 as uuidv4 } from 'uuid';
+import { PolygonNode } from '../models/polygon/polygon-node.model';
+import { Polygon } from '../models/polygon/polygon.model';
+import { GridService } from './data/grid.service';
+import { ItemStoreService } from './data/item-store.service';
+import { LatLng } from 'leaflet';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class PolygonService {
   constructor(private store: ItemStoreService) {}
@@ -51,7 +51,7 @@ export class PolygonService {
   //   }
   // }
   clearPolygon(uuid: uuidv4) {
-    this.polygonMapping.set(uuid, new Polygon([], "", ""));
+    this.polygonMapping.set(uuid, new Polygon([], '', ''));
     if (this.activatedPolygons.has(uuid)) {
       this.store.updateItems([]);
     }
@@ -74,7 +74,7 @@ export class PolygonService {
 
   dragNode(polygonUuid: uuidv4, nodeUuid: uuidv4, dragEndPosition: LatLng) {
     let newPolygon = this.polygonMapping.get(polygonUuid);
-    const index = newPolygon.polygonNodes.findIndex((n) => n.uuid === nodeUuid);
+    const index = newPolygon.polygonNodes.findIndex(n => n.uuid === nodeUuid);
     newPolygon.polygonNodes[index].lat = dragEndPosition.lat;
     newPolygon.polygonNodes[index].lng = dragEndPosition.lng;
     newPolygon.polygonQuery = this.getQueryString(newPolygon.polygonNodes);
@@ -92,7 +92,7 @@ export class PolygonService {
 
   removeNode(polygonUuid: uuidv4, uuid: uuidv4) {
     const polygon = this.polygonMapping.get(polygonUuid).polygonNodes;
-    const index = polygon.findIndex((node) => {
+    const index = polygon.findIndex(node => {
       return node.uuid === uuid;
     });
     if (index !== -1) {
@@ -111,7 +111,7 @@ export class PolygonService {
     }
   }
   getQueryString(polygon: PolygonNode[]) {
-    let polygonString = "";
+    let polygonString = '';
     let index = 0;
     for (const node of polygon) {
       if (index == 0) {
@@ -149,8 +149,8 @@ export class PolygonService {
   }
 
   getRandomColor(): string {
-    const letters = "0123456789ABCDEF";
-    let color = "#";
+    const letters = '0123456789ABCDEF';
+    let color = '#';
     for (let i = 0; i < 6; i++) {
       color += letters[Math.floor(Math.random() * 16)];
     }

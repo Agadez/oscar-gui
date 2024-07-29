@@ -7,17 +7,14 @@
     margin: 0 auto;
     width: 100%;
     display: flex;
-    align-items:center;
+    align-items: center;
     justify-content: center;
-    visibility:hidden;
-    z-index:1;
-    
-  "
->
+    visibility: hidden;
+    z-index: 1;
+  ">
   <div
     class="bg-light h-100 mat-elevation-z3"
-    style="max-width: 30vw; border-radius: 10px; visibility:visible;"
-  >
+    style="max-width: 30vw; border-radius: 10px; visibility: visible">
     <div *ngIf="expanded">
       <app-item-kv-table [oscarItem]="item"></app-item-kv-table>
     </div>
@@ -29,20 +26,17 @@
         justify-content: space-between;
         padding-left: 10px;
         padding-right: 10px;
-      "
-    >
+      ">
       <div
         class="d-flex align-items-center"
-        style="justify-content: space-between; width: 40%"
-      >
+        style="justify-content: space-between; width: 40%">
         <mat-icon color="primary">place</mat-icon>
         <span style="margin-top: 2px">{{ name }}</span>
       </div>
       <button
         mat-icon-button
         [color]="expanded ? 'primary' : null"
-        (click)="showInfo()"
-      >
+        (click)="showInfo()">
         <mat-icon>info</mat-icon>
       </button>
       <button mat-icon-button (click)="addToRoute()">

@@ -8,9 +8,8 @@ describe('SearchResultViewComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SearchResultViewComponent ]
-    })
-    .compileComponents();
+      declarations: [SearchResultViewComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

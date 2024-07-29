@@ -1,9 +1,9 @@
-import { PolygonNode } from "./polygon-node.model";
+import { PolygonNode } from './polygon-node.model';
 
 export class Polygon {
   polygonNodes: PolygonNode[] = [];
-  polygonQuery: string = "";
-  boundingBoxString: string = "";
+  polygonQuery: string = '';
+  boundingBoxString: string = '';
 
   constructor(
     polygonNodes: PolygonNode[],

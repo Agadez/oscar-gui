@@ -5,34 +5,33 @@ import {
   NgZone,
   OnInit,
   Output,
-} from "@angular/core";
-import { OscarMinItem } from "../../models/oscar/oscar-min-item";
-import { MapService } from "../../services/map/map.service";
-import { OscarItemsService } from "../../services/oscar/oscar-items.service";
-import { GridService } from "../../services/data/grid.service";
-import _, { forEach } from "lodash";
+} from '@angular/core';
+import { MapService } from '../../services/map/map.service';
+import { OscarItemsService } from '../../services/oscar/oscar-items.service';
+import { GridService } from '../../services/data/grid.service';
+import _ from 'lodash';
 import {
   FacetRefinements,
   ParentRefinements,
-} from "../../models/oscar/refinements";
-import { SearchService } from "../../services/search/search.service";
-import { forkJoin, Subject } from "rxjs";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import { ItemStoreService } from "src/app/services/data/item-store.service";
-import { PolygonService } from "src/app/services/polygon-service.service";
-import { debounceTime, throttleTime } from "rxjs/operators";
-import { QueryParamsService } from "src/app/services/query-params.service";
-import { Cell } from "src/app/models/cell/cell.model";
-import {MatSliderModule} from '@angular/material/slider';
-import { debounce } from "lodash";
+} from '../../models/oscar/refinements';
+import { SearchService } from '../../services/search/search.service';
+import { Subject } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { ItemStoreService } from 'src/app/services/data/item-store.service';
+import { PolygonService } from 'src/app/services/polygon-service.service';
+import { debounceTime } from 'rxjs/operators';
+import { QueryParamsService } from 'src/app/services/query-params.service';
+import { Cell } from 'src/app/models/cell/cell.model';
+// import { MatSliderModule } from '@angular/material/slider';
+// import { debounce } from "lodash";
 
 export const clearItems = new Subject<string>();
 export const radiusSearchTrigger = new Subject<L.LatLng>();
 
 @Component({
-  selector: "app-search-result-view",
-  templateUrl: "./search-result-view.component.html",
-  styleUrls: ["./search-result-view.component.sass"]
+  selector: 'app-search-result-view',
+  templateUrl: './search-result-view.component.html',
+  styleUrls: ['./search-result-view.component.sass'],
 })
 export class SearchResultViewComponent implements OnInit {
   constructor(
@@ -74,12 +73,12 @@ export class SearchResultViewComponent implements OnInit {
   drawing = false;
 
   ngOnInit(): void {
-    this.paramsService.setQuery.subscribe((set) => {
-      if (set && this.paramsService.queryString != "")
+    this.paramsService.setQuery.subscribe(set => {
+      if (set && this.paramsService.queryString != '')
         this.mapService.shared = true;
       else this.mapService.shared = false;
     });
-    this.itemStoreService.items$.subscribe((items) => {
+    this.itemStoreService.items$.subscribe(items => {
       if (items.length == 0) {
         this.hideCounts = true;
       } else {
@@ -88,15 +87,15 @@ export class SearchResultViewComponent implements OnInit {
         this.zone.run(() => (this.globalCounts = items.length));
       }
     });
-    this.itemStoreService.currentItemsIds$.subscribe((currentItemsIds) => {
+    this.itemStoreService.currentItemsIds$.subscribe(currentItemsIds => {
       this.zone.run(() => {
         this.localCounts = currentItemsIds.length;
       });
     });
-    this.searchService.queryToDraw$.subscribe(async (queryString) => {
+    this.searchService.queryToDraw$.subscribe(async queryString => {
       await this.drawQuery(queryString);
     });
-    this.mapService.onMoved$.pipe(debounceTime(100)).subscribe((event) => {
+    this.mapService.onMoved$.pipe(debounceTime(100)).subscribe(event => {
       if (event !== null) {
         this.reDrawSearchMarkers();
       }
@@ -104,25 +103,25 @@ export class SearchResultViewComponent implements OnInit {
     this.mapService.onZoom$.subscribe(() => {
       this.mapService.clearHeatMap();
     });
-    this.searchService.clearItems.asObservable().subscribe((value) => {
+    this.searchService.clearItems.asObservable().subscribe(value => {
       if (value) {
         this.clearItems();
       }
     });
-    this.mapService.onContextMenu$.subscribe(async (event) => {
-      if (event) {
-      }
-      // await this.searchRadius(event.latlng);
-    });
-    this.mapService._mapReady.subscribe((ready) => {
+    // this.mapService.onContextMenu$.subscribe(async event => {
+    //   if (event) {
+    //   }
+    //   // await this.searchRadius(event.latlng);
+    // });
+    this.mapService._mapReady.subscribe(ready => {
       if (!ready) {
         return;
       }
-      this.mapService._map.on("click", async (event: any) => {
-        // await this.searchRadius(event.latlng);
-      });
+      // this.mapService._map.on('click', async (event: any) => {
+      //   // await this.searchRadius(event.latlng);
+      // });
     });
-    radiusSearchTrigger.asObservable().subscribe(async (latlng) => {
+    radiusSearchTrigger.asObservable().subscribe(async latlng => {
       if (!latlng) return;
       await this.searchRadius(latlng);
     });
@@ -148,7 +147,7 @@ export class SearchResultViewComponent implements OnInit {
       }
     }
     if (!foundSomething) {
-      this.snackBar.open("Nothing found!", "close", {
+      this.snackBar.open('Nothing found!', 'close', {
         duration: 2000,
       });
     }
@@ -171,7 +170,7 @@ export class SearchResultViewComponent implements OnInit {
       this.heatmapSliderVisible = false;
       this.progress = 1;
       this.oscarItemsService.getItemsBinary(queryString).subscribe(
-        (binaryItems) => {
+        binaryItems => {
           this.itemStoreService.updateItemsFromBinary(binaryItems);
           // this.itemCheck(queryString);
 
@@ -179,27 +178,23 @@ export class SearchResultViewComponent implements OnInit {
 
           this.oscarItemsService
             .getParents(queryString, 0)
-            .subscribe((parents) => {
+            .subscribe(parents => {
               this.zone.run(() => (this.parentRefinements = parents));
               this.progress += 25;
             });
-          this.oscarItemsService
-            .getFacets(queryString, 0)
-            .subscribe((facets) => {
-              this.zone.run(() => (this.facetRefinements = facets));
-              this.progress += 25;
-            });
+          this.oscarItemsService.getFacets(queryString, 0).subscribe(facets => {
+            this.zone.run(() => (this.facetRefinements = facets));
+            this.progress += 25;
+          });
           this.searchLoading.emit(false);
         },
-        (error) => {
-          console.error("Error fetching data:", error);
+        error => {
+          console.error('Error fetching data:', error);
         }
       );
     }
   }
   reDrawSearchMarkers() {
-    this.mapService.clearSearchMarkers();
-    this.mapService.clearHeatMap();
     const bounds = this.mapService.bounds;
     this.zone.run(() => {
       const current = this.gridService.getCurrentItems(
@@ -237,7 +232,7 @@ export class SearchResultViewComponent implements OnInit {
     this.reDrawSearchMarkers();
   }
 
-  globalClick($event: MouseEvent) {
+  globalClick() {
     this.showLocal = false;
     this.showGlobal = !this.showGlobal;
     this.showParents = false;

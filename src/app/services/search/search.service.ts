@@ -1,21 +1,21 @@
-import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable, Subject } from "rxjs";
-import { RefinementsService } from "../data/refinements.service";
-import { MapService } from "../map/map.service";
-import { OscarItemsService } from "../oscar/oscar-items.service";
-import { PolygonService } from "../polygon-service.service";
-import { RefinementType } from "../../models/gui/refinement";
-import { TextUtil } from "../../util/text-util";
-import { OscarItem } from "src/app/models/oscar/oscar-item";
-import { RoutingDataStoreService } from "../data/routing-data-store.service";
-import { RoutingService, RoutingType } from "../routing/routing.service";
-import { OscarApxstats } from "src/app/models/oscar/oscar-apxstats";
-import { GridService } from "../data/grid.service";
-import { ItemStoreService } from "../data/item-store.service";
-import { MatDialog } from "@angular/material/dialog";
-import { DialogComponent } from "src/app/components/dialog/dialog.component";
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { RefinementsService } from '../data/refinements.service';
+import { MapService } from '../map/map.service';
+import { OscarItemsService } from '../oscar/oscar-items.service';
+import { PolygonService } from '../polygon-service.service';
+import { RefinementType } from '../../models/gui/refinement';
+import { TextUtil } from '../../util/text-util';
+import { OscarItem } from 'src/app/models/oscar/oscar-item';
+import { RoutingDataStoreService } from '../data/routing-data-store.service';
+import { RoutingService } from '../routing/routing.service';
+import { OscarApxstats } from 'src/app/models/oscar/oscar-apxstats';
+import { GridService } from '../data/grid.service';
+import { ItemStoreService } from '../data/item-store.service';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogComponent } from 'src/app/components/dialog/dialog.component';
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class SearchService {
   constructor(
@@ -32,7 +32,7 @@ export class SearchService {
     this.subscribeRefinements();
   }
 
-  queryToDraw = new BehaviorSubject<string>("");
+  queryToDraw = new BehaviorSubject<string>('');
   readonly queryToDraw$ = this.queryToDraw.asObservable();
 
   displayRegion = new Subject<string>();
@@ -49,91 +49,91 @@ export class SearchService {
 
   localSearch = false;
 
-  fullQueryString = "";
-  routeQueryString = "";
-  idPrependix = "";
-  keyPrependix = "";
-  keyValuePrependix = "";
-  parentPrependix = "";
-  keyAppendix = "";
-  keyValueAppendix = "";
-  parentAppendix = "";
+  fullQueryString = '';
+  routeQueryString = '';
+  idPrependix = '';
+  keyPrependix = '';
+  keyValuePrependix = '';
+  parentPrependix = '';
+  keyAppendix = '';
+  keyValueAppendix = '';
+  parentAppendix = '';
 
   subscribeRefinements() {
-    this.refinementStore.refinements$.subscribe((refinements) => {
-      this.keyValuePrependix = "";
+    this.refinementStore.refinements$.subscribe(refinements => {
+      this.keyValuePrependix = '';
       refinements
         .filter(
-          (refinement) =>
+          refinement =>
             refinement.refinementType === RefinementType.KeyValue &&
             refinement.excluding === false
         )
-        .forEach((refinement) => {
+        .forEach(refinement => {
           this.keyValuePrependix += `@${refinement.key}:${refinement.value} `;
         });
-      this.keyPrependix = "";
+      this.keyPrependix = '';
       refinements
         .filter(
-          (refinement) =>
+          refinement =>
             refinement.refinementType === RefinementType.Key &&
             refinement.excluding === false
         )
-        .forEach((refinement) => {
+        .forEach(refinement => {
           this.keyValuePrependix += `@${refinement.key} `;
         });
-      this.parentPrependix = "";
+      this.parentPrependix = '';
       refinements
         .filter(
-          (refinement) =>
+          refinement =>
             refinement.refinementType === RefinementType.Parent &&
             refinement.excluding === false
         )
-        .forEach((refinement) => {
+        .forEach(refinement => {
           this.parentPrependix += `"${refinement.value}" `;
         });
-      this.keyValueAppendix = "";
+      this.keyValueAppendix = '';
       refinements
         .filter(
-          (refinement) =>
+          refinement =>
             refinement.refinementType === RefinementType.KeyValue &&
             refinement.excluding === true
         )
-        .forEach((refinement) => {
+        .forEach(refinement => {
           this.keyValueAppendix += `-@${refinement.key}:${refinement.value} `;
         });
-      this.keyAppendix = "";
+      this.keyAppendix = '';
       refinements
         .filter(
-          (refinement) =>
+          refinement =>
             refinement.refinementType === RefinementType.Key &&
             refinement.excluding === true
         )
-        .forEach((refinement) => {
+        .forEach(refinement => {
           this.keyAppendix += `-@${refinement.key} `;
         });
-      this.parentAppendix = "";
+      this.parentAppendix = '';
       refinements
         .filter(
-          (refinement) =>
+          refinement =>
             refinement.refinementType === RefinementType.Parent &&
             refinement.excluding === true
         )
-        .forEach((refinement) => {
+        .forEach(refinement => {
           this.parentAppendix += `-"${refinement.value}" `;
         });
-      this.startSearch.next("start");
+      this.startSearch.next('start');
     });
   }
   mapPolygonName(inputString: string, clientRenderingMode: boolean) {
     const polygonMapping = this.polygonService.polygonMapping;
     const nameMapping = this.polygonService.idUuidMap;
     this.polygonService.activatedPolygons = new Map();
-    let activatedPolygons = this.polygonService.activatedPolygons;
-    let newQueryString = "";
+    const activatedPolygons = this.polygonService.activatedPolygons;
+    let newQueryString = '';
     if (clientRenderingMode) {
       newQueryString = inputString.replace(/\$polygon:(\w+)/g, (_, p1) => {
         const uuid = this.polygonService.idUuidMap.get(p1);
-        this.polygonService.activatedPolygons.set(uuid, "");
+        this.polygonService.activatedPolygons.set(uuid, '');
         return this.polygonService.polygonMapping.get(uuid).boundingBoxString;
       });
     } else {
@@ -141,7 +141,7 @@ export class SearchService {
         /\$polygon:(\w+)/g,
         function (_, p1) {
           const uuid = nameMapping.get(p1);
-          activatedPolygons.set(uuid, "");
+          activatedPolygons.set(uuid, '');
           return polygonMapping.get(uuid).polygonQuery;
         }
       );
@@ -149,11 +149,11 @@ export class SearchService {
     return newQueryString;
   }
   createQueryString(inputString: string, clientRenderingMode: boolean) {
-    let polygonString = this.mapPolygonName(inputString, clientRenderingMode);
-    let routeString = this.getRouteQueryString(polygonString);
+    const polygonString = this.mapPolygonName(inputString, clientRenderingMode);
+    const routeString = this.getRouteQueryString(polygonString);
     this.fullQueryString =
       this.idPrependix +
-      ") " +
+      ') ' +
       this.keyPrependix +
       this.keyValuePrependix +
       this.parentPrependix +
@@ -171,15 +171,15 @@ export class SearchService {
       for (const property of regions[0].properties.v) {
         const similarity = TextUtil.similarity(
           property,
-          inputString.replaceAll('"', "")
+          inputString.replaceAll('"', '')
         );
         if (similarity > 0.7) {
           this.gridService.deleteGrid();
           this.store.updateItems([]);
-          this.clearItems.next("clear");
+          this.clearItems.next('clear');
           this.mapService.drawRegion(regions[0]);
           const region = regions[0];
-          this.displayRegion.next(OscarItem.getValue(region, "wikidata"));
+          this.displayRegion.next(OscarItem.getValue(region, 'wikidata'));
           return true;
         }
       }
@@ -193,17 +193,17 @@ export class SearchService {
   getItems(apxStats: OscarApxstats): Promise<boolean> {
     this.displayRegion.next(null);
     this.mapService.clearRegions();
-    return new Promise<boolean>((resolve) => {
+    return new Promise<boolean>(resolve => {
       if (apxStats.items <= this.maxItems) {
         this.queryToDraw.next(this.fullQueryString);
         resolve(true);
       }
       if (apxStats.items > this.maxItems) {
         const dialogRef = this.dialog.open(DialogComponent, {
-          width: "500px",
+          width: '500px',
           data: { maxItems: this.maxItems, returnedItems: apxStats.items },
         });
-        dialogRef.afterClosed().subscribe((result) => {
+        dialogRef.afterClosed().subscribe(result => {
           if (result) {
             this.queryToDraw.next(this.fullQueryString);
             resolve(true);
@@ -213,17 +213,17 @@ export class SearchService {
     });
   }
   getRouteQueryString(inputString) {
-    let newQueryString = inputString.replace(/\$route:(\w+)/g, (_, id) => {
-      let route = this.routingDataStoreService.routesToAdd.get(id);
-      let routingTypeIndicator = 0;
-      let routeString = "$route(0," + routingTypeIndicator;
+    const newQueryString = inputString.replace(/\$route:(\w+)/g, (_, id) => {
+      const route = this.routingDataStoreService.routesToAdd.get(id);
+      const routingTypeIndicator = 0;
+      let routeString = '$route(0,' + routingTypeIndicator;
       for (const point of route.geoPoints) {
         routeString += `,${point.lat},${point.lng}`;
       }
-      routeString += ")";
+      routeString += ')';
       return routeString;
     });
-    return "(" + newQueryString + ")";
+    return '(' + newQueryString + ')';
   }
   queryStringForLocalSearch(inputString: string, clientRenderingMode: boolean) {
     this.createQueryString(inputString, clientRenderingMode);
@@ -232,15 +232,15 @@ export class SearchService {
     return this.fullQueryString;
   }
   addRoute() {
-    this.idPrependix = "(";
+    this.idPrependix = '(';
     if (this.routingService.currentRoute) {
       let first = true;
       for (const cellId of this.routingService.currentRoute.cellIds) {
         if (!first) {
-          this.idPrependix += " + ";
+          this.idPrependix += ' + ';
         }
         first = false;
-        this.idPrependix += "$cell:" + cellId;
+        this.idPrependix += '$cell:' + cellId;
       }
     }
   }

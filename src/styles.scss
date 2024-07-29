@@ -1,13 +1,40 @@
-/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+
+@include mat.core();
+$primary-color: #3f51b5;
+$secondary-color: #828688;
+$secondary-lighter: #cbcdcd;
+$secondary-darker: #323434;
+$back: #efedf1;
+// $my-app-theme: mat.define-theme(
+//   (
+//     color: (
+//       theme-type: light,
+//       primary: mat.$azure-palette,
+//     ),
+//     density: (
+//       scale: 0,
+//     ),
+//   )
+// );
+
+// :root {
+//   @include mat.all-component-themes($my-app-theme);
+
+// }
+
 $base-color: #007884;
-html,
-body {
+* {
+  margin: 0;
+}
+html {
   height: 100%;
   width: 100%;
 }
 body {
   margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  font-weight: normal;
 }
 .refinement-item {
   font-size: small;
@@ -19,6 +46,7 @@ body {
   margin-top: 10px;
   width: 96%;
   margin-left: 2%;
+  border-radius: 20px;
 }
 .refinement-button {
   cursor: pointer;
@@ -27,6 +55,7 @@ body {
 .including-refinement {
   size: 20px;
   color: green;
+  margin-right: 3px;
 }
 .excluding-refinement {
   color: #db4969;
@@ -36,7 +65,9 @@ body {
   height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #ffffff;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -47,6 +78,3 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
-
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

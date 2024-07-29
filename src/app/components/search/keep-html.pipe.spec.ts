@@ -1,9 +1,20 @@
 import { KeepHtmlPipe } from './keep-html.pipe';
-import {DomSanitizer, SafeHtml, SafeResourceUrl, SafeScript, SafeValue, SafeStyle, SafeUrl} from '@angular/platform-browser';
+import {
+  DomSanitizer,
+  SafeHtml,
+  SafeResourceUrl,
+  SafeScript,
+  SafeValue,
+  SafeStyle,
+  SafeUrl,
+} from '@angular/platform-browser';
 import { SecurityContext } from '@angular/core';
 
 class SampleDomSanitizer extends DomSanitizer {
-  sanitize(context: SecurityContext, value: SafeValue | string | null): string | null {
+  sanitize(
+    context: SecurityContext,
+    value: SafeValue | string | null
+  ): string | null {
     throw new Error('Method not implemented.');
   }
   bypassSecurityTrustHtml(value: string): SafeHtml {
@@ -21,7 +32,7 @@ class SampleDomSanitizer extends DomSanitizer {
   bypassSecurityTrustResourceUrl(value: string): SafeResourceUrl {
     throw new Error('Method not implemented.');
   }
-};
+}
 
 describe('KeepHtmlPipe', () => {
   it('create an instance', () => {

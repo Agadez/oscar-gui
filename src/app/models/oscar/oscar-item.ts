@@ -24,14 +24,12 @@ export class OscarItem {
       }
     }
   }
-  static setFirstPoint(item: OscarItem): void {
-
-  }
+  static setFirstPoint(item: OscarItem): void {}
   static getValue(item: OscarItem, key: string): string {
     for (let i = 0; i < item.properties.k.length; i++) {
       const searchKey = item.properties.k[i];
       console.log('key-search', key, searchKey, key === searchKey);
-      if (key === searchKey ) {
+      if (key === searchKey) {
         return item.properties.v[i];
       }
     }

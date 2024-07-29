@@ -1,4 +1,4 @@
-import {GeoPoint} from '../geo-point';
+import { GeoPoint } from '../geo-point';
 
 export class CellInfo {
   id: number;

@@ -1,30 +1,30 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit } from '@angular/core';
 import {
   Location,
   LocationStrategy,
   PathLocationStrategy,
-} from "@angular/common";
-import { MapStateService } from "./services/state/map-state.service";
-import { RefinementsService } from "./services/data/refinements.service";
-import { MapService } from "./services/map/map.service";
-import { RefinementType } from "./models/gui/refinement";
-import { ActivatedRoute } from "@angular/router";
-import { QueryParamsService } from "./services/query-params.service";
-import { isEmpty } from "lodash";
+} from '@angular/common';
+import { MapStateService } from './services/state/map-state.service';
+import { RefinementsService } from './services/data/refinements.service';
+import { MapService } from './services/map/map.service';
+import { RefinementType } from './models/gui/refinement';
+import { ActivatedRoute } from '@angular/router';
+import { QueryParamsService } from './services/query-params.service';
+import { isEmpty } from 'lodash';
 declare var L;
 
 @Component({
-  selector: "app-root",
-  templateUrl: "./app.component.html",
-  styleUrls: ["./app.component.scss"],
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss'],
   providers: [
     Location,
     { provide: LocationStrategy, useClass: PathLocationStrategy },
   ],
 })
 export class AppComponent implements OnInit {
-  title = "oscar-gui";
-  query = "";
+  title = 'oscar-gui';
+  query = '';
   constructor(
     private location: Location,
     private mapState: MapStateService,
@@ -34,14 +34,14 @@ export class AppComponent implements OnInit {
     private queryParams: QueryParamsService
   ) {}
   ngOnInit(): void {
-    this.mapState.bounds$.subscribe((b) => {
+    this.mapState.bounds$.subscribe(b => {
       this.changeUrl();
     });
     this.refinementService.refinements$.subscribe(() => this.changeUrl());
-    this.route.queryParams.subscribe((params) => {
+    this.route.queryParams.subscribe(params => {
       if (isEmpty(params)) return;
       this.queryParams.paramsFromQuery(params);
-      this.location.replaceState("/");
+      this.location.replaceState('/');
     });
   }
 
@@ -50,91 +50,91 @@ export class AppComponent implements OnInit {
     if (!latLong) {
       return;
     }
-    if (this.query === "") {
+    if (this.query === '') {
       return;
     }
-    let parentRefinementsString = "p=";
+    let parentRefinementsString = 'p=';
     this.refinementService
       .getRefinements()
       .filter(
-        (refinement) =>
+        refinement =>
           refinement.refinementType === RefinementType.Parent &&
           refinement.excluding === false
       )
       .forEach(
-        (parentRefinement) =>
+        parentRefinement =>
           (parentRefinementsString +=
-            encodeURIComponent(parentRefinement.value) + ",")
+            encodeURIComponent(parentRefinement.value) + ',')
       );
-    let exParentRefinementsString = "ep=";
+    let exParentRefinementsString = 'ep=';
     this.refinementService
       .getRefinements()
       .filter(
-        (refinement) =>
+        refinement =>
           refinement.refinementType === RefinementType.Parent &&
           refinement.excluding === true
       )
       .forEach(
-        (parentRefinement) =>
+        parentRefinement =>
           (exParentRefinementsString +=
-            encodeURIComponent(parentRefinement.value) + ",")
+            encodeURIComponent(parentRefinement.value) + ',')
       );
-    let keyRefinementsString = "k=";
+    let keyRefinementsString = 'k=';
     this.refinementService
       .getRefinements()
       .filter(
-        (refinement) =>
+        refinement =>
           refinement.refinementType === RefinementType.Key &&
           refinement.excluding === false
       )
       .forEach(
-        (keyRefinement) =>
-          (keyRefinementsString += encodeURIComponent(keyRefinement.key) + ",")
+        keyRefinement =>
+          (keyRefinementsString += encodeURIComponent(keyRefinement.key) + ',')
       );
-    let exKeyRefinementsString = "ek=";
+    let exKeyRefinementsString = 'ek=';
     this.refinementService
       .getRefinements()
       .filter(
-        (refinement) =>
+        refinement =>
           refinement.refinementType === RefinementType.Key &&
           refinement.excluding === true
       )
       .forEach(
-        (exKeyRefinement) =>
+        exKeyRefinement =>
           (exKeyRefinementsString +=
-            encodeURIComponent(exKeyRefinement.key) + ",")
+            encodeURIComponent(exKeyRefinement.key) + ',')
       );
-    let keyValueRefinementsString = "kv=";
+    let keyValueRefinementsString = 'kv=';
     this.refinementService
       .getRefinements()
       .filter(
-        (refinement) =>
+        refinement =>
           refinement.refinementType === RefinementType.KeyValue &&
           refinement.excluding === false
       )
       .forEach(
-        (keyValueRefinement) =>
+        keyValueRefinement =>
           (keyValueRefinementsString +=
             encodeURIComponent(keyValueRefinement.key) +
-            ":" +
+            ':' +
             keyValueRefinement.value +
-            ",")
+            ',')
       );
-    let exKeyValueRefinementsString = "ekv=";
+    let exKeyValueRefinementsString = 'ekv=';
     this.refinementService
       .getRefinements()
       .filter(
-        (refinement) =>
+        refinement =>
           refinement.refinementType === RefinementType.KeyValue &&
           refinement.excluding === true
       )
       .forEach(
-        (exKeyValueRefinement) =>
+        exKeyValueRefinement =>
           (exKeyValueRefinementsString +=
             encodeURIComponent(exKeyValueRefinement.key) +
-            ":" +
+            ':' +
             exKeyValueRefinement.value +
-            ",")
+            ',')
       );
     let urlString = `?q=${encodeURIComponent(
       this.query

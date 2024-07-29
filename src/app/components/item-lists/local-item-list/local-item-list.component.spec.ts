@@ -8,9 +8,8 @@ describe('LocalItemListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ LocalItemListComponent ]
-    })
-    .compileComponents();
+      declarations: [LocalItemListComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

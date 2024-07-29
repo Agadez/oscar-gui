@@ -8,30 +8,30 @@ import {
   OnInit,
   Output,
   SimpleChanges,
-} from "@angular/core";
-import { MapService } from "../../services/map/map.service";
-import { RoutingMarker } from "../../models/routing-marker";
-import { CdkDragDrop } from "@angular/cdk/drag-drop";
-import { moveItemInArray } from "@angular/cdk/drag-drop";
+} from '@angular/core';
+import { MapService } from '../../services/map/map.service';
+import { RoutingMarker } from '../../models/routing-marker';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { moveItemInArray } from '@angular/cdk/drag-drop';
 import {
   RoutingService,
   RoutingType,
-} from "../../services/routing/routing.service";
-import { GeoPoint } from "../../models/geo-point";
-import { RoutingDataStoreService } from "../../services/data/routing-data-store.service";
-import { Subject } from "rxjs";
-import { LeafletEvent } from "leaflet";
-import {MatSnackBar } from "@angular/material/snack-bar";
-import { debounceTime } from "rxjs/operators";
+} from '../../services/routing/routing.service';
+import { GeoPoint } from '../../models/geo-point';
+import { RoutingDataStoreService } from '../../services/data/routing-data-store.service';
+import { Subject } from 'rxjs';
+import { LeafletEvent } from 'leaflet';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { debounceTime } from 'rxjs/operators';
 
 declare var L;
 
 // export const removeRoutingPointEvent = new Subject<GeoPoint>();
 
 @Component({
-  selector: "app-route",
-  templateUrl: "./route.component.html",
-  styleUrls: ["./route.component.sass"],
+  selector: 'app-route',
+  templateUrl: './route.component.html',
+  styleUrls: ['./route.component.sass'],
 })
 export class RouteComponent implements OnInit, OnChanges, OnDestroy {
   constructor(
@@ -42,7 +42,7 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
     private snackBar: MatSnackBar
   ) {}
   @Input()
-  id: string;
+  id: string = '';
   @Input()
   active = true;
   @Input()
@@ -63,25 +63,26 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
   @Input()
   routesVisible = false;
 
-  deprecatedId: string = "";
+  deprecatedId: string;
   showIdForm = false;
   @Output()
   needIdEvent = new EventEmitter<{
     deprecatedId: string;
     currentId: string;
   }>();
+  @Output()
+  addTab = new EventEmitter<string>();
 
   setId() {
     if (this.deprecatedId == this.id) return;
     if (this.id == undefined) return;
     if (!this.routingDataStoreService.routesToAdd.has(this.id)) {
       this.routingDataStoreService.routesToAdd.set(this.id, {
-        geoPoints: this.routingMarkers.map((value) => value.geoPoint),
+        geoPoints: this.routingMarkers.map(value => value.geoPoint),
         routingType: this.routingType,
       });
       if (this.routingDataStoreService.routesToAdd.has(this.deprecatedId))
         this.routingDataStoreService.routesToAdd.delete(this.deprecatedId);
-      this.toggleIdForm();
       this.needIdEvent.emit({
         deprecatedId: this.deprecatedId,
         currentId: this.id,
@@ -89,10 +90,8 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
       this.deprecatedId = this.id;
     }
   }
-  toggleIdForm() {
-    this.showIdForm = !this.showIdForm;
-  }
   ngOnInit(): void {
+    this.deprecatedId = this.id;
     let init = true;
     this.polyLine = L.polyline([], {
       color: this.color,
@@ -101,34 +100,32 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
       smoothFactor: 1,
     });
     this.mapService._route.next(true);
-    this.mapService.onClick$.subscribe((event) => {
+    this.mapService.onClick$.subscribe(event => {
       if (!event || init || !this.active || !this.routesVisible) {
         return;
       }
       this.zone.run(() => {
         this.addRoutingPoint({
           point: new GeoPoint(event.latlng.lat, event.latlng.lng),
-          name: "",
+          name: '',
         });
       });
     });
     if (this.initialPoint) {
       this.addRoutingPoint(this.initialPoint);
     }
-    this.routingService.addRoutingPointEvent
-      .asObservable()
-      .subscribe((point) => {
-        if (init) {
-          return;
-        }
-        if (!this.active) {
-          return;
-        }
+    this.routingService.addRoutingPointEvent.asObservable().subscribe(point => {
+      if (init) {
+        return;
+      }
+      if (!this.active) {
+        return;
+      }
 
-        this.addRoutingPoint(point);
-      });
+      this.addRoutingPoint(point);
+    });
 
-    this.mapService.onMapReady$.subscribe((mapReady) => {
+    this.mapService.onMapReady$.subscribe(mapReady => {
       if (mapReady) {
         this.mapService._map.addLayer(this.routingMarkerLayer);
         this.mapService._map.addLayer(this.polyLine);
@@ -153,8 +150,8 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
     this.updateRoute();
   }
   getRandomColor(): string {
-    const letters = "0123456789ABCDEF";
-    let color = "#";
+    const letters = '0123456789ABCDEF';
+    let color = '#';
     for (let i = 0; i < 6; i++) {
       color += letters[Math.floor(Math.random() * 16)];
     }
@@ -171,18 +168,18 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
   updateRoute() {
     this.routingService
       .getRoute(
-        this.routingMarkers.map((marker) => marker.geoPoint),
+        this.routingMarkers.map(marker => marker.geoPoint),
         1000,
         this.routingType
       )
-      .subscribe((result) => {
+      .subscribe(result => {
         if (!result) {
-          this.snackBar.open("No Route!", "close", {
+          this.snackBar.open('No Route!', 'close', {
             duration: 2000,
           });
         }
         this.drawRoute(
-          result.path.map((point) => new GeoPoint(point[0], point[1]))
+          result.path.map(point => new GeoPoint(point[0], point[1]))
         );
         this.addToSearch();
         this.time = result.distance;
@@ -191,7 +188,7 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
   calcDistance() {
     let previousPoint: L.LatLng = null;
     let distance = 0;
-    this.polyLine.getLatLngs().forEach((currLatLng) => {
+    this.polyLine.getLatLngs().forEach(currLatLng => {
       if (previousPoint) {
         distance += previousPoint.distanceTo(currLatLng);
       }
@@ -222,7 +219,7 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
   addToSearch() {
     if (this.id !== undefined) {
       this.routingDataStoreService.routesToAdd.set(this.id, {
-        geoPoints: this.routingMarkers.map((value) => value.geoPoint),
+        geoPoints: this.routingMarkers.map(value => value.geoPoint),
         routingType: this.routingType,
       });
     }
@@ -231,7 +228,7 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
   addToSearchCheckbox() {
     if (this.checkboxActive) {
       this.routingDataStoreService.routesToAdd.set(this.color, {
-        geoPoints: this.routingMarkers.map((value) => value.geoPoint),
+        geoPoints: this.routingMarkers.map(value => value.geoPoint),
         routingType: this.routingType,
       });
     } else {
@@ -241,17 +238,16 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
 
   removePoint(color: string) {
     this.routingMarkers = this.routingMarkers.filter(
-      (value) => value.color !== color
+      value => value.color !== color
     );
     this.updateRoute();
     this.drawMarkers();
   }
   drawMarkers() {
     this.routingMarkerLayer.clearLayers();
-    let i = 0;
     for (const routingMarker of this.routingMarkers) {
       const redMarker = L.VectorMarkers.icon({
-        icon: "location",
+        icon: 'location',
         markerColor: routingMarker.color,
       });
       const marker = L.marker(
@@ -260,12 +256,11 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
       );
       marker.addTo(this.routingMarkerLayer);
       const dragSubject = new Subject<LeafletEvent>();
-      marker.on("drag", (event: LeafletEvent) => dragSubject.next(event));
+      marker.on('drag', (event: LeafletEvent) => dragSubject.next(event));
       dragSubject
         .pipe(debounceTime(this.routingService.debounceTime))
-        .subscribe((event) => this.markerDragHandler(event));
+        .subscribe(event => this.markerDragHandler(event));
       routingMarker.leafletId = marker._leaflet_id;
-      i++;
     }
   }
   async markerDragHandler(event) {
@@ -292,19 +287,23 @@ export class RouteComponent implements OnInit, OnChanges, OnDestroy {
 
     if (hours < 10) {
       // @ts-ignore
-      hours = "0" + hours;
+      hours = '0' + hours;
     }
     if (minutes < 10) {
       // @ts-ignore
-      minutes = "0" + minutes;
+      minutes = '0' + minutes;
     }
     if (seconds < 10) {
       // @ts-ignore
-      seconds = "0" + seconds;
+      seconds = '0' + seconds;
     }
-    return hours + "h " + minutes + "m";
+    return hours + 'h ' + minutes + 'm';
   }
   formatLabel(value: number) {
-    return Math.round(value) + "km";
+    return Math.round(value) + 'km';
+  }
+
+  emitNewTab() {
+    this.addTab.emit();
   }
 }

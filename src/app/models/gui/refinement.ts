@@ -1,7 +1,7 @@
 export enum RefinementType {
   Parent,
   Key,
-  KeyValue
+  KeyValue,
 }
 export class Refinement {
   id: number;

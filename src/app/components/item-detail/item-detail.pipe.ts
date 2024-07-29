@@ -1,13 +1,11 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {OscarItem} from '../../models/oscar/oscar-item';
+import { OscarItem } from '../../models/oscar/oscar-item';
 
 @Pipe({
-  name: 'itemDetail'
+  name: 'itemDetail',
 })
 export class ItemDetailPipe implements PipeTransform {
-
   transform(value: OscarItem, args?: any): string {
     return ``;
   }
-
 }

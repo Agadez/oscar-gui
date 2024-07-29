@@ -6,17 +6,17 @@ import {
   OnInit,
   SimpleChange,
   SimpleChanges,
-} from "@angular/core";
-import { OscarMinItem } from "../../models/oscar/oscar-min-item";
-import { OscarItem } from "../../models/oscar/oscar-item";
-import { OscarItemsService } from "../../services/oscar/oscar-items.service";
-import { MapService } from "../../services/map/map.service";
-import { ItemStoreService } from "src/app/services/data/item-store.service";
+} from '@angular/core';
+import { OscarMinItem } from '../../models/oscar/oscar-min-item';
+import { OscarItem } from '../../models/oscar/oscar-item';
+import { OscarItemsService } from '../../services/oscar/oscar-items.service';
+import { MapService } from '../../services/map/map.service';
+import { ItemStoreService } from 'src/app/services/data/item-store.service';
 
 @Component({
-  selector: "app-new-item-list",
-  templateUrl: "./new-item-list.component.html",
-  styleUrls: ["./new-item-list.component.sass"],
+  selector: 'app-new-item-list',
+  templateUrl: './new-item-list.component.html',
+  styleUrls: ['./new-item-list.component.sass'],
 })
 export class NewItemListComponent implements OnInit, OnChanges {
   constructor(
@@ -31,7 +31,7 @@ export class NewItemListComponent implements OnInit, OnChanges {
   fetchCount = 20;
   detail = false;
   detailItem: OscarItem;
-  markerId = "Selected Item";
+  markerId = 'Selected Item';
   @Input()
   currentItemsIds: number[];
   ngOnInit(): void {
@@ -74,7 +74,7 @@ export class NewItemListComponent implements OnInit, OnChanges {
           currentLength + this.fetchCount
         )
       )
-      .subscribe((items) => {
+      .subscribe(items => {
         this.zone.run(() => this.items.push(...items));
       });
   }
@@ -90,6 +90,6 @@ export class NewItemListComponent implements OnInit, OnChanges {
     this.mapService.deleteMarker(this.markerId);
   }
   scroll(detailDiv: HTMLDivElement) {
-    detailDiv.scrollIntoView({ behavior: "smooth" });
+    detailDiv.scrollIntoView({ behavior: 'smooth' });
   }
 }

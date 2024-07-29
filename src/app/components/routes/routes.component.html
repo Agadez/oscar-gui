@@ -1,43 +1,36 @@
-<button
-  class="add-route-button"
-  mat-raised-button
-  color="primary"
-  (click)="addTab()"
->
-  Add new route
-</button>
-
 <mat-tab-group
   mat-stretch-tabs
   #tabs
-  style="margin-top: 10px; border-radius: 3px"
   class="route-tabs"
-  (selectedTabChange)="changeTab($event)"
->
-  <mat-tab *ngFor="let route of this.routes">
-    <ng-template class="w-100 d-flex justify-content-between" mat-tab-label>
-      <i
-        class="fas fa-route"
-        [hidden]="route.id !== ''"
-        [style.color]="route.color"
-      ></i>
-      <h6 [hidden]="route.id === ''" [style.color]="route.color">
-        {{ route.id }}
-      </h6>
-      <i
-        style="cursor: pointer"
-        (click)="closeTab(route)"
-        class="fas fa-times ml-4"
-      ></i>
-    </ng-template>
-    <app-route
-      (needIdEvent)="emit($event)"
-      [id]=""
-      [routesVisible]="routesVisible"
-      [destroy]="route.destroyed"
-      [active]="route.active"
-      [color]="route.color"
-      [initialPoint]="route.initialPoint"
-    ></app-route>
-  </mat-tab>
+  (selectedTabChange)="changeTab($event)">
+  @for (route of this.routes; track route; let i = $index) {
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <label class="route-tab"
+          ><i
+            class="fas fa-route fa-lg"
+            [hidden]="route.id !== ''"
+            [style.color]="route.color"></i>
+          <h2
+            [hidden]="route.id === ''"
+            [ngStyle]="{ color: route.color, margin: '0' }">
+            {{ route.id }}
+          </h2>
+          <i
+            style="cursor: pointer"
+            (click)="closeTab(route)"
+            class="fas fa-times fa-lg"></i
+        ></label>
+      </ng-template>
+      <app-route
+        (needIdEvent)="emit($event)"
+        (addTab)="addTab()"
+        [id]="(i + 1).toString()"
+        [routesVisible]="routesVisible"
+        [destroy]="route.destroyed"
+        [active]="route.active"
+        [color]="route.color"
+        [initialPoint]="route.initialPoint"></app-route>
+    </mat-tab>
+  }
 </mat-tab-group>

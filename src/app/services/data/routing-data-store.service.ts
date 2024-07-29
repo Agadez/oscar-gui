@@ -1,9 +1,9 @@
-import { Injectable } from "@angular/core";
-import { GeoPoint } from "../../models/geo-point";
-import { RoutingType } from "../routing/routing.service";
+import { Injectable } from '@angular/core';
+import { GeoPoint } from '../../models/geo-point';
+import { RoutingType } from '../routing/routing.service';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class RoutingDataStoreService {
   routesToAdd = new Map<

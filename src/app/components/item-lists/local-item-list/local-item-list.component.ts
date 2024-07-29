@@ -1,14 +1,14 @@
-import { Component, OnInit, NgZone } from "@angular/core";
-import { GeoPoint } from "src/app/models/geo-point";
-import { OscarItem } from "src/app/models/oscar/oscar-item";
-import { ItemStoreService } from "src/app/services/data/item-store.service";
-import { MapService } from "src/app/services/map/map.service";
-import { OscarItemsService } from "src/app/services/oscar/oscar-items.service";
+import { Component, OnInit, NgZone } from '@angular/core';
+import { GeoPoint } from 'src/app/models/geo-point';
+import { OscarItem } from 'src/app/models/oscar/oscar-item';
+import { ItemStoreService } from 'src/app/services/data/item-store.service';
+import { MapService } from 'src/app/services/map/map.service';
+import { OscarItemsService } from 'src/app/services/oscar/oscar-items.service';
 
 @Component({
-  selector: "app-local-item-list",
-  templateUrl: "./local-item-list.component.html",
-  styleUrls: ["./local-item-list.component.sass"],
+  selector: 'app-local-item-list',
+  templateUrl: './local-item-list.component.html',
+  styleUrls: ['./local-item-list.component.sass'],
 })
 export class LocalItemListComponent implements OnInit {
   constructor(
@@ -23,10 +23,10 @@ export class LocalItemListComponent implements OnInit {
   currentItems: number[] = [];
   detail = false;
   detailItem: OscarItem;
-  markerId = "Selected Item";
+  markerId = 'Selected Item';
 
   ngOnInit(): void {
-    this.store.currentItemsIds$.subscribe((items) => {
+    this.store.currentItemsIds$.subscribe(items => {
       this.currentItems = items;
       this.listedItems = [];
       this.queryNewItems();
@@ -50,7 +50,7 @@ export class LocalItemListComponent implements OnInit {
           currentLength + this.fetchCount
         )
       )
-      .subscribe((items) => {
+      .subscribe(items => {
         this.zone.run(() => this.listedItems.push(...items));
       });
   }
@@ -68,6 +68,6 @@ export class LocalItemListComponent implements OnInit {
     this.mapService.deleteMarker(this.markerId);
   }
   scroll(detailDiv: HTMLDivElement) {
-    detailDiv.scrollIntoView({ behavior: "smooth" });
+    detailDiv.scrollIntoView({ behavior: 'smooth' });
   }
 }

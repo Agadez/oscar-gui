@@ -1,8 +1,8 @@
-import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PolygonsComponent } from "./polygons.component";
+import { PolygonsComponent } from './polygons.component';
 
-describe("PolygonsComponent", () => {
+describe('PolygonsComponent', () => {
   let component: PolygonsComponent;
   let fixture: ComponentFixture<PolygonsComponent>;
 
@@ -18,7 +18,7 @@ describe("PolygonsComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });

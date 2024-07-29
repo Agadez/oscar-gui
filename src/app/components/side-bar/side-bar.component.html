@@ -6,8 +6,7 @@
     display: flex;
     flex-direction: column;
     position: fixed;
-  "
->
+  ">
   <app-search
     [noResult]="noResult"
     [loading]="searchLoading"
@@ -15,23 +14,24 @@
     (impressumVisibleEvent)="impressumVisible = $event"
     (helpVisibleEvent)="helpVisible = $event"
     (polygonVisibleEvent)="polygonVisible = $event.valueOf()"
-    (preferencesVisibleEvent)="preferencesVisible = $event.valueOf()"
-  ></app-search>
+    (preferencesVisibleEvent)="
+      preferencesVisible = $event.valueOf()
+    "></app-search>
   <div style="overflow: auto; margin-top: 5px">
-    <app-impressum *ngIf="impressumVisible"></app-impressum>
-    <app-help *ngIf="helpVisible"></app-help>
     <app-preference *ngIf="preferencesVisible"></app-preference>
     <app-routes
       [routesVisible]="routesVisible"
-      [hidden]="!routesVisible"
-    ></app-routes>
-    <app-polygons [polygonVisible] = "polygonVisible" [hidden]="!polygonVisible"></app-polygons>
+      [hidden]="!routesVisible"></app-routes>
+    <app-polygons
+      [polygonVisible]="polygonVisible"
+      [hidden]="!polygonVisible"></app-polygons>
     <!-- <button (click)="sort()"></button> -->
     <app-search-result-view
       (noResult)="noResult = $event"
       (searchLoading)="searchLoading = $event"
-      [routesVisible]="routesVisible"
-    ></app-search-result-view>
+      [routesVisible]="routesVisible"></app-search-result-view>
     <app-region></app-region>
+    <app-impressum *ngIf="impressumVisible"></app-impressum>
+    <app-help *ngIf="helpVisible"></app-help>
   </div>
 </div>

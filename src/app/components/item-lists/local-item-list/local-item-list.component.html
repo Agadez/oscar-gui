@@ -1,11 +1,27 @@
-<div [hidden]="listedItems.length === 0" class="scrolling-wrapper rounded">
-    <div id="list-div" #listDiv class="list-div rounded" infinite-scroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="30" (scrolled)="onScrollDown()" [scrollWindow]="false">
-      <ul class="list-group list-inner-div" >
-        <li class="list-group-item" *ngFor="let item of listedItems"><app-item-detail (itemClick)="clickOnItem(item); scroll(detailDiv)" [oscarItem]="item"></app-item-detail></li>
-      </ul>
-    </div>
-    <div #detailDiv class="detail-div">
-      <button mat-button (click)="backButtonClick($event); scroll(listDiv)"><i class="fas fa-chevron-left"></i></button>
-      <app-item-kv-table  class="item-detail" [oscarItem]="detailItem"></app-item-kv-table>
-    </div>
+<div [hidden]="listedItems.length === 0" class="scrolling-wrapper">
+  <div
+    id="list-div"
+    #listDiv
+    class="list-div"
+    infinite-scroll
+    [infiniteScrollDistance]="2"
+    [infiniteScrollThrottle]="30"
+    (scrolled)="onScrollDown()"
+    [scrollWindow]="false">
+    <ul class="list-group list-inner-div">
+      <li class="list-group-item" *ngFor="let item of listedItems">
+        <app-item-detail
+          (itemClick)="clickOnItem(item); scroll(detailDiv)"
+          [oscarItem]="item"></app-item-detail>
+      </li>
+    </ul>
   </div>
+  <div #detailDiv class="detail-div">
+    <button mat-button (click)="backButtonClick($event); scroll(listDiv)">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    <app-item-kv-table
+      class="item-detail"
+      [oscarItem]="detailItem"></app-item-kv-table>
+  </div>
+</div>

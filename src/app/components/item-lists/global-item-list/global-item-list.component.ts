@@ -1,14 +1,14 @@
-import { Component, OnInit, NgZone } from "@angular/core";
-import { OscarItem } from "src/app/models/oscar/oscar-item";
-import { ItemStoreService } from "src/app/services/data/item-store.service";
-import { OscarItemsService } from "src/app/services/oscar/oscar-items.service";
-import { MapService } from "src/app/services/map/map.service";
-import { GeoPoint } from "src/app/models/geo-point";
+import { Component, OnInit, NgZone } from '@angular/core';
+import { OscarItem } from 'src/app/models/oscar/oscar-item';
+import { ItemStoreService } from 'src/app/services/data/item-store.service';
+import { OscarItemsService } from 'src/app/services/oscar/oscar-items.service';
+import { MapService } from 'src/app/services/map/map.service';
+import { GeoPoint } from 'src/app/models/geo-point';
 
 @Component({
-  selector: "app-global-item-list",
-  templateUrl: "./global-item-list.component.html",
-  styleUrls: ["./global-item-list.component.sass"],
+  selector: 'app-global-item-list',
+  templateUrl: './global-item-list.component.html',
+  styleUrls: ['./global-item-list.component.sass'],
 })
 export class GlobalItemListComponent implements OnInit {
   constructor(
@@ -23,10 +23,10 @@ export class GlobalItemListComponent implements OnInit {
   allItems: number[] = [];
   detail = false;
   detailItem: OscarItem;
-  markerId = "Selected Item";
+  markerId = 'Selected Item';
 
   ngOnInit(): void {
-    this.store.itemsIds.subscribe((items) => {
+    this.store.itemsIds.subscribe(items => {
       this.allItems = items;
       this.listedItems = [];
       this.queryNewItems();
@@ -47,7 +47,7 @@ export class GlobalItemListComponent implements OnInit {
       .getItemsInfoByIds(
         this.allItems.slice(currentLength, currentLength + this.fetchCount)
       )
-      .subscribe((items) => {
+      .subscribe(items => {
         this.zone.run(() => this.listedItems.push(...items));
       });
   }
@@ -65,6 +65,6 @@ export class GlobalItemListComponent implements OnInit {
     this.mapService.deleteMarker(this.markerId);
   }
   scroll(detailDiv: HTMLDivElement) {
-    detailDiv.scrollIntoView({ behavior: "smooth" });
+    detailDiv.scrollIntoView({ behavior: 'smooth' });
   }
 }

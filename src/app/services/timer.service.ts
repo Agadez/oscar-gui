@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TimerService {
   time: number;
   private startTime: number;
-  constructor() { }
+  constructor() {}
   start() {
     this.startTime = Date.now();
   }

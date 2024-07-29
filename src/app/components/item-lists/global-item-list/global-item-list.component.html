@@ -7,14 +7,12 @@
     [infiniteScrollDistance]="2"
     [infiniteScrollThrottle]="30"
     (scrolled)="onScrollDown()"
-    [scrollWindow]="false"
-  >
+    [scrollWindow]="false">
     <ul class="list-group list-inner-div">
       <li class="list-group-item" *ngFor="let item of listedItems">
         <app-item-detail
           (itemClick)="clickOnItem(item); scroll(detailDiv)"
-          [oscarItem]="item"
-        ></app-item-detail>
+          [oscarItem]="item"></app-item-detail>
       </li>
     </ul>
   </div>
@@ -24,7 +22,6 @@
     </button>
     <app-item-kv-table
       class="item-detail"
-      [oscarItem]="detailItem"
-    ></app-item-kv-table>
+      [oscarItem]="detailItem"></app-item-kv-table>
   </div>
 </div>

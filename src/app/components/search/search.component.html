@@ -10,14 +10,13 @@
         (keydown.enter)="enterKey()"
         type="text"
         class="search-input"
-        placeholder="Search"
-      />
+        placeholder="Search" />
       <mat-autocomplete
         #normal_auto="matAutocomplete"
         (closed)="panelClosed()"
-        (optionActivated)="panelOpened()"
-      >
+        (optionActivated)="panelOpened()">
         <mat-option
+          class="autocomplete"
           *ngFor="let option of normalSuggestions"
           [value]="inputWithoutCurrentWord(inputString, option)"
           >&#64;{{ option.k }}:{{ option.v }}</mat-option
@@ -32,13 +31,11 @@
         (ngModelChange)="naturalUpdate($event)"
         (keydown.enter)="search()"
         [formControl]="myControl"
-        [matAutocomplete]="auto"
-      />
+        [matAutocomplete]="auto" />
       <mat-autocomplete
         #auto="matAutocomplete"
         (optionSelected)="panelClosed()"
-        (optionActivated)="panelOpened()"
-      >
+        (optionActivated)="panelOpened()">
         <mat-option
           *ngFor="let option of suggestions"
           [value]="option.prefix + option.suggestion"
@@ -55,8 +52,7 @@
         <span matTooltip="Route menu">
           <i
             (click)="toggleRouting()"
-            class="fas fa-route {{ sideButtonClass }}"
-          ></i>
+            class="fas fa-route {{ sideButtonClass }}"></i>
         </span>
         <span matTooltip="Polygon menu">
           <i
@@ -64,9 +60,8 @@
             class="fa-solid fa-draw-polygon"
             [ngClass]="{
               'side-button': !polygonVisible,
-              'side-button-active': polygonVisible
-            }"
-          ></i>
+              'side-button-active': polygonVisible,
+            }"></i>
         </span>
         <span matTooltip="Preferences">
           <i
@@ -74,25 +69,22 @@
             class="fas fa-cog"
             [ngClass]="{
               'side-button': !preferences,
-              'side-button-active': preferences
-            }"
-          ></i>
+              'side-button-active': preferences,
+            }"></i>
         </span>
         <span matTooltip="Share">
           <i
             (click)="copyToClipboard()"
-            class="fa fa-share-nodes side-button"
-          ></i>
+            class="fa fa-share-nodes side-button"></i>
         </span>
-        <span matTooltip="Impressum"
+        <span matTooltip="Imprint"
           ><i
             (click)="toggleImpressum()"
             class="fa fa-paragraph"
             [ngClass]="{
               'side-button': !impressumVisible,
-              'side-button-active': impressumVisible
-            }"
-          ></i>
+              'side-button-active': impressumVisible,
+            }"></i>
         </span>
         <span matTooltip="Help"
           ><i
@@ -100,9 +92,8 @@
             class="fa fa-question"
             [ngClass]="{
               'side-button': !helpVisible,
-              'side-button-active': helpVisible
-            }"
-          ></i
+              'side-button-active': helpVisible,
+            }"></i
         ></span>
       </div>
     </div>

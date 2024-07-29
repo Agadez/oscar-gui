@@ -6,17 +6,17 @@ import {
   NgZone,
   SimpleChanges,
   ViewChild,
-} from "@angular/core";
-import { MatTabChangeEvent } from "@angular/material/tabs";
+} from '@angular/core';
+import { MatTabChangeEvent } from '@angular/material/tabs';
 
-import { MatTabGroup } from "@angular/material/tabs";
-import { v4 as uuidv4 } from "uuid";
-import { PolygonService } from "src/app/services/polygon-service.service";
+import { MatTabGroup } from '@angular/material/tabs';
+import { v4 as uuidv4 } from 'uuid';
+import { PolygonService } from 'src/app/services/polygon-service.service';
 
 @Component({
-  selector: "app-polygons",
-  templateUrl: "./polygons.component.html",
-  styleUrls: ["./polygons.component.sass"],
+  selector: 'app-polygons',
+  templateUrl: './polygons.component.html',
+  styleUrls: ['./polygons.component.sass'],
 })
 export class PolygonsComponent implements OnInit {
   constructor(public polygonService: PolygonService) {}
@@ -26,7 +26,7 @@ export class PolygonsComponent implements OnInit {
   tabIndexToId: uuidv4[] = [];
   uuidToName = new Map();
 
-  @ViewChild("tabs", { static: false }) activeTab: MatTabGroup;
+  @ViewChild('tabs', { static: false }) activeTab: MatTabGroup;
   ngOnInit(): void {}
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.polygonVisible) {
@@ -40,7 +40,7 @@ export class PolygonsComponent implements OnInit {
     const uuid = uuidv4();
     this.polygonService.addPolygon(uuid, []);
     this.tabIndexToId.push(uuid);
-    this.uuidToName.set(uuid, "");
+    this.uuidToName.set(uuid, '');
     if (this.polygonsEmpty) {
       this.polygonsEmpty = false;
       return;

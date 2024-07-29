@@ -1,11 +1,11 @@
-import { OscarMinItem } from "../oscar/oscar-min-item";
-import { Bounds, LatLngBounds } from "leaflet";
-import { Polygon } from "src/app/models/polygon/polygon.model";
-import { Point } from "src/app/models/ray/point.model";
-import { Line } from "src/app/models/ray/line.model";
-import { Cell } from "src/app/models/cell/cell.model";
-import { indexOf, maxBy, mean, minBy } from "lodash";
-import { Map as LeafletMap } from "leaflet";
+import { OscarMinItem } from '../oscar/oscar-min-item';
+import { Bounds, LatLngBounds } from 'leaflet';
+import { Polygon } from 'src/app/models/polygon/polygon.model';
+import { Point } from 'src/app/models/ray/point.model';
+import { Line } from 'src/app/models/ray/line.model';
+import { Cell } from 'src/app/models/cell/cell.model';
+import { indexOf, maxBy, mean, minBy } from 'lodash';
+import { Map as LeafletMap } from 'leaflet';
 
 declare var L;
 
@@ -170,8 +170,6 @@ export class Grid {
     this.currentMaxLat = north;
     this.currentMaxLng = east;
 
-    
-
     let northWest = L.CRS.EPSG3857.latLngToPoint(
       L.latLng(north, west),
       this.zoom
@@ -189,10 +187,18 @@ export class Grid {
       this.zoom
     );
 
-    this.currentMinXPos = this.getXPositionInGrid(Math.min(northWest.x, northEast.x));
-    this.currentMinYPos = this.getYPositionInGrid(Math.min(northWest.y,southWest.y));
-    this.currentMaxXPos = this.getXPositionInGrid(Math.max(southWest.x,southEast.x));
-    this.currentMaxYPos = this.getYPositionInGrid(Math.max(northEast.y,southEast.y));
+    this.currentMinXPos = this.getXPositionInGrid(
+      Math.min(northWest.x, northEast.x)
+    );
+    this.currentMinYPos = this.getYPositionInGrid(
+      Math.min(northWest.y, southWest.y)
+    );
+    this.currentMaxXPos = this.getXPositionInGrid(
+      Math.max(southWest.x, southEast.x)
+    );
+    this.currentMaxYPos = this.getYPositionInGrid(
+      Math.max(northEast.y, southEast.y)
+    );
 
     let northWestOverflow = L.CRS.EPSG3857.latLngToPoint(
       L.latLng(north + this.maxBoundingRadius, west - this.maxBoundingRadius),
@@ -211,26 +217,30 @@ export class Grid {
       this.zoom
     );
 
-
     this.currentMinXOffset = Math.max(
       0,
-      this.getXPositionInGrid(Math.min(northWestOverflow.x, northEastOverflow.x))
+      this.getXPositionInGrid(
+        Math.min(northWestOverflow.x, northEastOverflow.x)
+      )
     );
     this.currentMinYOffset = Math.max(
       0,
-      this.getYPositionInGrid(Math.min(northWestOverflow.y, southWestOverflow.y))
+      this.getYPositionInGrid(
+        Math.min(northWestOverflow.y, southWestOverflow.y)
+      )
     );
     this.currentMaxXOffset = Math.min(
       this.gridX - 1,
-      this.getXPositionInGrid(Math.max(southWestOverflow.x, southEastOverflow.x))
+      this.getXPositionInGrid(
+        Math.max(southWestOverflow.x, southEastOverflow.x)
+      )
     );
     this.currentMaxYOffset = Math.min(
       this.gridY - 1,
-      this.getYPositionInGrid(Math.max(northEastOverflow.y,southEastOverflow.y))
+      this.getYPositionInGrid(
+        Math.max(northEastOverflow.y, southEastOverflow.y)
+      )
     );
-    console.log(this.map.getPixelBounds(), this.pixelBounds);
-    console.log(this.currentMinXPos, this.currentMaxXPos);
-    
   }
 
   isInsideBounds(south: number, west: number, north: number, east: number) {
@@ -387,7 +397,7 @@ export class Grid {
       Array.from({ length: this.gridY }, () => [])
     );
     let amountItemsInGrid = 0;
-    polygon.polygonNodes.forEach((node) => {
+    polygon.polygonNodes.forEach(node => {
       const gridPoint = L.CRS.EPSG3857.latLngToPoint(
         L.latLng(node.lat, node.lng),
         this.zoom
@@ -396,7 +406,7 @@ export class Grid {
       gridPoint.y = this.getYPositionInGrid(gridPoint.y);
       polygonCoordinates.push(gridPoint);
     });
-    polygon.polygonNodes.forEach((node) => {
+    polygon.polygonNodes.forEach(node => {
       const gridPoint = new Point();
       gridPoint.x = node.lat;
       gridPoint.y = node.lng;

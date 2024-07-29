@@ -1,17 +1,17 @@
-import { Injectable } from "@angular/core";
-import { ItemCountComponent } from "src/app/components/item-count/item-count.component";
-import { OscarMinItem } from "../../models/oscar/oscar-min-item";
-import { ItemStoreService } from "./item-store.service";
-import { LatLngBounds } from "leaflet";
-import { Grid } from "src/app/models/grid/grid.model";
-import { Polygon } from "src/app/models/polygon/polygon.model";
-import { Cell } from "src/app/models/cell/cell.model";
-import { MapService } from "../map/map.service";
-import { PolygonService } from "../polygon-service.service";
+import { Injectable } from '@angular/core';
+import { ItemCountComponent } from 'src/app/components/item-count/item-count.component';
+import { OscarMinItem } from '../../models/oscar/oscar-min-item';
+import { ItemStoreService } from './item-store.service';
+import { LatLngBounds } from 'leaflet';
+import { Grid } from 'src/app/models/grid/grid.model';
+import { Polygon } from 'src/app/models/polygon/polygon.model';
+import { Cell } from 'src/app/models/cell/cell.model';
+import { MapService } from '../map/map.service';
+import { PolygonService } from '../polygon-service.service';
 declare var L;
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class GridService {
   globalGrid: Grid;
@@ -37,7 +37,7 @@ export class GridService {
         this.globalGrid.refineGrid(this.polygonService.polygonMapping.get(k));
       });
     } else {
-      this.mapService._map.once("moveend", (event) => {
+      this.mapService._map.once('moveend', event => {
         this.buildGrid(items);
       });
     }

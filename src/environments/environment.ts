@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  oscarUrl: window["env"]["oscarUrl"] || "https://old.oscar-web.de",
+  oscarUrl: window['env']['oscarUrl'] || 'https://old.oscar-web.de',
 };
 
 /*

@@ -6,19 +6,19 @@ import {
   OnDestroy,
   Output,
   EventEmitter,
-} from "@angular/core";
-import { MapService } from "src/app/services/map/map.service";
-import { PolygonNode } from "src/app/models/polygon/polygon-node.model";
-import { v4 as uuidv4 } from "uuid";
-import { PolygonService } from "../../services/polygon-service.service";
-import { GridService } from "../../services/data/grid.service";
+} from '@angular/core';
+import { MapService } from 'src/app/services/map/map.service';
+import { PolygonNode } from 'src/app/models/polygon/polygon-node.model';
+import { v4 as uuidv4 } from 'uuid';
+import { PolygonService } from '../../services/polygon-service.service';
+import { GridService } from '../../services/data/grid.service';
 
 declare var L;
 
 @Component({
-  selector: "app-polygon",
-  templateUrl: "./polygon.component.html",
-  styleUrls: ["./polygon.component.sass"],
+  selector: 'app-polygon',
+  templateUrl: './polygon.component.html',
+  styleUrls: ['./polygon.component.sass'],
 })
 export class PolygonComponent implements OnInit, OnDestroy {
   constructor(
@@ -29,14 +29,17 @@ export class PolygonComponent implements OnInit, OnDestroy {
 
   showNameForm = false;
 
-  @Output() newNameEvent = new EventEmitter<[uuidv4, string]>();
-
   @Input()
   polygonVisible;
   @Input()
   uuid = uuidv4();
-  id = "";
-  deprecatedId = "";
+
+  @Output()
+  newNameEvent = new EventEmitter<[uuidv4, string]>();
+  @Output()
+  addTab = new EventEmitter<void>();
+  id = '';
+  deprecatedId = '';
   isActive = true;
 
   routeActivated = false;
@@ -45,12 +48,12 @@ export class PolygonComponent implements OnInit, OnDestroy {
     let init = true;
 
     // Observes if the User is currently planning a Route
-    this.mapService._route.subscribe((route) => {
+    this.mapService._route.subscribe(route => {
       this.routeActivated = route;
     });
 
     // Allows the User to create a Polygon by adding a Node when clicking the map
-    this.mapService.onClick$.subscribe((event) => {
+    this.mapService.onClick$.subscribe(event => {
       if (!event || init || !this.polygonVisible || !this.isActive) {
         return;
       }
@@ -67,7 +70,7 @@ export class PolygonComponent implements OnInit, OnDestroy {
     });
 
     // Observes if the user closes the Tab of a Polygon and then removes that Polygon from the Dataset and the Map.
-    this.polygonService.tabClosed.subscribe((uuid) => {
+    this.polygonService.tabClosed.subscribe(uuid => {
       if (this.uuid == uuid) {
         this.isActive = false;
         this.clearList();
@@ -81,7 +84,7 @@ export class PolygonComponent implements OnInit, OnDestroy {
 
     /* Draws a specific Polygon if the Tab of the Polygon is active and deactivates all other Polygons.
      */
-    this.polygonService.tabActivated.subscribe((uuid) => {
+    this.polygonService.tabActivated.subscribe(uuid => {
       if (this.uuid !== uuid) {
         this.isActive = false;
         return;
@@ -103,7 +106,7 @@ export class PolygonComponent implements OnInit, OnDestroy {
       // hier dialog, dass name schon drin is
       this.id = this.deprecatedId;
       this.toggleNameForm();
-      console.log(this.id + " already taken");
+      console.log(this.id + ' already taken');
       return;
     }
     this.polygonService.removeId(this.deprecatedId, this.uuid);
@@ -124,7 +127,7 @@ export class PolygonComponent implements OnInit, OnDestroy {
     this.mapService.drawPolygon(
       this.polygonService.polygonMapping.get(this.uuid).polygonNodes,
       this.uuid,
-      "blue"
+      'blue'
     );
   }
   // async markerDragHandler(event) {
@@ -140,6 +143,10 @@ export class PolygonComponent implements OnInit, OnDestroy {
   }
   ngOnDestroy(): void {
     this.clearList;
+  }
+
+  emitNewTab() {
+    this.addTab.emit();
   }
 
   // Method that clears the Dataset of a Polygon from the PolygonService and clears the Shape from the Map.

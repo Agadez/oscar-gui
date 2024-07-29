@@ -1,24 +1,24 @@
-import { Injectable, NgZone } from "@angular/core";
-import { ItemStoreService } from "../data/item-store.service";
-import { GeoPoint } from "../../models/geo-point";
-import { BehaviorSubject, forkJoin } from "rxjs";
-import "../../../../node_modules/leaflet-webgl-heatmap/src/webgl-heatmap/webgl-heatmap";
-import { v4 as uuidv4 } from "uuid";
-import { PolygonNode } from "src/app/models/polygon/polygon-node.model";
-import { OscarItemsService } from "../oscar/oscar-items.service";
-import { RoutingMarker } from "../../models/routing-marker";
-import { PolygonService } from "../polygon-service.service";
-import { LatLng, LatLngBounds, Map as LeafletMap } from "leaflet";
-import { OscarItem } from "../../models/oscar/oscar-item";
-import { SelectedItemService } from "../ui/selected-item.service";
-import { ConfigService } from "src/app/config/config.service";
-import "leaflet.awesome-markers";
-import { Cell } from "src/app/models/cell/cell.model";
-import { maxBy } from "lodash";
+import { Injectable, NgZone } from '@angular/core';
+import { ItemStoreService } from '../data/item-store.service';
+import { GeoPoint } from '../../models/geo-point';
+import { BehaviorSubject, forkJoin } from 'rxjs';
+import '../../../../node_modules/leaflet-webgl-heatmap/src/webgl-heatmap/webgl-heatmap';
+import { v4 as uuidv4 } from 'uuid';
+import { PolygonNode } from 'src/app/models/polygon/polygon-node.model';
+import { OscarItemsService } from '../oscar/oscar-items.service';
+import { RoutingMarker } from '../../models/routing-marker';
+import { PolygonService } from '../polygon-service.service';
+import { LatLng, LatLngBounds, Map as LeafletMap } from 'leaflet';
+import { OscarItem } from '../../models/oscar/oscar-item';
+import { SelectedItemService } from '../ui/selected-item.service';
+import { ConfigService } from 'src/app/config/config.service';
+import 'leaflet.awesome-markers';
+import { Cell } from 'src/app/models/cell/cell.model';
+import { maxBy } from 'lodash';
 declare var L;
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class MapService {
   lat: number;
@@ -30,7 +30,7 @@ export class MapService {
   maxZoom = 20;
   heatmap = new L.webGLHeatmap({
     size: 15,
-    units: "px",
+    units: 'px',
     alphaRange: 1,
   });
   searchMarkerLayer = new L.LayerGroup();
@@ -55,7 +55,7 @@ export class MapService {
   readonly onMapReady$ = this._mapReady.asObservable();
   _map: LeafletMap;
   route: L.Polyline = L.polyline([], {
-    color: "red",
+    color: 'red',
     weight: 3,
     opacity: 0.5,
     smoothFactor: 1,
@@ -115,20 +115,20 @@ export class MapService {
     this.map.addLayer(this.nodeLayer);
 
     // actually not used since move is triggered on zoom aswell
-    this.map.on("zoomend", (event) => {
+    this.map.on('zoomend', event => {
       this.zoom = event.target._zoom;
       this._zoom.next(event);
     });
 
-    this.map.on("move", (event) => {
+    this.map.on('move', event => {
       this.zoom = event.target._zoom;
       this._move.next(event);
     });
-    this.map.on("moveend", (event) => {
+    this.map.on('moveend', event => {
       this._moved.next(event);
     });
-    this.map.on("click", (event) => this._click.next(event));
-    this.map.on("contextmenu", (event) => {
+    this.map.on('click', event => this._click.next(event));
+    this.map.on('contextmenu', event => {
       this._contextMenu.next(event);
     });
   }
@@ -136,7 +136,7 @@ export class MapService {
   drawPolygon(polygonNodes: PolygonNode[], uuid: uuidv4, color: string) {
     if (this.polygons.has(uuid)) {
       this.polygonLayer.removeLayer(this.polygons.get(uuid)[0]);
-      this.polygons.get(uuid)[1].forEach((node) => {
+      this.polygons.get(uuid)[1].forEach(node => {
         this.nodeLayer.removeLayer(node);
       });
     }
@@ -163,7 +163,7 @@ export class MapService {
         icon: icon,
         draggable: true,
       });
-      marker.on("dragend", () => {
+      marker.on('dragend', () => {
         this.polygonService.dragNode(uuid, node.uuid, marker.getLatLng());
         this.drawPolygon(polygonNodes, uuid, color);
       });
@@ -188,10 +188,12 @@ export class MapService {
     pixel: number,
     scale: number
   ) {
+    this.clearSearchMarkers();
+    this.clearHeatMap();
     if (cells.length === 0) return;
     let base = 1.7;
     const dataPoints = [];
-    const max = maxBy(cells, "numObjects").numObjects;
+    const max = maxBy(cells, 'numObjects').numObjects;
     const maxLog = Math.max(1, this.getBaseLog(base, max));
     for (const cell of cells) {
       let logValue = Math.max(1, this.getBaseLog(base, cell.numObjects));
@@ -216,28 +218,30 @@ export class MapService {
     return chunks;
   }
   drawItemsMarker(itemIds: number[]) {
+    this.clearHeatMap();
     const currentItemsIds: number[] = [];
     const chunks = this.chunkItems(itemIds, 2000);
     const observables = [];
+    const toRemove = this.searchMarkerLayer.getLayers().length;
+    console.log(toRemove);
     for (const chunk of chunks) {
       const obs = this.oscarItemsService.getMultipleItems(chunk);
       observables.push(obs);
     }
-    this.searchMarkerLayer.clearLayers();
     forkJoin(observables).subscribe((dataArray: any) => {
       let itemFeatures = [];
-      dataArray.forEach((data) => {
+      dataArray.forEach(data => {
         itemFeatures = [...itemFeatures, ...data.features];
       });
       // draw markers
-      itemFeatures.forEach((item) => {
-        if (item.geometry.type === "LineString") {
-          if (this.getIcon(item)) {
+      itemFeatures.forEach(item => {
+        if (item.geometry.type === 'LineString') {
+          if (this.getCorrespondingIcon(item)) {
             this.drawGeoJSON({
               type: item.type,
               properties: item.properties,
               geometry: {
-                type: "Point",
+                type: 'Point',
                 coordinates: item.geometry.coordinates[0],
               },
             });
@@ -253,10 +257,18 @@ export class MapService {
       ) {
         this.itemStore.currentItemsIds = currentItemsIds;
       }
+      var i = 0;
+      this.searchMarkerLayer.eachLayer(marker => {
+        if (i == toRemove) {
+          return;
+        }
+        this.searchMarkerLayer.removeLayer(marker);
+        i++;
+      });
     });
   }
 
-  private getIcon(item) {
+  private getCorrespondingIcon(item) {
     for (var i = 0; i < item.properties.k.length; i++) {
       var key = item.properties.k[i];
       if (this.configService.iconMapping[key] !== undefined) {
@@ -269,12 +281,12 @@ export class MapService {
     return undefined;
   }
   private drawGeoJSON(item): boolean {
-    var icon = this.getIcon(item);
+    var icon = this.getCorrespondingIcon(item);
     const smallIcon = L.AwesomeMarkers.icon({
       icon: icon,
-      prefix: "fa",
-      iconColor: "white",
-      markerColor: "blue",
+      prefix: 'fa',
+      iconColor: 'white',
+      markerColor: 'blue',
     });
     const shape = L.geoJSON(item, {
       title: `${item.properties.id}`,
@@ -284,19 +296,19 @@ export class MapService {
         });
       },
       onEachFeature: (feature, layer) => {
-        layer.on("click", (event) => {
+        layer.on('click', event => {
           this.selectedItemService.subject.next(item);
           // layer.options.icon.options.markerColor = "red";
           layer.pointToLayer = L.marker(layer.pointToLayer);
           layer.bindPopup(
-            feature.properties.v[item.properties.k.indexOf("name")]
+            feature.properties.v[item.properties.k.indexOf('name')]
           );
         });
-        layer.on("mouseover", (event) => {
-          layer.bindPopup("");
+        layer.on('mouseover', event => {
+          layer.bindPopup('');
         });
       },
-      style: { color: "blue", stroke: true, fill: false, opacity: 0.7 },
+      style: { color: 'blue', stroke: true, fill: false, opacity: 0.7 },
     });
     if (this.bounds.intersects(shape.getBounds())) {
       shape.addTo(this.searchMarkerLayer);

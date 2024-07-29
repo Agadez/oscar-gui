@@ -1,13 +1,13 @@
-import { Component, OnInit } from "@angular/core";
-import { SearchService } from "src/app/services/search/search.service";
-import { PolygonService } from "src/app/services/polygon-service.service";
-import { RoutingService } from "src/app/services/routing/routing.service";
-import { GridService } from "src/app/services/data/grid.service";
+import { Component, OnInit } from '@angular/core';
+import { SearchService } from 'src/app/services/search/search.service';
+import { PolygonService } from 'src/app/services/polygon-service.service';
+import { RoutingService } from 'src/app/services/routing/routing.service';
+import { GridService } from 'src/app/services/data/grid.service';
 
 @Component({
-  selector: "app-preference",
-  templateUrl: "./preference.component.html",
-  styleUrls: ["./preference.component.sass"],
+  selector: 'app-preference',
+  templateUrl: './preference.component.html',
+  styleUrls: ['./preference.component.sass'],
 })
 export class PreferenceComponent implements OnInit {
   constructor(
@@ -45,7 +45,7 @@ export class PreferenceComponent implements OnInit {
   }
   updatePolygonCalculation() {
     this.polygonService.polyClientCalc = this.polyClientCalc;
-    this.searchService.startSearch.next("start");
+    this.searchService.startSearch.next('start');
   }
   updateDisplay() {
     this.searchService.displayHeatmap = this.displayHeatmap;

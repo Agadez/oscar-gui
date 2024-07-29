@@ -8,9 +8,8 @@ describe('ItemCountComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ItemCountComponent ]
-    })
-    .compileComponents();
+      declarations: [ItemCountComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

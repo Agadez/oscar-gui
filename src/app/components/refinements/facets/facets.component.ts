@@ -1,13 +1,20 @@
-import {Component, Input, NgZone, OnChanges, OnInit, SimpleChanges} from '@angular/core';
-import {FacetRefinements} from '../../../models/oscar/refinements';
+import {
+  Component,
+  Input,
+  NgZone,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
+import { FacetRefinements } from '../../../models/oscar/refinements';
 
 @Component({
   selector: 'app-facets',
   templateUrl: './facets.component.html',
-  styleUrls: ['./facets.component.sass']
+  styleUrls: ['./facets.component.sass'],
 })
 export class FacetsComponent implements OnInit, OnChanges {
-  constructor() { }
+  constructor() {}
   queryId = 0;
   show = false;
   @Input()
@@ -18,7 +25,9 @@ export class FacetsComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     this.checkVisibility();
     if (this.show && document.getElementById('refinementsDiv')) {
-      document.getElementById('refinementsDiv').scrollIntoView({behavior: 'auto'});
+      document
+        .getElementById('refinementsDiv')
+        .scrollIntoView({ behavior: 'auto' });
     }
   }
   checkVisibility() {

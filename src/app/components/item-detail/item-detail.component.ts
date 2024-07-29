@@ -5,19 +5,19 @@ import {
   NgZone,
   OnInit,
   Output,
-} from "@angular/core";
-import { OscarItem } from "../../models/oscar/oscar-item";
-import { ItemStoreService } from "../../services/data/item-store.service";
-import { MapService } from "../../services/map/map.service";
-import { OscarMinItem } from "../../models/oscar/oscar-min-item";
-import { LocationService } from "../../services/location.service";
-import { GeoPoint } from "../../models/geo-point";
-import { RoutingService } from "src/app/services/routing/routing.service";
+} from '@angular/core';
+import { OscarItem } from '../../models/oscar/oscar-item';
+import { ItemStoreService } from '../../services/data/item-store.service';
+import { MapService } from '../../services/map/map.service';
+import { OscarMinItem } from '../../models/oscar/oscar-min-item';
+import { LocationService } from '../../services/location.service';
+import { GeoPoint } from '../../models/geo-point';
+import { RoutingService } from 'src/app/services/routing/routing.service';
 
 @Component({
-  selector: "app-item-detail",
-  templateUrl: "./item-detail.component.html",
-  styleUrls: ["./item-detail.component.sass"],
+  selector: 'app-item-detail',
+  templateUrl: './item-detail.component.html',
+  styleUrls: ['./item-detail.component.sass'],
 })
 export class ItemDetailComponent implements OnInit {
   @Input() oscarItem: OscarItem;

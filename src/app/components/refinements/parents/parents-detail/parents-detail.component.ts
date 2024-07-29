@@ -1,12 +1,12 @@
-import { Component, Input, OnInit } from "@angular/core";
-import { Parent } from "../../../../models/oscar/refinements";
-import { RefinementsService } from "../../../../services/data/refinements.service";
-import { RefinementType } from "../../../../models/gui/refinement";
+import { Component, Input, OnInit } from '@angular/core';
+import { Parent } from '../../../../models/oscar/refinements';
+import { RefinementsService } from '../../../../services/data/refinements.service';
+import { RefinementType } from '../../../../models/gui/refinement';
 
 @Component({
-  selector: "app-parents-detail",
-  templateUrl: "./parents-detail.component.html",
-  styleUrls: ["./parents-detail.component.sass"],
+  selector: 'app-parents-detail',
+  templateUrl: './parents-detail.component.html',
+  styleUrls: ['./parents-detail.component.sass'],
 })
 export class ParentsDetailComponent implements OnInit {
   @Input()
@@ -18,7 +18,7 @@ export class ParentsDetailComponent implements OnInit {
     this.refinementService.addRefinement({
       id: 0,
       value: parent.name,
-      key: "",
+      key: '',
       refinementType: RefinementType.Parent,
       excluding: false,
     });
@@ -27,7 +27,7 @@ export class ParentsDetailComponent implements OnInit {
     this.refinementService.addRefinement({
       id: 0,
       value: parent.name,
-      key: "",
+      key: '',
       refinementType: RefinementType.Parent,
       excluding: true,
     });

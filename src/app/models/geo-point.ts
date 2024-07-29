@@ -1,5 +1,4 @@
 export class GeoPoint {
-
   constructor(lat: number, lng: number) {
     this.lat = lat;
     this.lng = lng;

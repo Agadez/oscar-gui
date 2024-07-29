@@ -1,12 +1,12 @@
-import { Injectable } from "@angular/core";
-import { BehaviorSubject } from "rxjs";
-import { Subject } from "rxjs";
-import { OscarItem } from "../../models/oscar/oscar-item";
-import { OscarMinItem } from "../../models/oscar/oscar-min-item";
-import { OscarItemsService } from "../oscar/oscar-items.service";
+import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+import { Subject } from 'rxjs';
+import { OscarItem } from '../../models/oscar/oscar-item';
+import { OscarMinItem } from '../../models/oscar/oscar-min-item';
+import { OscarItemsService } from '../oscar/oscar-items.service';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class ItemStoreService {
   private readonly _radiusChange = new BehaviorSubject<number>(10000);
@@ -37,7 +37,7 @@ export class ItemStoreService {
     let items = this.oscarItemsService.binaryItemsToOscarMin(binaryItems);
     this._items.next(items);
     const itemIds: number[] = [];
-    items.forEach((item) => {
+    items.forEach(item => {
       itemIds.push(item.id);
     });
     this.itemsIds.next(itemIds);

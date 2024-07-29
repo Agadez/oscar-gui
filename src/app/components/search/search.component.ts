@@ -6,21 +6,21 @@ import {
   Output,
   ViewChild,
   ElementRef,
-} from "@angular/core";
-import { OscarItemsService } from "../../services/oscar/oscar-items.service";
-import { ItemStoreService } from "../../services/data/item-store.service";
-import { RefinementsService } from "../../services/data/refinements.service";
-import { UntypedFormControl } from "@angular/forms";
-import { ColorTag } from "../../models/natural-language/color-tag";
-import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
-import keyValueTags from "../../../assets/keyValueTags.json";
-import { SearchService } from "../../services/search/search.service";
-import { Subject } from "rxjs";
-import { MapService } from "../../services/map/map.service";
-import { PolygonService } from "../../services/polygon-service.service";
-import { QueryParamsService } from "src/app/services/query-params.service";
-import { Clipboard } from "@angular/cdk/clipboard";
-import {MatSnackBar} from '@angular/material/snack-bar';
+} from '@angular/core';
+import { OscarItemsService } from '../../services/oscar/oscar-items.service';
+import { ItemStoreService } from '../../services/data/item-store.service';
+import { RefinementsService } from '../../services/data/refinements.service';
+import { UntypedFormControl } from '@angular/forms';
+import { ColorTag } from '../../models/natural-language/color-tag';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import keyValueTags from '../../../assets/keyValueTags.json';
+import { SearchService } from '../../services/search/search.service';
+import { Subject } from 'rxjs';
+import { MapService } from '../../services/map/map.service';
+import { PolygonService } from '../../services/polygon-service.service';
+import { QueryParamsService } from 'src/app/services/query-params.service';
+import { Clipboard } from '@angular/cdk/clipboard';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 declare function getOscarQuery(input);
 
@@ -31,9 +31,9 @@ declare function coloredInput(input);
 export const activateRouting = new Subject<boolean>();
 // export const activatePolygon = new Subject<boolean>();
 @Component({
-  selector: "app-search",
-  templateUrl: "./search.component.html",
-  styleUrls: ["./search.component.sass"],
+  selector: 'app-search',
+  templateUrl: './search.component.html',
+  styleUrls: ['./search.component.sass'],
 })
 export class SearchComponent implements OnInit {
   constructor(
@@ -47,7 +47,7 @@ export class SearchComponent implements OnInit {
     private clipboard: Clipboard,
     private snackBar: MatSnackBar
   ) {}
-  @ViewChild("input") input: ElementRef;
+  @ViewChild('input') input: ElementRef;
   @Input()
   loading = false;
   @Input()
@@ -56,15 +56,15 @@ export class SearchComponent implements OnInit {
   noResult = false;
   error = false;
   aborted = false;
-  inputString = "";
+  inputString = '';
   first = true;
-  naturalInput = "";
+  naturalInput = '';
   eventCount = 0;
   suggestions = [];
   naturalPrefix = [];
   waitTime = 200;
   myControl = new UntypedFormControl();
-  options: string[] = ["One", "Two", "Three"];
+  options: string[] = ['One', 'Two', 'Three'];
   normalSuggestions = [];
   oscarQuery = true;
   request;
@@ -73,8 +73,9 @@ export class SearchComponent implements OnInit {
 
   enterKey() {
     if (this.inAutocompletePanel) return;
-    this.refinementStore.clearRefinements();
-    this.search();
+    if (this.refinementStore.hasRefinements)
+      this.refinementStore.clearRefinements();
+    else this.search();
   }
   panelClosed() {
     setTimeout(() => {
@@ -85,8 +86,8 @@ export class SearchComponent implements OnInit {
     this.inAutocompletePanel = true;
   }
   abort() {
-    this.inputString = "";
-    this.searchService.clearItems.next("clear");
+    this.inputString = '';
+    this.searchService.clearItems.next('clear');
     this.refinementStore.clearRefinements();
     this.polygonService.activatedPolygons.clear();
     this.itemStore.updateItems([]);
@@ -99,14 +100,14 @@ export class SearchComponent implements OnInit {
   copyToClipboard() {
     this.clipboard.copy(this.queryParams.getCurrentState(this.inputString));
     this.snackBar.open(
-      "The search state is copied to the clipboard!",
-      "Close",
+      'The search state is copied to the clipboard!',
+      'Close',
       { duration: 2000 }
     );
   }
   @Output() routesVisibleEvent = new EventEmitter<boolean>();
   routesVisible = false;
-  sideButtonClass = "side-button";
+  sideButtonClass = 'side-button';
 
   @Output() polygonVisibleEvent = new EventEmitter<boolean>();
   polygonVisible = false;
@@ -122,7 +123,7 @@ export class SearchComponent implements OnInit {
     activateRouting.subscribe(() => this.showRouting());
     // activatePolygon.subscribe(() => this.togglePolygon());
     this.polygonService.activatedPolygonUpdated.subscribe(() => this.search());
-    this.queryParams.setQuery.subscribe((set) => {
+    this.queryParams.setQuery.subscribe(set => {
       if (set) {
         this.inputString = this.queryParams.queryString;
         this.search();
@@ -133,7 +134,7 @@ export class SearchComponent implements OnInit {
     this.aborted = false;
     this.error = false;
     this.searchService.addRoute();
-    let fullQueryString = "";
+    let fullQueryString = '';
     if (this.polygonService.polyClientCalc) {
       // this.searchService.itemsOfPolygon(this.inputString);
       fullQueryString = this.searchService.createQueryString(
@@ -146,7 +147,7 @@ export class SearchComponent implements OnInit {
         false
       );
     }
-    if (fullQueryString === "") {
+    if (fullQueryString === '') {
       return;
     }
     this.itemStore.setHighlightedItem(null);
@@ -168,7 +169,7 @@ export class SearchComponent implements OnInit {
   startRequest(fullQueryString) {
     this.request = this.oscarItemService
       .getRegion(fullQueryString)
-      .subscribe((regions) => {
+      .subscribe(regions => {
         const regionFound = this.searchService.searchForRegions(
           fullQueryString,
           regions
@@ -179,7 +180,7 @@ export class SearchComponent implements OnInit {
         } else {
           this.oscarItemService
             .getApxItemCount(fullQueryString)
-            .subscribe(async (apxStats) => {
+            .subscribe(async apxStats => {
               try {
                 const result = await this.searchService.getItems(apxStats);
                 if (!result) {
@@ -197,20 +198,20 @@ export class SearchComponent implements OnInit {
 
   inputUpdate($event) {
     const currentPosition = this.input.nativeElement.selectionStart;
-    const splitString = $event.substring(0, currentPosition).split(" ");
+    const splitString = $event.substring(0, currentPosition).split(' ');
     const currentWord = splitString[splitString.length - 1];
-    if (currentWord.charAt(0) === "@") {
-      if (currentWord.charAt(currentWord.length - 1) === " ") {
+    if (currentWord.charAt(0) === '@') {
+      if (currentWord.charAt(currentWord.length - 1) === ' ') {
         this.normalSuggestions = [];
       } else {
         let i = 0;
-        this.normalSuggestions = keyValueTags.filter((item) => {
+        this.normalSuggestions = keyValueTags.filter(item => {
           if (i > 100) {
             return false;
           }
-          const keyValueTag = item.k + ":" + item.v;
+          const keyValueTag = item.k + ':' + item.v;
           const isMatch = keyValueTag.match(
-            new RegExp(currentWord.slice(1), "i")
+            new RegExp(currentWord.slice(1), 'i')
           );
           if (isMatch) {
             ++i;
@@ -225,9 +226,8 @@ export class SearchComponent implements OnInit {
 
   naturalUpdate($event) {
     this.naturalInput = $event;
-    let colorOutputTags: ColorTag[];
-    colorOutputTags = getOscarQuery(this.naturalInput);
-    colorOutputTags.forEach((colorTag) => {
+    const colorOutputTags: ColorTag[] = getOscarQuery(this.naturalInput);
+    colorOutputTags.forEach(colorTag => {
       this.inputString += `${colorTag.tags} `;
     });
     this.eventCount++;
@@ -246,7 +246,7 @@ export class SearchComponent implements OnInit {
   }
 
   selectEvent($event: any) {
-    const splitValues = this.naturalInput.split(" ");
+    const splitValues = this.naturalInput.split(' ');
     this.naturalInput.replace(splitValues[splitValues.length - 1], $event);
   }
 
@@ -254,10 +254,10 @@ export class SearchComponent implements OnInit {
 
   inputWithoutCurrentWord(input: string, option: any) {
     const currentPosition = this.input.nativeElement.selectionStart;
-    var currentIndex = 0;
+    let currentIndex = 0;
 
     for (let i = currentPosition - 1; i >= 0; i--) {
-      if (input[i] === " ") {
+      if (input[i] === ' ') {
         break;
       }
       currentIndex = i;
@@ -265,16 +265,16 @@ export class SearchComponent implements OnInit {
 
     const stringHead = input.substring(0, currentIndex);
     const wordTail =
-      input[currentPosition] && input[currentPosition] != " " ? " " : "";
+      input[currentPosition] && input[currentPosition] != ' ' ? ' ' : '';
     const stringTail = input.substring(currentPosition, input.length);
 
-    return stringHead + "@" + option.k + ":" + option.v + wordTail + stringTail;
+    return stringHead + '@' + option.k + ':' + option.v + wordTail + stringTail;
   }
   inputWithoutLastWord(input: string) {
     const charArray = [...input];
     let endNormalString = 0;
     for (let i = charArray.length - 1; i >= 0; i--) {
-      if (charArray[i] === " ") {
+      if (charArray[i] === ' ') {
         endNormalString = i + 1;
         break;
       }
@@ -301,8 +301,8 @@ export class SearchComponent implements OnInit {
     this.routesVisibleEvent.emit(!this.routesVisible);
     this.routesVisible = !this.routesVisible;
     this.sideButtonClass = this.routesVisible
-      ? "side-button-active"
-      : "side-button";
+      ? 'side-button-active'
+      : 'side-button';
   }
 
   showRouting() {

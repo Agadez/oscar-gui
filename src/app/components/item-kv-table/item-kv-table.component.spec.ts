@@ -8,9 +8,8 @@ describe('ItemKvTableComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ItemKvTableComponent ]
-    })
-    .compileComponents();
+      declarations: [ItemKvTableComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

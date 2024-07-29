@@ -1,4 +1,4 @@
-import { Point } from "./point.model";
+import { Point } from './point.model';
 export class Line {
   startingPoint: Point;
   endingPoint: Point;

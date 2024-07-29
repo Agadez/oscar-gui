@@ -1,21 +1,24 @@
-import { Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
-import { Observable } from "rxjs";
-import { OscarItem } from "../../models/oscar/oscar-item";
-import { ConfigService } from "../../config/config.service";
-import { OscarMinItem } from "../../models/oscar/oscar-min-item";
-import { OscarApxstats } from "../../models/oscar/oscar-apxstats";
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { OscarItem } from '../../models/oscar/oscar-item';
+import { ConfigService } from '../../config/config.service';
+import { OscarMinItem } from '../../models/oscar/oscar-min-item';
+import { OscarApxstats } from '../../models/oscar/oscar-apxstats';
 
 import {
   FacetRefinements,
   ParentRefinements,
-} from "../../models/oscar/refinements";
+} from '../../models/oscar/refinements';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class OscarItemsService {
-  constructor(private http: HttpClient, private configService: ConfigService) {}
+  constructor(
+    private http: HttpClient,
+    private configService: ConfigService
+  ) {}
 
   getItemsBinary(queryString: string): Observable<any> {
     const itemUrl =
@@ -23,7 +26,7 @@ export class OscarItemsService {
       `/oscar/cqr/clustered/itemswithlocation?q=${encodeURIComponent(
         queryString
       )}&bounding-radius=true`;
-    return this.http.get(itemUrl, { responseType: "arraybuffer" });
+    return this.http.get(itemUrl, { responseType: 'arraybuffer' });
   }
   public binaryItemsToOscarMin(itemArray): OscarMinItem[] {
     const itemList = new Array<OscarMinItem>();
@@ -48,7 +51,7 @@ export class OscarItemsService {
   }
   getItemsInfo(items: OscarMinItem[]): Observable<OscarItem[]> {
     const ids = new Array<number>();
-    items.forEach((item) => ids.push(item.id));
+    items.forEach(item => ids.push(item.id));
     const queryString =
       this.configService.getOscarUrl() +
       `/oscar/items/info?i=${JSON.stringify(ids)}`;
@@ -96,9 +99,9 @@ export class OscarItemsService {
   }
   getMultipleItems(itemIds: number[]): any {
     const formdata = new FormData();
-    formdata.append("which", JSON.stringify(itemIds));
-    formdata.append("format", "geojson");
-    formdata.append("shape", "true");
+    formdata.append('which', JSON.stringify(itemIds));
+    formdata.append('format', 'geojson');
+    formdata.append('shape', 'true');
     const queryString =
       this.configService.getOscarUrl() + `/oscar/itemdb/multiple`;
     return this.http.post(queryString, formdata);

@@ -1,3 +1,11 @@
-<div style="cursor:pointer; padding: 5px 10px; background-color: white; border-radius: 20px;"[style.border] = " 'solid 2px ' + backgroundColor" (click)="handleClick($event)">
-  <i class="{{iconClass}}" style="margin-right: 10px"></i>{{text}}
+<div
+  style="
+    cursor: pointer;
+    padding: 5px 10px;
+    background-color: white;
+    border-radius: 20px;
+  "
+  [style.border]="'solid 2px ' + backgroundColor"
+  (click)="handleClick($event)">
+  <i class="{{ iconClass }}" style="margin-right: 10px"></i>{{ text }}
 </div>

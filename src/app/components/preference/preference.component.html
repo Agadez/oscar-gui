@@ -1,19 +1,17 @@
-<div class="bg-white mt-2 rounded px-3 py-2 flex justify-content-between">
-  <div class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between">
+<div class="wrapper-preference">
+  <div class="wrapper-pref-option">
     <span>Local Search</span>
     <mat-slide-toggle
       color="primary"
       [(ngModel)]="localSearch"
-      (ngModelChange)="updateLocalSearch()"
-    ></mat-slide-toggle>
+      (ngModelChange)="updateLocalSearch()"></mat-slide-toggle>
   </div>
-  <div class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between">
+  <div class="wrapper-pref-option">
     <span>Only display Heatmap</span>
     <mat-slide-toggle
       color="primary"
       [(ngModel)]="displayHeatmap"
-      (ngModelChange)="updateDisplay()"
-    ></mat-slide-toggle>
+      (ngModelChange)="updateDisplay()"></mat-slide-toggle>
   </div>
   <!-- <div class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between">
     <span>Increase Polygon accuracy (refine on Client)</span>
@@ -24,29 +22,26 @@
     ></mat-slide-toggle>
   </div> -->
 
-  <div class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between">
+  <div class="wrapper-pref-option">
     <span>Max Items in Result</span>
     <input
       [(ngModel)]="maxItems"
       (focusout)="updateMaxItems()"
-      appBlurOnEnter
-    />
+      appBlurOnEnter />
   </div>
-  <div class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between">
+  <div class="wrapper-pref-option">
     <span>Max Objects Rendered (approximation)</span>
     <input
       [(ngModel)]="markerThreshold"
       (focusout)="updateMarkerThreshold()"
-      appBlurOnEnter
-    />
+      appBlurOnEnter />
   </div>
-  <div class="bg-white mt-2 rounded px-3 py-2 d-flex justify-content-between">
+  <div class="wrapper-pref-option">
     <span>Debouncetime (ms) for Routing:</span>
     <input
       [(ngModel)]="debounceTime"
       (focusout)="updateDebounceTime()"
-      appBlurOnEnter
-    />
+      appBlurOnEnter />
   </div>
   <!-- <mat-radio-group
     aria-label="Choose accuracy for Polygon"

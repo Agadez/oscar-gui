@@ -25,50 +25,49 @@
       <!-- Clicking on the value will take you to the respective wikipedia entry or the url defined as value. -->
     </p>
   </div>
-  <table class="table table-hover table-bordered table-condensed">
+  <h3>Examples</h3>
+  <table class="table-condensed">
     <tbody>
       <tr>
-        <th colspan="2">Examples</th>
+        <th colspan="1">Query</th>
+        <th colspan="1">Description</th>
       </tr>
       <tr>
         <td>
-          <a class="example-query-string"> &#64;waterway:waterfall germany </a>
+          <a> &#64;waterway:waterfall germany </a>
         </td>
         <td>List all waterfalls in Germany</td>
       </tr>
       <tr>
         <td>
-          <a class="example-query-string">"Yosemite National Park" &#64;highway</a>
+          <a>"Yosemite National Park" &#64;highway</a>
         </td>
         <td>List all higways in Yosemite National Park</td>
       </tr>
       <tr>
         <td>
-          <a class="example-query-string">
-            &#64;amenity:restaurant + &#64;amenity:fast_food miami
-          </a>
+          <a> &#64;amenity:restaurant + &#64;amenity:fast_food miami </a>
         </td>
         <td>List all restaurants and fast-food places in Miami</td>
       </tr>
       <tr>
         <td>
-          <a class="example-query-string">
-            &#64;tourism:hotel &quot;new york&quot;
-          </a>
+          <a> &#64;tourism:hotel &quot;new york&quot; </a>
         </td>
         <td>List all hotels in New York</td>
       </tr>
       <tr>
         <td>
-          <a class="example-query-string">
-            &#64;amenity:restaurant (&#64;cuisine:italian + &#64;cuisine:french) munich
+          <a>
+            &#64;amenity:restaurant (&#64;cuisine:italian + &#64;cuisine:french)
+            munich
           </a>
         </td>
         <td>List all restaurants with italian or french cuisine in Munich</td>
       </tr>
       <tr>
         <td>
-          <a class="example-query-string">
+          <a>
             &#64;amenity:fast_food munich - (burger? ?king) - (mc? ?donald?)
           </a>
         </td>
@@ -80,7 +79,7 @@
       </tr>
       <tr>
         <td>
-          <a class="example-query-string">
+          <a>
             &#37;1&#37;&#37; &#64;amenity:school &#64;amenity:kindergarten
           </a>
         </td>
@@ -88,9 +87,9 @@
       </tr>
       <tr>
         <td>
-          <a class="example-query-string">
-            &#64;shop:supermarket (&#37;&#64;amenity:atm &#37;&#64;amenity:pharmacy
-            &#37;&#64;shop:car_repair)
+          <a>
+            &#64;shop:supermarket (&#37;&#64;amenity:atm
+            &#37;&#64;amenity:pharmacy &#37;&#64;shop:car_repair)
           </a>
         </td>
         <td>
@@ -100,23 +99,22 @@
       </tr>
       <tr>
         <td>
-          <a class="example-query-string">
-            &#64;tourism:hotel :north-of (eiffel tour france &#64;tourism:attraction)
+          <a>
+            &#64;tourism:hotel :north-of (eiffel tour france
+            &#64;tourism:attraction)
           </a>
         </td>
         <td>List hotels north of the Eiffel Tour in Paris.</td>
       </tr>
       <tr>
         <td>
-          <a class="example-query-string">
-            &#64;shop:supermarket :north-of &#35;Munich
-          </a>
+          <a> &#64;shop:supermarket :north-of &#35;Munich </a>
         </td>
         <td>List supermarkets north of Munich</td>
       </tr>
       <tr>
         <td>
-          <a class="example-query-string">
+          <a>
             &#64;tourism:hotel (&quot;Frankfurt am Main&quot; &lt;-&gt;
             &quot;Munich&quot;)
           </a>
@@ -125,7 +123,7 @@
       </tr>
       <tr>
         <td>
-          <a class="example-query-string">
+          <a>
             &#37;5&#37;&#37; (&#64;waterway:river &quot;Donau&quot;)
             &#64;tourism:camp_site
           </a>
@@ -137,10 +135,13 @@
       </tr>
     </tbody>
   </table>
-  <table class="table table-hover table-bordered table-condensed">
+  <h3>Query Statements</h3>
+  <table class="table-normal">
     <tbody>
       <tr>
-        <th colspan="3">Query statements</th>
+        <th colspan="1">Type</th>
+        <th colspan="1">Syntax</th>
+        <th colspan="1">Explanation</th>
       </tr>
       <tr>
         <td>Strings</td>
@@ -221,10 +222,12 @@
     </tr> -->
     </tbody>
   </table>
-  <table class="table table-hover table-bordered table-condensed">
+  <h3>Operations</h3>
+  <table class="table-normal">
     <tbody>
       <tr>
-        <th colspan="2">Operations</th>
+        <th colspan="1">Type</th>
+        <th colspan="1">Syntax</th>
       </tr>
       <tr>
         <td>Intersection</td>
@@ -244,10 +247,12 @@
       </tr>
     </tbody>
   </table>
-  <table class="table table-hover table-bordered table-condensed">
+  <h3>Spatial Operations</h3>
+  <table class="table-normal">
     <tbody>
       <tr>
-        <th colspan="2">Spatial operations</th>
+        <th colspan="1">Spatial Operation</th>
+        <th colspan="1">Syntax</th>
       </tr>
       <tr>
         <td>Match near something</td>
@@ -299,7 +304,9 @@
       </tr>
     </tbody>
   </table>
-  <table class="table table-hover table-bordered table-condensed">
+
+  <h3>Nesting</h3>
+  <table class="table-normal">
     <tbody>
       <tr>
         <th colspan="3">Nesting</th>

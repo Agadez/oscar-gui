@@ -1,11 +1,11 @@
-import { Injectable } from "@angular/core";
-import { BehaviorSubject } from "rxjs";
-import { TagSuggestion } from "../../models/osm/tag-suggestion";
-import { ActiveRefinement } from "../../models/gui/refinement";
-import * as _ from "lodash";
+import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+import { TagSuggestion } from '../../models/osm/tag-suggestion';
+import { ActiveRefinement } from '../../models/gui/refinement';
+import * as _ from 'lodash';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class RefinementsService {
   loadedParentRefinements = false;
@@ -27,7 +27,7 @@ export class RefinementsService {
   }
   removeRefinement(refinement: ActiveRefinement) {
     this._refinements.next(
-      _.reject(this._refinements.getValue(), (el) => {
+      _.reject(this._refinements.getValue(), el => {
         return (
           el.key === refinement.key &&
           el.value === refinement.value &&

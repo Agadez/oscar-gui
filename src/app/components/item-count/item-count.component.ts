@@ -1,13 +1,21 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 
 @Component({
   selector: 'app-item-count',
   templateUrl: './item-count.component.html',
-  styleUrls: ['./item-count.component.sass']
+  styleUrls: ['./item-count.component.sass'],
 })
 export class ItemCountComponent implements OnInit, OnChanges {
   private arrowVisible: boolean;
-  constructor() { }
+  constructor() {}
   @Input()
   text: string;
   @Input()
@@ -18,8 +26,7 @@ export class ItemCountComponent implements OnInit, OnChanges {
   public chipClick = new EventEmitter<MouseEvent>();
   chipClass = '';
   backgroundColor = 'white';
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
   @Output()
   handleClick(event) {
     this.chipClick.emit(event);
